@@ -44,6 +44,15 @@ def install(app,module_map):
         data={k:p.model_dump() for k,p in ports.items()}
         for key,port in data.items():port['chinese_name']=labels.get(key,key)
         for key,label in [('Vin','输入电压'),('Vout','输出电压'),('Pout','输出功率')]:data['point']['fields'][key]['chinese_name']=label
+        from .profile_files import load_file
+        try:
+            preset=load_file(module_map)
+            if preset:
+                for path,record in preset['parameter_declarations'].items():
+                    bag,field=path.split('.',1)
+                    data[bag]['fields'][field]['chinese_name']=record['chinese_name']
+        except Exception:
+            pass # Invalid file is reported by the preset list; base form remains usable.
         names={'modulation':'调制方式','scope':'计算范围','assessment':'本次评价','upstream_constraints':'上游约束','control':'候选遍历方式'}
         values={'EPS':'EPS','single_workpoint':'单个工况','loss_only':'只计算损耗，不判整机可行性','not_evaluated':'不评价上游器件约束','finite_batch':'保留全部候选，有限逐行计算'}
         return {'input_ports':data,'primary_inputs':['point','design'],'conditions':[{'key':r.fact,'label':names[r.fact],'value':r.expected,'text':values[r.expected]} for r in scene().rules]}

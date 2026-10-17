@@ -149,3 +149,52 @@ def test_restart_marks_unfinished_run_interrupted(tmp_path):
     assert restored["status"] == "interrupted"
     assert restored["outputs"] == {}
     assert restored["diagnostics"][0]["code"] == "INTERRUPTED"
+
+def test_optional_fields_without_defaults_can_be_omitted():
+    from pe_workflow.engine import fill_inputs
+    ports={'design':Port(type='flat_dict',fields={'C':Port(type='number',unit='F',quantity='capacitance'),'L':Port(type='number',unit='H',quantity='inductance',required=False)})}
+    assert fill_inputs({'design':{'C':0.0001}},ports,'/inputs')=={'design':{'C':0.0001}}
+    assert fill_inputs({'design':{'C':0.0001,'L':0}},ports,'/inputs')['design']['L']==0
+
+
+def test_optional_supplied_invalid_value_is_not_silently_ignored():
+    from pe_workflow.engine import fill_inputs,WorkflowError
+    import pytest
+    with pytest.raises(WorkflowError) as error:fill_inputs({'L':''},{'L':Port(type='number',required=False)},'/inputs')
+    assert error.value.diagnostic.code=='VALUE_TYPE'
+
+
+def test_optional_omission_does_not_relax_required_fields():
+    from pe_workflow.engine import fill_inputs,WorkflowError
+    import pytest
+    with pytest.raises(WorkflowError) as error:fill_inputs({}, {'C':Port(type='number'),'L':Port(type='number',required=False)},'/inputs')
+    assert error.value.diagnostic.code=='MISSING_INPUT'
+
+
+def test_optional_dictionary_fields_can_be_absent_during_execution():
+    from pe_workflow.engine import execute
+    from pe_workflow.models import Module,Workflow,Node,Binding
+    inp={'design':Port(type='flat_dict',fields={'C':Port(type='number',unit='F',quantity='capacitance'),'L':Port(type='number',unit='H',quantity='inductance',required=False)})}
+    out={'result':Port(type='flat_dict',fields={'value':Port(type='number',quantity='capacitance',unit='F')})}
+    m=Module(id='optional_demo',version=1,name='optional',contract_version='3.0',inputs=inp,outputs=out,expressions={'result':"{'value': design['C'] * 2}"},provenance='test')
+    w=Workflow(schema_version='3.0',id='optional',name='optional',inputs=inp,nodes=[Node(id='calc',module_id=m.id,module_version=1,inputs={'design':Binding(source='input',port='design')})],outputs={'result':Binding(source='node',node='calc',port='result')},output_ports=out)
+    assert execute(w,{'optional_demo@1':m},{'design':{'C':0.0001}})['result']['value']==0.0002
+
+
+def test_optional_field_not_declared_by_source_can_be_omitted():
+    from pe_workflow.engine import project_dictionary
+    source=Port(type='flat_dict',fields={'C':Port(type='number',unit='F',quantity='capacitance')})
+    target=Port(type='flat_dict',fields={**source.fields,'L':Port(type='number',unit='H',quantity='inductance',required=False)})
+    assert project_dictionary({'C':0.0001},source,target,{},'/binding')=={'C':0.0001}
+
+
+def test_thermal_resistance_units_have_zero_offset_and_distinct_dimension():
+    from pe_workflow.engine import check_port,compatible,WorkflowError,UNITS
+    from pe_workflow.adapters import conversion
+    import pytest
+    check_port(Port(type='number',quantity='thermal_resistance',unit='K/W'),'/thermal')
+    assert UNITS['K/W']==('thermal_resistance',1,0)
+    assert conversion(10,'K/W','degC/W')==10
+    assert conversion(10,'degC/W','K/W')==10
+    assert conversion(0,'degC','K')==pytest.approx(273.15)
+    with pytest.raises(WorkflowError):compatible(Port(type='number',unit='K/W'),Port(type='number',unit='K'),'/thermal')

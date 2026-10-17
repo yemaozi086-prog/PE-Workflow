@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Any, Literal
-from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator, field_validator, model_serializer
 
 
 class StrictModel(BaseModel):
@@ -43,13 +43,26 @@ class CatalogRef(DefinitionRef):
     name: str
 
 
+class ExtensionRef(StrictModel):
+    project_id: str
+    kind: Literal['unit','parameter','alias']
+    name: str
+    version: int = Field(ge=1)
+    fingerprint: str
+
 class Port(StrictModel):
+    @model_serializer(mode='wrap')
+    def serialize_extensions(self,handler):
+        result=handler(self)
+        if not self.extension_refs:result.pop('extension_refs',None)
+        return result
     type: Literal["number", "string", "boolean", "array", "flat_dict", "collection"] = "number"
     kind: Literal["bare", "flat_dict", "collection"] | None = None
     value_type: ValueType | None = None
     axes: list[Axis] = Field(default_factory=list)
     definition_ref: DefinitionRef | None = None
     unit_definition: UnitDefinition | None = None
+    extension_refs: list[ExtensionRef] = Field(default_factory=list)
     catalog_ref: CatalogRef | None = None
     chinese_name: str = ""
     family_id: str = ""
@@ -584,3 +597,111 @@ class AssemblyInputProfileApply(StrictModel):
     inputs: dict[str, Any] = Field(default_factory=dict)
     facts: dict[str, str] = Field(default_factory=dict)
     provenance: dict[str, str] = Field(default_factory=dict)
+
+
+class AssemblyInputConfig(AssemblyInputProfileRequest):
+    schema_version: Literal['assembly_input_config_v1']
+    id: str = Field(pattern=r'^file_[a-z][a-z0-9_]{0,70}$')
+    version: int = Field(ge=1)
+    scene_id: str
+    scene_version: int = Field(ge=1)
+    module_refs: dict[str, int]
+    contract_hash: str = Field(pattern=r'^[a-f0-9]{64}$')
+    catalog_source: dict[str, Any]
+    parameter_declarations: dict[str, dict[str, Any]]
+    limitations: list[str]
+
+# Design plans intentionally contain no operating-point values.
+class DesignStep(StrictModel):
+    id: str = Field(pattern=r'^[A-Za-z][A-Za-z0-9_-]{0,59}$')
+    title: str = Field(min_length=1,max_length=160)
+    purpose: str = Field(min_length=1,max_length=2000)
+    dependencies: list[str] = Field(default_factory=list,max_length=40)
+    inputs: dict[str, Port] = Field(default_factory=dict)
+    outputs: dict[str, Port] = Field(default_factory=dict)
+    assumptions: list[str] = Field(default_factory=list,max_length=30)
+    evidence: list[str] = Field(default_factory=list,max_length=30)
+    formula_latex: str = Field(default='',max_length=8000)
+    module_ref: str | None = None
+    selection_reason: str = Field(default='',max_length=2000)
+
+class DesignPlan(StrictModel):
+    title: str = Field(min_length=1,max_length=160)
+    summary: str = Field(min_length=1,max_length=4000)
+    steps: list[DesignStep] = Field(min_length=1,max_length=60)
+    limitations: list[str] = Field(default_factory=list,max_length=40)
+
+class DesignRequest(StrictModel):
+    project_id: str = Field(default='local',pattern=r'^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$')
+    instruction: str = Field(min_length=3,max_length=20000)
+    allow_external_suggestions: bool = True
+    environment_ref: str | None = None
+
+class DesignRevision(StrictModel):
+    revision: int = Field(ge=1)
+    plan: DesignPlan
+
+class DesignConfirm(StrictModel):
+    revision: int = Field(ge=1)
+    allow_unverified: bool = False
+    max_calls: int = Field(default=4,ge=1,le=4)
+
+class ExtensionProposal(StrictModel):
+    kind: Literal['unit','parameter','alias']
+    name: str = Field(min_length=1,max_length=100)
+    description: str = Field(default='',max_length=2000)
+    evidence: str = Field(default='',max_length=4000)
+    unit_definition: UnitDefinition | None = None
+    declaration: Port | None = None
+    alias_target: str | None = None
+
+class ExtensionEdit(StrictModel):
+    revision: int = Field(ge=1)
+    proposal: ExtensionProposal
+
+class ExtensionDecision(StrictModel):
+    revision: int = Field(ge=1)
+    approve: bool
+
+class DesignWorkerResult(StrictModel):
+    call_id: str
+    token: str
+    kind: Literal['plan','workflow','questions','blocked','module','extension_request']
+    extension_request: ExtensionProposal | None = None
+    plan: DesignPlan | None = None
+    workflow: Workflow | None = None
+    module: Module | None = None
+    questions: dict[str,str] = Field(default_factory=dict,max_length=20)
+    explanation: str = Field(default='',max_length=10000)
+
+class FormulaExample(StrictModel):
+    inputs: dict[str,Any]
+    outputs: dict[str,Any]
+
+class FormulaRequest(StrictModel):
+    revision: int = Field(ge=1)
+    step_id: str
+    formula: str = Field(min_length=1,max_length=10000)
+    declarations: str = Field(min_length=1,max_length=10000)
+    evidence: str = Field(min_length=1,max_length=4000)
+    examples: list[FormulaExample] = Field(default_factory=list,max_length=30)
+
+class DesignAnswer(StrictModel):
+    revision: int = Field(ge=1)
+    answers: dict[str,str]
+
+class DesignContinue(DesignConfirm):
+    max_calls: int = Field(default=3,ge=1,le=3)
+
+
+class DependencyAudit(StrictModel):
+    status: Literal['passed','failed','uncertain']
+    required_fields: list[str]
+    optional_fields: list[str]
+    read_fields: list[str]
+    guarded_fields: list[str]
+    unused_required_fields: list[str]
+    undeclared_fields: list[str]
+    unsafe_optional_fields: list[str]
+    uncertainties: list[str]
+    basis: str = 'restricted_python_ast_v1'

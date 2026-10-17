@@ -30,4 +30,12 @@ DSH 默认关闭，创建任务会返回 DSH_DISABLED 而非永久排队。开�
 
 ## GitHub 内容边界
 
-GitHub 私有源码仓库不包含 data、backups、.venv、.build、dist、用户本机配置或 DSH 根路径文件。运行包应作为 Release 附件，不把运行时二进制提交源码历史。上传前检查暂存文件和疑似密钥。仓库可见性默认私有，不自动给课题组模型添加开源许可。
+GitHub 源码仓库不包含 data、backups、.venv、.build、dist、用户本机配置或 DSH 根路径文件。运行包应作为 Release 附件，不把运行时二进制提交源码历史。上传前检查暂存文件和疑似密钥。当前仓库按用户要求公开；运行历史、凭证和本机配置仍保持排除，不自动给课题组模型添加开源许可。
+
+## 当前版本补充
+
+- 新增使用说明随便携包交付；本机 evidence、任务数据和交接报告不打包。
+- 自定义声明的空字段不改变旧标准词典；审批表在新数据库中自动创建。
+- DSH 新建图使用 flux-design-v2，重复安装相同配置幂等，目录迁移时另存原配置后更新路径。
+- 离线源码配置可执行 `scripts/setup.ps1 -Python <固定版本解释器> -Wheelhouse <轮子目录> -NpmCache <预填缓存> -Offline`。轮子与 npm 包均继续进行锁文件完整性校验；空依赖环境不复用旧虚拟环境或 node_modules。
+- GitHub Actions 在 Windows runner 上安装固定工具链、运行回归、构建并解压验证便携包。远程执行结果以对应提交的 Actions 状态为准，本机验证不能替代该结果。

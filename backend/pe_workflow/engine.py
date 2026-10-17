@@ -18,6 +18,8 @@ UNITS = {"": ("none", 1, 0), "1": ("none", 1, 0),
          "J": ("energy", 1, 0), "mJ": ("energy", .001, 0),
          "ohm": ("resistance", 1, 0), "mohm": ("resistance", .001, 0),
          "degC": ("temperature", 1, 273.15), "K": ("temperature", 1, 0)}
+# Thermal resistance uses a temperature DIFFERENCE per power: no Celsius offset.
+UNITS.update({'K/W':('thermal_resistance',1,0),'degC/W':('thermal_resistance',1,0),'°C/W':('thermal_resistance',1,0)})
 UNITS.update({"s":("time",1,0),"ms":("time",.001,0),"us":("time",1e-6,0)})
 UNITS.update({'uF':('capacitance',1e-6,0),'nH':('inductance',1e-9,0),'MHz':('frequency',1e6,0),
     'Ω':('resistance',1,0),'°C':('temperature',1,273.15),'T':('flux_density',1,0),'mT':('flux_density',1e-3,0),
@@ -80,8 +82,9 @@ def fill_inputs(values: dict, ports: dict[str, Port], path: str) -> dict:
     result = dict(values)
     for name, port in ports.items():
         if name not in result:
-            if not port.required and port.default is not None:
-                result[name] = port.default
+            if not port.required:
+                if port.default is not None:result[name] = port.default
+                else:continue
             else:
                 fail("MISSING_INPUT", f"缺少输入：{name}；没有可使用的显式默认值", f"{path}/{name}", port=name)
         result[name] = validate_value(result[name], port, f"{path}/{name}")
@@ -92,6 +95,7 @@ def fill_inputs(values: dict, ports: dict[str, Port], path: str) -> dict:
 def shape_dimensions(values,ports,path,dimensions=None):
     dimensions=dimensions if dimensions is not None else {}
     for name,port in ports.items():
+        if name not in values:continue
         value=values[name]
         if port.type=="flat_dict":shape_dimensions(value,port.fields,path+"/"+name,dimensions)
         if port.type!="array":continue
@@ -153,14 +157,15 @@ def dictionary_plan(source,target,field_map,path):
     for name,port in target.fields.items():
         origin=field_map.get(name,name)
         if origin not in source.fields:
-            if name not in field_map and not port.required and port.default is not None:
-                result.append({'target_field':name,'source_field':None,'default':port.default,'conversion':None});continue
+            if name not in field_map and not port.required:
+                if port.default is not None:result.append({'target_field':name,'source_field':None,'default':port.default,'conversion':None})
+                continue
             fail('MISSING_DICT_FIELD',f'缺少所需字段：{name}（来源 {origin}）',path+'/fields/'+name,port=name)
         other=source.fields[origin];compatible(other,port,path+'/fields/'+name)
         result.append({'target_field':name,'source_field':origin,'conversion':f'{other.unit} → {port.unit}' if other.unit!=port.unit else None})
     origins={r['target_field']:r['source_field'] for r in result}
     for name,port in target.fields.items():
-        if port.type!='array' or not origins[name]:continue
+        if port.type!='array' or not origins.get(name):continue
         other=source.fields[origins[name]]
         for sa,ta in zip(other.axes,port.axes):
             if ta.coordinate_ref and origins.get(ta.coordinate_ref)!=sa.coordinate_ref:fail('COORDINATE_BINDING','字典内波形与坐标的映射必须保持同一采样关系',path+'/fields/'+name)
@@ -171,13 +176,22 @@ def project_dictionary(value,source,target,field_map,path):
     plan=dictionary_plan(source,target,field_map,path)
     # Validate all supplied fields against the producer, including unused fields.
     value=validate_value(value,source,path+'/source')
-    result={r['target_field']:convert(value[r['source_field']],source.fields[r['source_field']],target.fields[r['target_field']]) if r['source_field'] is not None else r['default'] for r in plan}
+    result={}
+    for row in plan:
+        name=row['target_field'];origin=row['source_field'];port=target.fields[name]
+        if origin is None:result[name]=row['default'];continue
+        if origin not in value:
+            if not port.required:
+                if port.default is not None:result[name]=port.default
+                continue
+            fail('MISSING_DICT_FIELD',f'缺少所需字段：{name}（来源 {origin}）',path+'/fields/'+name,port=name)
+        result[name]=convert(value[origin],source.fields[origin],port)
     return validate_value(result,target,path+'/target')
 
 
 def convert(value, source: Port, target: Port):
     if source.type == "flat_dict":
-        return {k: convert(value[k], source.fields[k], target.fields[k]) for k in target.fields}
+        return {k: convert(value[k], source.fields[k], target.fields[k]) for k in target.fields if k in value}
     if source.type == "collection":
         return [convert(v, source.item, target.item) for v in value]
     if source.unit != target.unit:

@@ -26,6 +26,7 @@ config.local.toml
 credentials*
 flux-root.txt
 docs/handoff-report/
+docs/evidence/
 
 # Local evaluation traces and task identifiers are not part of the source release.
 docs/*.json

@@ -1,6 +1,6 @@
 # Flux 电力电子工作流平台
 
-Windows 本地单机研究原型。支持声明驱动的计算模块、命名扁平字典接口、语义及单位校验、可视化工作流、不可变版本和冻结回放；已接通可选真实 DSH 单函数适配及限定 DBSRC 场景建图。
+Windows 本地单机研究原型。支持声明驱动的计算模块、命名扁平字典接口、语义及单位校验、可视化工作流、不可变版本和冻结回放；通过可选 DSH 提出计算方案、补齐公式或上传函数、接线检查并保存工作流。项目自定义声明须补充依据并批准后才启用。
 
 ## 直接使用
 
@@ -35,7 +35,7 @@ Python 使用 `backend/requirements-win-py314.lock` 精确版本与轮子 SHA256
 runtime/python.exe scripts/install_dsh_presets.py
 ```
 
-源码环境改用 `.venv/Scripts/python.exe`。安装专用 flux、flux-worker、flux-assembly preset，写入当前路径并备份已有专用配置，不改默认 agent。移动目录后需重新安装 preset。启用前可查看 `GET /api/health`，该接口只报告配置，不证明模型服务在线。真实 AI 验收需要用户自己的服务及调用预算。
+源码环境改用 `.venv/Scripts/python.exe`。安装专用 flux、flux-worker、flux-assembly 和 flux-design-v2 preset，写入当前路径并备份已有专用配置，不改默认 agent。重复安装相同配置不会重复备份；移动目录后需重新安装 preset。启用前可查看 `GET /api/health`，该接口只报告配置，不证明模型服务在线。真实 AI 验收需要用户自己的服务及调用预算。
 
 ## 复现与交付
 
@@ -55,3 +55,11 @@ runtime/python.exe scripts/verify_portable.py --output verification.json
 上传只支持受控单函数及指定数学功能；复杂内置模型经过审计后接入。已迁移 DBSRC EPS 独立单步链并与冻结旧程序对照，保留旧模型已知限制，不代表器件实测准确。AI 建图仅验证候选电流到电容损耗两个职责，尚未实现任意拓扑规划。已有单标量 DE；PPO、完整 Pareto 和通用收敛迭代尚未打通。
 
 历史本机验收结果不作为便携包用户数据发布。第三方组件保留原有许可；科学模型源码的权利归属需由课题组按实际来源管理，本项目没有擅自为其添加开源许可证。
+
+### 需求优先建图
+
+“AI 搭建工作流”现在先生成可确认的计算方案，支持缺工具暂存、公式或上传函数补齐，以及结构检查通过后保存未运行工作流。运行数值在保存后配置。详见 [使用与验证边界](docs/requirement-first-workflow-design.md)。环境包接口已预留，尚无完整领域知识包。
+
+前端任务入口与无指导使用验收见 [易用性决策记录](docs/decisions-ui-usability.md)。
+
+项目自定义表的申请、审批与版本规则见 [项目扩展说明](docs/project-extensions.md)。Windows 自动回归入口为 GitHub Actions 的 Windows reproducibility；便携包的独立验证脚本覆盖新表审批、单位转换和冻结回放，真实 DSH 仍需另行配置。

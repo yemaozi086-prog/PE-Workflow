@@ -25,10 +25,16 @@ def main():
         shutil.copytree(ROOT/name,target/name,ignore=IGNORE)
     shutil.copytree(ROOT/'frontend/dist',target/'frontend/dist')
     (target/'scripts').mkdir()
-    for name in ('launch.py','start.ps1','verify_portable.py','install_flux_worker.cjs','install_dsh_presets.py'):
+    for name in ('launch.py','start.ps1','stop.ps1','verify_portable.py','install_flux_worker.cjs','install_dsh_presets.py'):
         shutil.copy2(ROOT/'scripts'/name,target/'scripts'/name)
     for name in ('Start.cmd','config.example.toml','toolchain.json','pytest.ini','README.md'):shutil.copy2(ROOT/name,target/name)
-    (target/'docs').mkdir();shutil.copy2(ROOT/'docs/portability.md',target/'docs/portability.md')
+    # Ship user documentation, not local reports, histories or handoff materials.
+    (target/'docs').mkdir()
+    for p in (ROOT/'docs').iterdir():
+        if p.is_file() and p.suffix.lower() in ('.md','.png','.jpg'):shutil.copy2(p,target/'docs'/p.name)
+    if (ROOT/'docs/screenshots').exists():shutil.copytree(ROOT/'docs/screenshots',target/'docs/screenshots',ignore=IGNORE)
+    for name in ('dbsrc-reference.json','portability-verification.json'):
+        if (ROOT/'docs'/name).exists():shutil.copy2(ROOT/'docs'/name,target/'docs'/name)
     (target/'data').mkdir()
     files={p.relative_to(target).as_posix():sha(p) for p in sorted(target.rglob('*')) if p.is_file()}
     manifest={'format':'flux-release-v1','platform':chain['platform'],'toolchain':chain,'dependency_lock_sha256':sha(ROOT/'backend/requirements-win-py314.lock'),'frontend_lock_sha256':sha(ROOT/'frontend/package-lock.json'),'files':files}

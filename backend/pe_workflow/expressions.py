@@ -190,9 +190,9 @@ def run_function(source,entrypoint,arguments,legacy=False):
 def execute_module(module,inputs):
     def coerce(value,port):
         if port.type=="array":return numeric.array(value,port.value_type.dtype)
-        if port.type=="flat_dict":return {k:coerce(value[k],p) for k,p in port.fields.items()}
+        if port.type=="flat_dict":return {k:coerce(value[k],p) for k,p in port.fields.items() if k in value}
         return value
-    inputs={k:coerce(inputs[k],p) for k,p in module.inputs.items()}
+    inputs={k:coerce(inputs[k],p) for k,p in module.inputs.items() if k in inputs}
     if module.implementation=='trusted_builtin':
         from .dbsrc import execute_builtin
         value=execute_builtin(module,inputs)

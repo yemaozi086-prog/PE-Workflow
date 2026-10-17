@@ -9,7 +9,8 @@ from pe_workflow.storage import Store
 from pe_workflow.input_profiles import install
 
 @pytest.fixture
-def profiles(tmp_path):
+def profiles(tmp_path,monkeypatch):
+    monkeypatch.setattr("pe_workflow.profile_files.CONFIG_PATH",tmp_path/"absent.json")
     scalar=Port(type='number',quantity='voltage',unit='V')
     bag=Port(type='flat_dict',kind='flat_dict',fields={'Vin':scalar,'note':Port(type='string')})
     registry={'dbsrc_modulation@1':SimpleNamespace(inputs={'point':bag}),

@@ -142,6 +142,46 @@
       "title": "DefinitionRef",
       "type": "object"
     },
+    "ExtensionRef": {
+      "additionalProperties": false,
+      "properties": {
+        "project_id": {
+          "title": "Project Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "unit",
+            "parameter",
+            "alias"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "fingerprint": {
+          "title": "Fingerprint",
+          "type": "string"
+        }
+      },
+      "required": [
+        "project_id",
+        "kind",
+        "name",
+        "version",
+        "fingerprint"
+      ],
+      "title": "ExtensionRef",
+      "type": "object"
+    },
     "Node": {
       "additionalProperties": false,
       "properties": {
@@ -326,6 +366,13 @@
             }
           ],
           "default": null
+        },
+        "extension_refs": {
+          "items": {
+            "$ref": "#/$defs/ExtensionRef"
+          },
+          "title": "Extension Refs",
+          "type": "array"
         },
         "catalog_ref": {
           "anyOf": [

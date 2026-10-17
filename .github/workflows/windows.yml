@@ -1,0 +1,54 @@
+name: Windows reproducibility
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read pinned toolchain
+        shell: pwsh
+        run: |
+          $chain = Get-Content toolchain.json -Raw | ConvertFrom-Json
+          "PYTHON_VERSION=$($chain.python)" >> $env:GITHUB_ENV
+          "NODE_VERSION=$($chain.node)" >> $env:GITHUB_ENV
+          "NPM_VERSION=$($chain.npm)" >> $env:GITHUB_ENV
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install pinned npm
+        run: npm install --global npm@${{ env.NPM_VERSION }}
+      - name: Install locked dependencies and build
+        run: ./scripts/setup.ps1
+      - name: Backend regression with fresh database
+        shell: pwsh
+        run: |
+          $env:PE_WORKFLOW_DB = Join-Path $env:RUNNER_TEMP 'regression.sqlite'
+          .venv/Scripts/python.exe -m pytest backend/tests -q --basetemp "$env:RUNNER_TEMP/pytest"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm --prefix frontend test
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Build self-contained runtime
+        run: .venv/Scripts/python.exe scripts/build_portable.py --environment .venv --output dist/flux-windows-x64
+      - name: Verify relocated release
+        shell: pwsh
+        run: |
+          Expand-Archive -LiteralPath dist/flux-windows-x64.zip -DestinationPath "$env:RUNNER_TEMP/Flux clean relocation"
+          & "$env:RUNNER_TEMP/Flux clean relocation/flux-windows-x64/runtime/python.exe" "$env:RUNNER_TEMP/Flux clean relocation/flux-windows-x64/scripts/verify_portable.py" --output dist/verification.json
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flux-windows-x64
+          path: |
+            dist/flux-windows-x64.zip
+            dist/flux-windows-x64.zip.sha256
+            dist/verification.json
+          retention-days: 14

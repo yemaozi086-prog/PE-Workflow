@@ -1,0 +1,870 @@
+{
+  "schema_version": "assembly_input_config_v1",
+  "id": "file_dbsrc_eps_baseline",
+  "version": 1,
+  "name": "文件配置 · DBSRC EPS 基准输入 v1（待核对）",
+  "notes": "平台示例：器件输入来自冻结旧程序，电容器件可缺失；仅用于兼容性演示，待课题组核对。 仅适用于 EPS 单工况有限候选损耗计算；修改设计后需重新核对器件与派生参数。",
+  "inputs": {
+    "design": {
+      "n": 1.10172,
+      "inductance": 2.4999999999999998e-05,
+      "capacitance": 1.6109000000000002e-07,
+      "frequency_offset": 14942.0,
+      "resonant_frequency": 79307.78791867691,
+      "frequency": 94249.78791867691
+    },
+    "settings": {
+      "Vin": 390.0,
+      "I_limit": 22.0,
+      "Pout": 6600.0,
+      "ripple_limit": 5.0,
+      "p_s_limit": 80.0,
+      "p_cap_limit": 50.0,
+      "trans_loss_density": 1000.0,
+      "inductor_loss_density": 1000.0
+    },
+    "point": {
+      "Vin": 390.0,
+      "Vout": 350.0,
+      "Pout": 1000.0,
+      "vi": 0.0,
+      "pi": 0.0
+    },
+    "transformer": {
+      "valid": 1.0,
+      "reason": "",
+      "Ap_target": 6.038080302656386e-08,
+      "core_T": "EE56/21/25",
+      "Ns": 16,
+      "Np": 18,
+      "n": 1.125,
+      "wire_p": "D001×400",
+      "wire_s": "D001×450",
+      "wire_length_p": 1771.2,
+      "wire_length_s": 2297.6,
+      "wire_width": 11.3,
+      "Ae_T": 0.000359,
+      "Ve_T": 4.0782000000000004e-05,
+      "V_T": 123279.0,
+      "wire_area_p": 3.14,
+      "wire_area_s": 3.533,
+      "Ap_core": 1.3031700000000001e-07
+    },
+    "inductor": {
+      "valid": 1.0,
+      "reason": "",
+      "inductors__inductor1__Ap_target": 3.4956086058148706e-08,
+      "inductors__inductor1__core_L": "EE42/15/19",
+      "inductors__inductor1__NL": 23,
+      "inductors__inductor1__wire_L": "D001×400",
+      "inductors__inductor1__wire_length_L": 2001.0,
+      "inductors__inductor1__wire_width": 8.25,
+      "inductors__inductor1__Ae_L": 0.00018199999999999998,
+      "inductors__inductor1__Ve_L": 1.5761e-05,
+      "inductors__inductor1__V_L": 48951.0,
+      "inductors__inductor1__wire_area_L": 3.14,
+      "inductors__inductor1__Ap_core": 4.1142919999999994e-08,
+      "V_L_total": 48951.0
+    },
+    "switch": {
+      "valid": 1.0,
+      "reason": "",
+      "model": "IKW40N65RH5"
+    },
+    "capacitor": {
+      "valid": 1.0,
+      "available": 0.0,
+      "reason": "legacy accepts None; no capacitor metrics",
+      "volume": 0.0,
+      "cost": 0.0
+    }
+  },
+  "facts": {
+    "modulation": "EPS",
+    "scope": "single_workpoint",
+    "assessment": "loss_only",
+    "upstream_constraints": "not_evaluated",
+    "control": "finite_batch"
+  },
+  "scene_id": "dbsrc_eps_capacitor_candidates",
+  "scene_version": 1,
+  "module_refs": {
+    "dbsrc_modulation": 1,
+    "dbsrc_loss_capacitor": 1
+  },
+  "contract_hash": "94394cdf4b72c7ff93331dc56c7570103b600e6cdd428b1ba97fb7354c4098e1",
+  "catalog_source": {
+    "path": "resources/parameter_dictionary-v1.csv",
+    "id": "team_parameters",
+    "version": 1,
+    "row_count": 310,
+    "file_sha256": "35657dacf55deca7c7a8c2ad6f32ec4e1b8ba31642cf3eeb915addcb1a84a90d"
+  },
+  "parameter_declarations": {
+    "point.Vin": {
+      "chinese_name": "输入电压 Vin",
+      "runtime_type": "number",
+      "runtime_unit": "V",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 31,
+        "standard_name": "Vin",
+        "unit": "V"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "point.Vout": {
+      "chinese_name": "输出电压 Vout",
+      "runtime_type": "number",
+      "runtime_unit": "V",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 32,
+        "standard_name": "Vout",
+        "unit": "V"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "point.Pout": {
+      "chinese_name": "输出功率 Pout",
+      "runtime_type": "number",
+      "runtime_unit": "W",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 24,
+        "standard_name": "Pout",
+        "unit": "W"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "point.vi": {
+      "chinese_name": "旧模型电压索引",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "point.pi": {
+      "chinese_name": "旧模型功率索引",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "design.n": {
+      "chinese_name": "变压器等效变比 n",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 180,
+        "standard_name": "n",
+        "unit": ""
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "design.inductance": {
+      "chinese_name": "谐振电感",
+      "runtime_type": "number",
+      "runtime_unit": "H",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 158,
+        "standard_name": "inductance",
+        "unit": "H"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "design.capacitance": {
+      "chinese_name": "谐振电容",
+      "runtime_type": "number",
+      "runtime_unit": "F",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 50,
+        "standard_name": "capacitance",
+        "unit": "F"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "design.frequency_offset": {
+      "chinese_name": "开关频率偏移量",
+      "runtime_type": "number",
+      "runtime_unit": "Hz",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "design.resonant_frequency": {
+      "chinese_name": "谐振频率",
+      "runtime_type": "number",
+      "runtime_unit": "Hz",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "design.frequency": {
+      "chinese_name": "开关频率",
+      "runtime_type": "number",
+      "runtime_unit": "Hz",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 83,
+        "standard_name": "fs",
+        "unit": "Hz"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.valid": {
+      "chinese_name": "旧模型有效标记",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.reason": {
+      "chinese_name": "旧模型状态说明",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.Ap_target": {
+      "chinese_name": "目标面积乘积",
+      "runtime_type": "number",
+      "runtime_unit": "m^4",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 6,
+        "standard_name": "Ap_target",
+        "unit": "m^4"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.core_T": {
+      "chinese_name": "变压器磁芯型号",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 58,
+        "standard_name": "core_T",
+        "unit": ""
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.Ns": {
+      "chinese_name": "副边匝数",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_reference_unit_requires_review",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 23,
+        "standard_name": "Ns",
+        "unit": "匝"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。 词典单位与旧契约不同或未声明，保留旧运行单位，不自动换算。"
+    },
+    "transformer.Np": {
+      "chinese_name": "原边匝数",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_reference_unit_requires_review",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 22,
+        "standard_name": "Np",
+        "unit": "匝"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。 词典单位与旧契约不同或未声明，保留旧运行单位，不自动换算。"
+    },
+    "transformer.n": {
+      "chinese_name": "变压器等效变比 n",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 180,
+        "standard_name": "n",
+        "unit": ""
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.wire_p": {
+      "chinese_name": "原边绕组线材规格",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 292,
+        "standard_name": "wire_p",
+        "unit": ""
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.wire_s": {
+      "chinese_name": "副边绕组线材规格",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 293,
+        "standard_name": "wire_s",
+        "unit": ""
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.wire_length_p": {
+      "chinese_name": "原边绕组长度",
+      "runtime_type": "number",
+      "runtime_unit": "mm",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 290,
+        "standard_name": "wire_length_p",
+        "unit": "mm"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.wire_length_s": {
+      "chinese_name": "副边绕组长度",
+      "runtime_type": "number",
+      "runtime_unit": "mm",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 291,
+        "standard_name": "wire_length_s",
+        "unit": "mm"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.wire_width": {
+      "chinese_name": "电感绕组宽度",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_reference_unit_requires_review",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 294,
+        "standard_name": "wire_width",
+        "unit": "mm"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。 词典单位与旧契约不同或未声明，保留旧运行单位，不自动换算。"
+    },
+    "transformer.Ae_T": {
+      "chinese_name": "变压器磁芯有效截面积",
+      "runtime_type": "number",
+      "runtime_unit": "m^2",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 4,
+        "standard_name": "Ae_T",
+        "unit": "m^2"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.Ve_T": {
+      "chinese_name": "变压器磁芯有效体积",
+      "runtime_type": "number",
+      "runtime_unit": "m^3",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 30,
+        "standard_name": "Ve_T",
+        "unit": "m^3"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.V_T": {
+      "chinese_name": "变压器总体积",
+      "runtime_type": "number",
+      "runtime_unit": "mm^3",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 27,
+        "standard_name": "V_T",
+        "unit": "mm^3"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.wire_area_p": {
+      "chinese_name": "原边绕组截面积",
+      "runtime_type": "number",
+      "runtime_unit": "mm^2",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 286,
+        "standard_name": "wire_area_p",
+        "unit": "mm^2"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.wire_area_s": {
+      "chinese_name": "副边绕组截面积",
+      "runtime_type": "number",
+      "runtime_unit": "mm^2",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 287,
+        "standard_name": "wire_area_s",
+        "unit": "mm^2"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "transformer.Ap_core": {
+      "chinese_name": "磁芯面积乘积",
+      "runtime_type": "number",
+      "runtime_unit": "m^4",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 5,
+        "standard_name": "Ap_core",
+        "unit": "m^4"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.valid": {
+      "chinese_name": "旧模型有效标记",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.reason": {
+      "chinese_name": "旧模型状态说明",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.inductors__inductor1__Ap_target": {
+      "chinese_name": "目标面积乘积",
+      "runtime_type": "number",
+      "runtime_unit": "m^4",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 6,
+        "standard_name": "Ap_target",
+        "unit": "m^4"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.inductors__inductor1__core_L": {
+      "chinese_name": "电感磁芯型号",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 57,
+        "standard_name": "core_L",
+        "unit": ""
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.inductors__inductor1__NL": {
+      "chinese_name": "电感绕组匝数",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_reference_unit_requires_review",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 21,
+        "standard_name": "NL",
+        "unit": "匝"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。 词典单位与旧契约不同或未声明，保留旧运行单位，不自动换算。"
+    },
+    "inductor.inductors__inductor1__wire_L": {
+      "chinese_name": "电感绕组线材规格",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 283,
+        "standard_name": "wire_L",
+        "unit": ""
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.inductors__inductor1__wire_length_L": {
+      "chinese_name": "电感绕组长度",
+      "runtime_type": "number",
+      "runtime_unit": "mm",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 289,
+        "standard_name": "wire_length_L",
+        "unit": "mm"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.inductors__inductor1__wire_width": {
+      "chinese_name": "电感绕组宽度",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_reference_unit_requires_review",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 294,
+        "standard_name": "wire_width",
+        "unit": "mm"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。 词典单位与旧契约不同或未声明，保留旧运行单位，不自动换算。"
+    },
+    "inductor.inductors__inductor1__Ae_L": {
+      "chinese_name": "电感磁芯有效截面积",
+      "runtime_type": "number",
+      "runtime_unit": "m^2",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 3,
+        "standard_name": "Ae_L",
+        "unit": "m^2"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.inductors__inductor1__Ve_L": {
+      "chinese_name": "电感磁芯有效体积",
+      "runtime_type": "number",
+      "runtime_unit": "m^3",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 29,
+        "standard_name": "Ve_L",
+        "unit": "m^3"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.inductors__inductor1__V_L": {
+      "chinese_name": "电感总体积",
+      "runtime_type": "number",
+      "runtime_unit": "mm^3",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 26,
+        "standard_name": "V_L",
+        "unit": "mm^3"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.inductors__inductor1__wire_area_L": {
+      "chinese_name": "电感绕组截面积",
+      "runtime_type": "number",
+      "runtime_unit": "mm^2",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 285,
+        "standard_name": "wire_area_L",
+        "unit": "mm^2"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.inductors__inductor1__Ap_core": {
+      "chinese_name": "磁芯面积乘积",
+      "runtime_type": "number",
+      "runtime_unit": "m^4",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 5,
+        "standard_name": "Ap_core",
+        "unit": "m^4"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "inductor.V_L_total": {
+      "chinese_name": "电感总体积",
+      "runtime_type": "number",
+      "runtime_unit": "mm^3",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 300,
+        "standard_name": "V_L_total",
+        "unit": "mm^3"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "switch.valid": {
+      "chinese_name": "旧模型有效标记",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "switch.reason": {
+      "chinese_name": "旧模型状态说明",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "switch.model": {
+      "chinese_name": "开关器件型号",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "capacitor.valid": {
+      "chinese_name": "旧模型有效标记",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "capacitor.available": {
+      "chinese_name": "器件可用标记",
+      "runtime_type": "number",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "capacitor.reason": {
+      "chinese_name": "旧模型状态说明",
+      "runtime_type": "string",
+      "runtime_unit": "",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "capacitor.volume": {
+      "chinese_name": "电容组合体积",
+      "runtime_type": "number",
+      "runtime_unit": "mm^3",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 280,
+        "standard_name": "volume",
+        "unit": "mm^3"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "capacitor.cost": {
+      "chinese_name": "电容组合成本",
+      "runtime_type": "number",
+      "runtime_unit": "元",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 59,
+        "standard_name": "cost",
+        "unit": "元"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "settings.Vin": {
+      "chinese_name": "输入电压 Vin",
+      "runtime_type": "number",
+      "runtime_unit": "V",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 31,
+        "standard_name": "Vin",
+        "unit": "V"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "settings.I_limit": {
+      "chinese_name": "输出限流值",
+      "runtime_type": "number",
+      "runtime_unit": "A",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 18,
+        "standard_name": "I_limit",
+        "unit": "A"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "settings.Pout": {
+      "chinese_name": "输出功率 Pout",
+      "runtime_type": "number",
+      "runtime_unit": "W",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 24,
+        "standard_name": "Pout",
+        "unit": "W"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "settings.ripple_limit": {
+      "chinese_name": "ripple_limit",
+      "runtime_type": "number",
+      "runtime_unit": "%",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "settings.p_s_limit": {
+      "chinese_name": "p_s_limit",
+      "runtime_type": "number",
+      "runtime_unit": "W",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "settings.p_cap_limit": {
+      "chinese_name": "单个谐振电容或电容组损耗上限",
+      "runtime_type": "number",
+      "runtime_unit": "W",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "name_and_unit_reference",
+      "dictionary_reference": {
+        "catalog": "team_parameters",
+        "version": 1,
+        "csv_row": 190,
+        "standard_name": "p_cap_limit",
+        "unit": "W"
+      },
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "settings.trans_loss_density": {
+      "chinese_name": "trans_loss_density",
+      "runtime_type": "number",
+      "runtime_unit": "kW/m^3",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    },
+    "settings.inductor_loss_density": {
+      "chinese_name": "inductor_loss_density",
+      "runtime_type": "number",
+      "runtime_unit": "kW/m^3",
+      "value_source": "冻结 WDY DBSRC 基准示例 /api/examples/assembly-inputs；待课题组核对",
+      "alignment": "project_internal",
+      "description": "数值沿用旧程序兼容性样例；命名表只提供声明，不提供推荐数值。"
+    }
+  },
+  "limitations": [
+    "数值为冻结旧程序基准，不是工程推荐值或实测结果。",
+    "不自动选型、不筛选最优候选、不训练 PPO、不判断整机可行性。",
+    "旧模型中的零成本、可用性标志与控制字段原样保留，不能视为器件真实性证明。",
+    "修改电感、电容、频率、变比后，派生参数及器件选型不会自动更新。"
+  ]
+}

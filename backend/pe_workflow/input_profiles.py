@@ -1,5 +1,6 @@
 """Explicit local input presets; never implicit engineering defaults."""
 import copy,json,uuid
+from .profile_files import load_file
 from .models import AssemblyInputProfileRequest,AssemblyInputProfileApply
 from .assembly_form import input_ports
 from .scenarios import scene
@@ -54,6 +55,11 @@ def install(app,get_store,module_map,problem):
         _,fingerprint=contract(module_map)
         with connect().connect() as con:rows=con.execute('SELECT document FROM assembly_input_profiles ORDER BY created_at DESC LIMIT 100').fetchall()
         items=[]
+        try:
+            file_profile=load_file(module_map)
+            if file_profile:items.append({k:file_profile[k] for k in ('id','name','notes','created_at','scene_id','scene_version','scope','source_file')}|{'compatible':True})
+        except Exception as exc:
+            items.append({'id':'file_invalid','name':'项目配置文件校验失败','notes':str(exc),'compatible':False})
         for row in rows:
             p=json.loads(row[0]);items.append({k:p[k] for k in ('id','name','notes','created_at','scene_id','scene_version','scope') }|{'compatible':p['contract_hash']==fingerprint and p['scene_version']==scene().version})
         return {'items':items,'count':len(items)}
@@ -69,9 +75,14 @@ def install(app,get_store,module_map,problem):
         return p
     @app.post('/api/assembly/input-profiles/{key}/apply')
     def apply(key:str,req:AssemblyInputProfileApply):
-        with connect().connect() as con:row=con.execute('SELECT document FROM assembly_input_profiles WHERE id=?',(key,)).fetchone()
-        if not row:problem('NOT_FOUND','输入配置不存在',404)
-        profile=json.loads(row[0]);ports,fingerprint=contract(module_map)
+        if key.startswith('file_'):
+            profile=load_file(module_map)
+            if not profile or profile['id']!=key:problem('NOT_FOUND','文件配置不存在',404)
+        else:
+            with connect().connect() as con:row=con.execute('SELECT document FROM assembly_input_profiles WHERE id=?',(key,)).fetchone()
+            if not row:problem('NOT_FOUND','输入配置不存在',404)
+            profile=json.loads(row[0])
+        ports,fingerprint=contract(module_map)
         if profile['contract_hash']!=fingerprint or profile['scene_id']!=scene().id or profile['scene_version']!=scene().version:
             fail('PROFILE_STALE','模块声明或场景版本已改变，请重新核对配置，不能自动应用','/profile')
         inputs,applied,kept=fill_missing(req.inputs,profile['inputs'],ports)
@@ -80,5 +91,5 @@ def install(app,get_store,module_map,problem):
             if not facts.get(k,'').strip():facts[k]=v;facts_applied.append(k)
             else:facts_kept.append(k)
         provenance=copy.deepcopy(req.provenance)
-        for path in applied:provenance[path]='常用配置 '+profile['name']+' · '+profile['id'][:8]+'（用户保存，适用性需核对）'
+        for path in applied:provenance[path]=profile.get('source_file','本机快照')+' · 常用配置 '+profile['name']+' · '+profile['id'][:8]+'（用户保存，适用性需核对）'
         return {'inputs':inputs,'facts':facts,'provenance':provenance,'applied':applied,'preserved':kept,'facts_applied':facts_applied,'facts_preserved':facts_kept,'profile':{'id':profile['id'],'name':profile['name'],'notes':profile['notes'],'contract_hash':fingerprint},'automatic_application':False}

@@ -173,14 +173,14 @@ class Store:
             con.execute('UPDATE change_tasks SET document=? WHERE id=?',(canonical(task),task['id']))
         return revision
 
-    def add_module(self, module,parent_version=None,summary=''):
+    def add_module(self, module,parent_version=None,summary='',acceptance_label='模块锚点验证通过'):
         with self.connect() as con:
             self.persist_module_rules(con,module)
             try:
                 con.execute("INSERT INTO modules VALUES(?,?,?)", (module.id, module.version, canonical(module.model_dump())))
                 if parent_version is not None:
                     if not con.execute('SELECT 1 FROM modules WHERE id=? AND version=?',(module.id,parent_version)).fetchone():raise Conflict('派生基准不存在')
-                    con.execute('INSERT INTO module_relations VALUES(?,?,?)',(module.id,module.version,canonical({'parent_version':parent_version,'summary':summary,'created_at':now(),'acceptance_label':'模块锚点验证通过'})))
+                    con.execute('INSERT INTO module_relations VALUES(?,?,?)',(module.id,module.version,canonical({'parent_version':parent_version,'summary':summary,'created_at':now(),'acceptance_label':acceptance_label})))
             except sqlite3.IntegrityError as exc:
                 raise Conflict("模块版本已存在；不可覆盖，请派生新版本") from exc
 
