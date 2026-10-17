@@ -1,0 +1,341 @@
+{
+  "workflow": {
+    "schema_version": "3.0",
+    "id": "waveform_flat_demo",
+    "name": "波形能量 · 扁平字典基准",
+    "description": "",
+    "project_id": "",
+    "inputs": {
+      "waveform": {
+        "type": "flat_dict",
+        "kind": "flat_dict",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "catalog_ref": null,
+        "chinese_name": "",
+        "family_id": "",
+        "entry_type": "quantity",
+        "device": "",
+        "nature": "",
+        "statistic": "",
+        "event": "",
+        "direction": "",
+        "aggregation": "",
+        "loss_component": "",
+        "instance_id": "",
+        "semantic_id": "",
+        "semantic_evidence": "",
+        "quantity": "",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {
+          "time": {
+            "type": "array",
+            "kind": "bare",
+            "value_type": {
+              "dtype": "float64",
+              "shape": [
+                "N"
+              ]
+            },
+            "axes": [
+              {
+                "name": "time",
+                "coordinate_ref": "time",
+                "monotonic": true
+              }
+            ],
+            "definition_ref": null,
+            "unit_definition": null,
+            "catalog_ref": null,
+            "chinese_name": "",
+            "family_id": "",
+            "entry_type": "quantity",
+            "device": "",
+            "nature": "",
+            "statistic": "",
+            "event": "",
+            "direction": "",
+            "aggregation": "",
+            "loss_component": "",
+            "instance_id": "",
+            "semantic_id": "",
+            "semantic_evidence": "",
+            "quantity": "time",
+            "characteristic": "",
+            "scope": "",
+            "role": "",
+            "index": "",
+            "unit": "s",
+            "description": "",
+            "required": true,
+            "default": null,
+            "fields": {},
+            "item": null
+          },
+          "current": {
+            "type": "array",
+            "kind": "bare",
+            "value_type": {
+              "dtype": "float64",
+              "shape": [
+                "N"
+              ]
+            },
+            "axes": [
+              {
+                "name": "time",
+                "coordinate_ref": "time",
+                "monotonic": true
+              }
+            ],
+            "definition_ref": null,
+            "unit_definition": null,
+            "catalog_ref": null,
+            "chinese_name": "",
+            "family_id": "",
+            "entry_type": "quantity",
+            "device": "",
+            "nature": "",
+            "statistic": "",
+            "event": "",
+            "direction": "",
+            "aggregation": "",
+            "loss_component": "",
+            "instance_id": "",
+            "semantic_id": "",
+            "semantic_evidence": "",
+            "quantity": "current",
+            "characteristic": "instantaneous",
+            "scope": "",
+            "role": "",
+            "index": "",
+            "unit": "A",
+            "description": "",
+            "required": true,
+            "default": null,
+            "fields": {},
+            "item": null
+          }
+        },
+        "item": null
+      },
+      "electrical": {
+        "type": "flat_dict",
+        "kind": "flat_dict",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "catalog_ref": null,
+        "chinese_name": "",
+        "family_id": "",
+        "entry_type": "quantity",
+        "device": "",
+        "nature": "",
+        "statistic": "",
+        "event": "",
+        "direction": "",
+        "aggregation": "",
+        "loss_component": "",
+        "instance_id": "",
+        "semantic_id": "",
+        "semantic_evidence": "",
+        "quantity": "",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {
+          "voltage": {
+            "type": "number",
+            "kind": "bare",
+            "value_type": null,
+            "axes": [],
+            "definition_ref": null,
+            "unit_definition": null,
+            "catalog_ref": null,
+            "chinese_name": "",
+            "family_id": "",
+            "entry_type": "quantity",
+            "device": "",
+            "nature": "",
+            "statistic": "",
+            "event": "",
+            "direction": "",
+            "aggregation": "",
+            "loss_component": "",
+            "instance_id": "",
+            "semantic_id": "",
+            "semantic_evidence": "",
+            "quantity": "voltage",
+            "characteristic": "",
+            "scope": "",
+            "role": "",
+            "index": "",
+            "unit": "V",
+            "description": "",
+            "required": true,
+            "default": null,
+            "fields": {},
+            "item": null
+          }
+        },
+        "item": null
+      }
+    },
+    "nodes": [
+      {
+        "id": "integrate",
+        "label": "",
+        "kind": "compute",
+        "inputs": {
+          "waveform": {
+            "source": "input",
+            "node": null,
+            "port": "waveform",
+            "field": null,
+            "value": null,
+            "field_map": {}
+          },
+          "electrical": {
+            "source": "input",
+            "node": null,
+            "port": "electrical",
+            "field": null,
+            "value": null,
+            "field_map": {}
+          }
+        },
+        "module_id": "waveform_energy_flat",
+        "module_version": 1,
+        "cases": {},
+        "body": null,
+        "operation": null,
+        "field": null
+      }
+    ],
+    "outputs": {
+      "result": {
+        "source": "node",
+        "node": "integrate",
+        "port": "result",
+        "field": null,
+        "value": null,
+        "field_map": {}
+      }
+    },
+    "output_ports": {
+      "result": {
+        "type": "flat_dict",
+        "kind": "flat_dict",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "catalog_ref": null,
+        "chinese_name": "",
+        "family_id": "",
+        "entry_type": "quantity",
+        "device": "",
+        "nature": "",
+        "statistic": "",
+        "event": "",
+        "direction": "",
+        "aggregation": "",
+        "loss_component": "",
+        "instance_id": "",
+        "semantic_id": "",
+        "semantic_evidence": "",
+        "quantity": "",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {
+          "energy": {
+            "type": "number",
+            "kind": "bare",
+            "value_type": null,
+            "axes": [],
+            "definition_ref": null,
+            "unit_definition": null,
+            "catalog_ref": null,
+            "chinese_name": "",
+            "family_id": "",
+            "entry_type": "quantity",
+            "device": "",
+            "nature": "",
+            "statistic": "",
+            "event": "",
+            "direction": "",
+            "aggregation": "",
+            "loss_component": "",
+            "instance_id": "",
+            "semantic_id": "",
+            "semantic_evidence": "",
+            "quantity": "energy",
+            "characteristic": "",
+            "scope": "",
+            "role": "",
+            "index": "",
+            "unit": "J",
+            "description": "",
+            "required": true,
+            "default": null,
+            "fields": {},
+            "item": null
+          }
+        },
+        "item": null
+      }
+    },
+    "layout": {
+      "$input": {
+        "x": 0.0,
+        "y": 60.0
+      },
+      "integrate": {
+        "x": 350.0,
+        "y": 60.0
+      },
+      "$output": {
+        "x": 700.0,
+        "y": 60.0
+      }
+    }
+  },
+  "inputs": {
+    "waveform": {
+      "time": [
+        0.0,
+        0.001,
+        0.002
+      ],
+      "current": [
+        0.0,
+        1.0,
+        2.0
+      ]
+    },
+    "electrical": {
+      "voltage": 10.0
+    }
+  }
+}

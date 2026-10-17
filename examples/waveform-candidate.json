@@ -1,0 +1,207 @@
+{
+  "module": {
+    "id": "uploaded_waveform_energy",
+    "version": 1,
+    "name": "波形能量积分 · SciPy",
+    "description": "输入电流数组；原函数使用毫安、毫秒、嵌套字典和元组返回，经声明适配为外部接口。",
+    "inputs": {
+      "t": {
+        "type": "array",
+        "kind": "bare",
+        "value_type": {
+          "dtype": "float64",
+          "shape": [
+            "N"
+          ]
+        },
+        "axes": [
+          {
+            "name": "time",
+            "coordinate_ref": null,
+            "monotonic": true
+          }
+        ],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "time",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "s",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "i": {
+        "type": "array",
+        "kind": "bare",
+        "value_type": {
+          "dtype": "float64",
+          "shape": [
+            "N"
+          ]
+        },
+        "axes": [
+          {
+            "name": "time",
+            "coordinate_ref": "t",
+            "monotonic": true
+          }
+        ],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "current",
+        "characteristic": "instantaneous",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "A",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "voltage": {
+        "type": "number",
+        "kind": "bare",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "voltage",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "V",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      }
+    },
+    "outputs": {
+      "energy": {
+        "type": "number",
+        "kind": "bare",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "energy",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "J",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      }
+    },
+    "contract_version": "2.0",
+    "implementation": "python_function",
+    "expressions": {},
+    "source": "import numpy as np\nfrom scipy.integrate import trapezoid\ndef integrate_energy(samples, bus):\n    seconds = samples[\"clock_ms\"] / 1000\n    amps = samples[\"trace\"][\"milliamps\"] / 1000\n    joules = bus * trapezoid(amps, x=seconds)\n    return ({\"energy_mJ\": joules * 1000},)\n",
+    "provenance": "平台手算样例：恒定电压与线性电流，不代表器件标定",
+    "entrypoint": "integrate_energy",
+    "adapter": {
+      "arguments": {
+        "samples": {
+          "from_path": null,
+          "assemble": {
+            "clock_ms": {
+              "from_path": [
+                "inputs",
+                "t"
+              ],
+              "assemble": null,
+              "conversion": {
+                "from_unit": "s",
+                "to_unit": "ms"
+              }
+            },
+            "trace": {
+              "from_path": null,
+              "assemble": {
+                "milliamps": {
+                  "from_path": [
+                    "inputs",
+                    "i"
+                  ],
+                  "assemble": null,
+                  "conversion": {
+                    "from_unit": "A",
+                    "to_unit": "mA"
+                  }
+                }
+              },
+              "conversion": null
+            }
+          },
+          "conversion": null
+        },
+        "bus": {
+          "from_path": [
+            "inputs",
+            "voltage"
+          ],
+          "assemble": null,
+          "conversion": null
+        }
+      },
+      "returns": {
+        "energy": {
+          "from_path": [
+            "return",
+            0,
+            "energy_mJ"
+          ],
+          "assemble": null,
+          "conversion": {
+            "from_unit": "mJ",
+            "to_unit": "J"
+          }
+        }
+      }
+    },
+    "capabilities": [
+      "waveform_energy_integral"
+    ],
+    "applies_to": {
+      "voltage_model": [
+        "constant"
+      ]
+    },
+    "domains": {},
+    "transforms": []
+  },
+  "anchors": [
+    {
+      "inputs": {
+        "t": [
+          0,
+          0.001,
+          0.002
+        ],
+        "i": [
+          0,
+          1,
+          2
+        ],
+        "voltage": 10
+      },
+      "expected": {
+        "energy": 0.02
+      },
+      "tolerance": 1e-09
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Copy to config.local.toml. Relative paths resolve against this project, never CWD.
+[server]
+host = "127.0.0.1"
+port = 8020
+open_browser = true
+[storage]
+database = "data/workbench.sqlite"
+[dsh]
+# Optional external service. Enable after installing/configuring DSH separately.
+enabled = false
+url = "http://127.0.0.1:3080"

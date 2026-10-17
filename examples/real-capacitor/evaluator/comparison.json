@@ -1,0 +1,195 @@
+{
+  "status": "passed",
+  "case_count": 8,
+  "DSH_tested": false,
+  "rows": [
+    {
+      "name": "旧文件示例中的第一组",
+      "inputs": {
+        "fs": 70000,
+        "C": 2e-07,
+        "i_rms": 10,
+        "tan_delta": 0.001
+      },
+      "expected_W": {
+        "cap1_loss": 1.1368210220849668,
+        "p_cap_total": 1.1368210220849668
+      },
+      "source": "冻结旧函数 calc_Cr_loss 的实际返回，max_groups=1",
+      "platform_baseline_W": {
+        "cap1_loss": 1.1368210220849668,
+        "p_cap_total": 1.1368210220849668
+      },
+      "developer_adapter_W": {
+        "cap1_loss": 1.1368210220849668,
+        "p_cap_total": 1.1368210220849668
+      },
+      "passed": true
+    },
+    {
+      "name": "另一正常工况",
+      "inputs": {
+        "fs": 100000,
+        "C": 1e-07,
+        "i_rms": 8,
+        "tan_delta": 0.001
+      },
+      "expected_W": {
+        "cap1_loss": 1.0185916357881304,
+        "p_cap_total": 1.0185916357881304
+      },
+      "source": "冻结旧函数 calc_Cr_loss 的实际返回，max_groups=1",
+      "platform_baseline_W": {
+        "cap1_loss": 1.0185916357881304,
+        "p_cap_total": 1.0185916357881304
+      },
+      "developer_adapter_W": {
+        "cap1_loss": 1.0185916357881304,
+        "p_cap_total": 1.0185916357881304
+      },
+      "passed": true
+    },
+    {
+      "name": "损耗角变化",
+      "inputs": {
+        "fs": 50000,
+        "C": 4.7e-07,
+        "i_rms": 15,
+        "tan_delta": 0.002
+      },
+      "expected_W": {
+        "cap1_loss": 3.047647846440549,
+        "p_cap_total": 3.047647846440549
+      },
+      "source": "冻结旧函数 calc_Cr_loss 的实际返回，max_groups=1",
+      "platform_baseline_W": {
+        "cap1_loss": 3.047647846440549,
+        "p_cap_total": 3.047647846440549
+      },
+      "developer_adapter_W": {
+        "cap1_loss": 3.0476478464405496,
+        "p_cap_total": 3.0476478464405496
+      },
+      "passed": true
+    },
+    {
+      "name": "高频小电容",
+      "inputs": {
+        "fs": 200000,
+        "C": 4.7e-08,
+        "i_rms": 3,
+        "tan_delta": 0.0005
+      },
+      "expected_W": {
+        "cap1_loss": 0.07619119616101375,
+        "p_cap_total": 0.07619119616101375
+      },
+      "source": "冻结旧函数 calc_Cr_loss 的实际返回，max_groups=1",
+      "platform_baseline_W": {
+        "cap1_loss": 0.07619119616101375,
+        "p_cap_total": 0.07619119616101375
+      },
+      "developer_adapter_W": {
+        "cap1_loss": 0.07619119616101375,
+        "p_cap_total": 0.07619119616101375
+      },
+      "passed": true
+    },
+    {
+      "name": "零电流边界",
+      "inputs": {
+        "fs": 70000,
+        "C": 2e-07,
+        "i_rms": 0,
+        "tan_delta": 0.001
+      },
+      "expected_W": {
+        "cap1_loss": 0.0,
+        "p_cap_total": 0.0
+      },
+      "source": "冻结旧函数 calc_Cr_loss 的实际返回，max_groups=1",
+      "platform_baseline_W": {
+        "cap1_loss": 0.0,
+        "p_cap_total": 0.0
+      },
+      "developer_adapter_W": {
+        "cap1_loss": 0.0,
+        "p_cap_total": 0.0
+      },
+      "passed": true
+    },
+    {
+      "name": "零损耗角边界",
+      "inputs": {
+        "fs": 70000,
+        "C": 2e-07,
+        "i_rms": 10,
+        "tan_delta": 0
+      },
+      "expected_W": {
+        "cap1_loss": 0.0,
+        "p_cap_total": 0.0
+      },
+      "source": "冻结旧函数 calc_Cr_loss 的实际返回，max_groups=1",
+      "platform_baseline_W": {
+        "cap1_loss": 0.0,
+        "p_cap_total": 0.0
+      },
+      "developer_adapter_W": {
+        "cap1_loss": 0.0,
+        "p_cap_total": 0.0
+      },
+      "passed": true
+    },
+    {
+      "name": "留出工况一",
+      "inputs": {
+        "fs": 83000,
+        "C": 3.3e-07,
+        "i_rms": 7.3,
+        "tan_delta": 0.0017
+      },
+      "expected_W": {
+        "cap1_loss": 0.5264083154262167,
+        "p_cap_total": 0.5264083154262167
+      },
+      "source": "冻结旧函数 calc_Cr_loss 的实际返回，max_groups=1",
+      "platform_baseline_W": {
+        "cap1_loss": 0.5264083154262167,
+        "p_cap_total": 0.5264083154262167
+      },
+      "developer_adapter_W": {
+        "cap1_loss": 0.5264083154262167,
+        "p_cap_total": 0.5264083154262167
+      },
+      "passed": true
+    },
+    {
+      "name": "留出工况二",
+      "inputs": {
+        "fs": 137000,
+        "C": 6.8e-08,
+        "i_rms": 11.2,
+        "tan_delta": 0.0008
+      },
+      "expected_W": {
+        "cap1_loss": 1.7144178670199528,
+        "p_cap_total": 1.7144178670199528
+      },
+      "source": "冻结旧函数 calc_Cr_loss 的实际返回，max_groups=1",
+      "platform_baseline_W": {
+        "cap1_loss": 1.7144178670199528,
+        "p_cap_total": 1.7144178670199528
+      },
+      "developer_adapter_W": {
+        "cap1_loss": 1.7144178670199524,
+        "p_cap_total": 1.7144178670199524
+      },
+      "passed": true
+    }
+  ],
+  "initial_workflow_outputs": {
+    "cap1_loss": 1.1368210220849668,
+    "p_cap_total": 1.1368210220849668
+  }
+}

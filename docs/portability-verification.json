@@ -1,0 +1,51 @@
+{
+  "status": "passed",
+  "isolation": "relocated runtime, fresh DB, unrelated CWD, system-only PATH, no DSH or network install",
+  "runtime": {
+    "status": "ok",
+    "python": "3.14.3",
+    "prefix": "<relocated-release>/runtime",
+    "root": "<relocated-release>",
+    "configuration": {
+      "host": "127.0.0.1",
+      "port": 61829,
+      "database": "<fresh-temp-directory>/fresh.sqlite",
+      "dsh_url": "http://127.0.0.1:3080",
+      "dsh_enabled": false,
+      "open_browser": false
+    },
+    "scientific_hash": "61a37756279b87041cf8d9a7e8e7c0927c31b96dc41adfcb11a0cc61af8ac185"
+  },
+  "checked_files": 4848,
+  "dictionary_loss": {
+    "loss": {
+      "cap1_loss": 1.1368210220849666,
+      "p_cap_total": 1.1368210220849666
+    }
+  },
+  "replay_equal": true,
+  "dbsrc_result": {
+    "valid": 1.0,
+    "reward": 0.704378924970644,
+    "efficiency": 0.9573093852587994,
+    "volume": 198150.0,
+    "cost": 13.999999999999998
+  },
+  "dbsrc_replay_equal": true,
+  "scope": "Same Windows host, not a pristine OS VM; real DSH calls excluded.",
+  "backend_regression": {
+    "passed": 203,
+    "environment": "new offline hash-locked venv",
+    "seconds": 266.85
+  },
+  "frontend_rebuild": {
+    "empty_node_modules": true,
+    "artifact_hashes_equal": true,
+    "files": 3
+  },
+  "archive": {
+    "archived": 13,
+    "retained": 5,
+    "recoverable": true
+  }
+}

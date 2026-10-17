@@ -1,0 +1,95 @@
+{
+  "provenance": "冻结旧函数执行结果；不是从候选输出生成答案",
+  "anchors": [
+    {
+      "inputs": {
+        "fs": 70000,
+        "C": 2e-07,
+        "i_rms": 10,
+        "tan_delta": 0.001
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 1.1368210220849668,
+          "p_cap_total": 1.1368210220849668
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 100000,
+        "C": 1e-07,
+        "i_rms": 8,
+        "tan_delta": 0.001
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 1.0185916357881304,
+          "p_cap_total": 1.0185916357881304
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 50000,
+        "C": 4.7e-07,
+        "i_rms": 15,
+        "tan_delta": 0.002
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 3.047647846440549,
+          "p_cap_total": 3.047647846440549
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 200000,
+        "C": 4.7e-08,
+        "i_rms": 3,
+        "tan_delta": 0.0005
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 0.07619119616101375,
+          "p_cap_total": 0.07619119616101375
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 70000,
+        "C": 2e-07,
+        "i_rms": 0,
+        "tan_delta": 0.001
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 0.0,
+          "p_cap_total": 0.0
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 70000,
+        "C": 2e-07,
+        "i_rms": 10,
+        "tan_delta": 0
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 0.0,
+          "p_cap_total": 0.0
+        }
+      },
+      "tolerance": 1e-10
+    }
+  ]
+}

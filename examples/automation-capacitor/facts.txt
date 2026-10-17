@@ -1,0 +1,8 @@
+本次只适配接口，保留上传函数，替换 cr_loss_flat 选中的单组电容损耗节点。
+point.freq_MHz 是开关频率，单位 MHz，来源 electrical.fs（Hz）。
+point.irms_A 是第 1 组谐振电容 RMS 电流，单位 A，来源 electrical.i_rms_c1。
+part.values.c_uF 是同一组并联总电容，单位 uF，来源 component.C_total（F）。
+part.df 是无量纲介质损耗角正切，来源 component.tan_delta。
+返回元组第 0 项 watts_per_group 是单组损耗 W，对应 loss.cap1_loss。
+返回元组第 1 项 total_mW 是该单组即全部电容的总损耗 mW，对应 loss.p_cap_total（W）。
+本次适用范围仅单组。不能把它推广到多组电容或真实器件标定。

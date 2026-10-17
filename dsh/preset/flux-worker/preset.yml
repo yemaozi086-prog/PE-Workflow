@@ -1,0 +1,2 @@
+name: Flux 自动适配 Worker
+description: 平台调度的纯计算函数适配；只能读取当前任务和提交候选，不允许发布。

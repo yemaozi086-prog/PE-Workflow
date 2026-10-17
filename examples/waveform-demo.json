@@ -1,0 +1,182 @@
+{
+  "workflow": {
+    "schema_version": "2.0",
+    "id": "waveform_demo",
+    "name": "波形能量 · 函数适配演示",
+    "description": "手算假设：10 V 恒压，0–2 A 线性电流，持续 2 ms，积分为 0.02 J。",
+    "inputs": {
+      "t": {
+        "type": "array",
+        "kind": "bare",
+        "value_type": {
+          "dtype": "float64",
+          "shape": [
+            "N"
+          ]
+        },
+        "axes": [
+          {
+            "name": "time",
+            "coordinate_ref": null,
+            "monotonic": true
+          }
+        ],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "time",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "s",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "i": {
+        "type": "array",
+        "kind": "bare",
+        "value_type": {
+          "dtype": "float64",
+          "shape": [
+            "N"
+          ]
+        },
+        "axes": [
+          {
+            "name": "time",
+            "coordinate_ref": "t",
+            "monotonic": true
+          }
+        ],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "current",
+        "characteristic": "instantaneous",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "A",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "voltage": {
+        "type": "number",
+        "kind": "bare",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "voltage",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "V",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      }
+    },
+    "nodes": [
+      {
+        "id": "integrate",
+        "label": "",
+        "kind": "compute",
+        "inputs": {
+          "t": {
+            "source": "input",
+            "node": null,
+            "port": "t",
+            "field": null,
+            "value": null
+          },
+          "i": {
+            "source": "input",
+            "node": null,
+            "port": "i",
+            "field": null,
+            "value": null
+          },
+          "voltage": {
+            "source": "input",
+            "node": null,
+            "port": "voltage",
+            "field": null,
+            "value": null
+          }
+        },
+        "module_id": "waveform_energy",
+        "module_version": 1,
+        "cases": {},
+        "body": null,
+        "operation": null,
+        "field": null
+      }
+    ],
+    "outputs": {
+      "energy": {
+        "source": "node",
+        "node": "integrate",
+        "port": "energy",
+        "field": null,
+        "value": null
+      }
+    },
+    "output_ports": {
+      "energy": {
+        "type": "number",
+        "kind": "bare",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "energy",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "J",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      }
+    },
+    "layout": {
+      "$input": {
+        "x": 0.0,
+        "y": 60.0
+      },
+      "integrate": {
+        "x": 330.0,
+        "y": 80.0
+      },
+      "$output": {
+        "x": 660.0,
+        "y": 80.0
+      }
+    }
+  },
+  "inputs": {
+    "t": [
+      0,
+      0.001,
+      0.002
+    ],
+    "i": [
+      0,
+      1,
+      2
+    ],
+    "voltage": 10
+  }
+}

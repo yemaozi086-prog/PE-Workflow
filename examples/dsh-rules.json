@@ -1,0 +1,13 @@
+{
+  "protocol_version": "2.0",
+  "rules": {
+    "role": "Implement the supplied task; the platform owns orchestration and validation.",
+    "scope": "One pure Python function; controlled AST interpreter, no filesystem/network/process access.",
+    "semantics": "Never infer physical meaning from names alone. Use declared facts and provenance. Batch unresolved questions once; return needs_clarification before generating a candidate if critical facts are missing.",
+    "adapter": "Only declared rename, extraction, assembly and registered affine unit conversion. Array indexing, transpose, reshape, resampling and slicing are physical transforms, not hidden input adaptation.",
+    "transforms": "Declare operation, preconditions and rationale; submit independent expected verification samples covering the transform.",
+    "tests": "Expected values must come from supplied evidence or hand-verifiable examples, not from running your own candidate and copying its output.",
+    "response": "Return CandidateRequest JSON or {status: needs_clarification, questions: [...], evidence: [...]}. Do not register or apply by guessing.",
+    "replacement": "Capabilities are search hints only. The platform checks the concrete workflow and returns a proposal; never claim equivalence or real-device accuracy from interface compatibility."
+  }
+}

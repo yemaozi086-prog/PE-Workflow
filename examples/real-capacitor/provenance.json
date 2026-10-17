@@ -1,0 +1,28 @@
+{
+  "original_file": "C:\\Users\\ye_maozi\\Desktop\\ChatGPT\\aeep-dsh\\src\\deep_agent\\tools\\topo_open_loop_param_opt\\topo_open_loop_param_envs\\component_loss_cal\\capacitor_loss_cal\\capacitor_loss_cal.py",
+  "sha256": "e73c97834a588101cc427614b98f7b6371befa5bec924b1ea59786a3795c837d",
+  "snapshot_identical": true,
+  "caller": "C:\\Users\\ye_maozi\\Desktop\\ChatGPT\\aeep-dsh\\src\\deep_agent\\tools\\topo_open_loop_param_opt\\topo_open_loop_param_envs\\topo_envs_main\\DBSRC_env_main.py",
+  "call_lines": [
+    619
+  ],
+  "scope": "单组、有效输入、旧损耗角公式；不是完整拓扑或新物理模型",
+  "reference_snapshot": "reference/capacitor_loss_cal.py",
+  "legacy_issues": [
+    "fs<=0 返回 total_loss 键，与正常路径 p_cap_total 不同",
+    "缺失或非法组被跳过；本平台不继承静默跳过或填零行为"
+  ],
+  "semantic_evidence": {
+    "capacitance": "key_component_sel/capacitor_sel.py 对 C_nom/C_target/C_total 标注 F",
+    "current": "topo_volt_current_cal/DBSRC_SPS.py 将 i_rms_c1 赋为 ip_rms，并注明电容电流有效值",
+    "frequency": "DBSRC_env_main.py 的动作变换说明标注开关频率 Hz；损耗函数示例 fs=70000",
+    "tanx": "本实验对旧公式系数明确声明为无量纲损耗角正切；不声称经过器件实测核验"
+  },
+  "new_contract": "fs>=1 Hz，C>=1e-15 F，i_rms>=0 A，tan_delta>=0；所有输入必填且有限",
+  "source_roles": {
+    "baseline_single_group.py": "审计后提取的单组迁移实现",
+    "upload_equivalent.py": "人为构造的接口不同但公式等价变体",
+    "evaluator/reference-candidate.json": "开发侧适配答案，不作为 DSH 生成结果"
+  },
+  "optimization_extension": "本包不实现 PPO/奖励更新；等价适配不改变优化变量与目标。以后物理模型变化须另建验收依据并标记旧策略适用性待验证。"
+}

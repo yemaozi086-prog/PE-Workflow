@@ -1,0 +1,617 @@
+{
+  "$defs": {
+    "Axis": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "coordinate_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Coordinate Ref"
+        },
+        "monotonic": {
+          "default": false,
+          "title": "Monotonic",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Axis",
+      "type": "object"
+    },
+    "Binding": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "enum": [
+            "input",
+            "node",
+            "constant"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "node": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Node"
+        },
+        "port": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Port"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        },
+        "value": {
+          "default": null,
+          "title": "Value"
+        },
+        "field_map": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Field Map",
+          "type": "object"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "Binding",
+      "type": "object"
+    },
+    "CatalogRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "name"
+      ],
+      "title": "CatalogRef",
+      "type": "object"
+    },
+    "DefinitionRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "title": "DefinitionRef",
+      "type": "object"
+    },
+    "Node": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "default": "",
+          "title": "Label",
+          "type": "string"
+        },
+        "kind": {
+          "default": "compute",
+          "enum": [
+            "compute",
+            "switch",
+            "foreach",
+            "aggregate",
+            "batch"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "inputs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Binding"
+          },
+          "title": "Inputs",
+          "type": "object"
+        },
+        "module_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Module Id"
+        },
+        "module_version": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Module Version"
+        },
+        "cases": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Workflow"
+          },
+          "title": "Cases",
+          "type": "object"
+        },
+        "body": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Workflow"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operation": {
+          "anyOf": [
+            {
+              "enum": [
+                "sum",
+                "mean",
+                "max",
+                "min"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operation"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "Node",
+      "type": "object"
+    },
+    "Port": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "default": "number",
+          "enum": [
+            "number",
+            "string",
+            "boolean",
+            "array",
+            "flat_dict",
+            "collection"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "kind": {
+          "anyOf": [
+            {
+              "enum": [
+                "bare",
+                "flat_dict",
+                "collection"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Kind"
+        },
+        "value_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "axes": {
+          "items": {
+            "$ref": "#/$defs/Axis"
+          },
+          "title": "Axes",
+          "type": "array"
+        },
+        "definition_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DefinitionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "unit_definition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UnitDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "catalog_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CatalogRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "chinese_name": {
+          "default": "",
+          "title": "Chinese Name",
+          "type": "string"
+        },
+        "family_id": {
+          "default": "",
+          "title": "Family Id",
+          "type": "string"
+        },
+        "entry_type": {
+          "default": "quantity",
+          "enum": [
+            "quantity",
+            "reference",
+            "control"
+          ],
+          "title": "Entry Type",
+          "type": "string"
+        },
+        "device": {
+          "default": "",
+          "title": "Device",
+          "type": "string"
+        },
+        "nature": {
+          "default": "",
+          "title": "Nature",
+          "type": "string"
+        },
+        "statistic": {
+          "default": "",
+          "title": "Statistic",
+          "type": "string"
+        },
+        "event": {
+          "default": "",
+          "title": "Event",
+          "type": "string"
+        },
+        "direction": {
+          "default": "",
+          "title": "Direction",
+          "type": "string"
+        },
+        "aggregation": {
+          "default": "",
+          "title": "Aggregation",
+          "type": "string"
+        },
+        "loss_component": {
+          "default": "",
+          "title": "Loss Component",
+          "type": "string"
+        },
+        "instance_id": {
+          "default": "",
+          "title": "Instance Id",
+          "type": "string"
+        },
+        "semantic_id": {
+          "default": "",
+          "title": "Semantic Id",
+          "type": "string"
+        },
+        "semantic_evidence": {
+          "default": "",
+          "title": "Semantic Evidence",
+          "type": "string"
+        },
+        "quantity": {
+          "default": "",
+          "title": "Quantity",
+          "type": "string"
+        },
+        "characteristic": {
+          "default": "",
+          "title": "Characteristic",
+          "type": "string"
+        },
+        "scope": {
+          "default": "",
+          "title": "Scope",
+          "type": "string"
+        },
+        "role": {
+          "default": "",
+          "title": "Role",
+          "type": "string"
+        },
+        "index": {
+          "default": "",
+          "title": "Index",
+          "type": "string"
+        },
+        "unit": {
+          "default": "",
+          "title": "Unit",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "default": {
+          "default": null,
+          "title": "Default"
+        },
+        "fields": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Port"
+          },
+          "title": "Fields",
+          "type": "object"
+        },
+        "item": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Port"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "Port",
+      "type": "object"
+    },
+    "UnitDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "title": "Dimension",
+          "type": "string"
+        },
+        "scale": {
+          "exclusiveMinimum": 0,
+          "title": "Scale",
+          "type": "number"
+        },
+        "offset": {
+          "default": 0,
+          "title": "Offset",
+          "type": "number"
+        }
+      },
+      "required": [
+        "dimension",
+        "scale"
+      ],
+      "title": "UnitDefinition",
+      "type": "object"
+    },
+    "ValueType": {
+      "additionalProperties": false,
+      "properties": {
+        "dtype": {
+          "default": "float64",
+          "enum": [
+            "float64",
+            "float32",
+            "int64"
+          ],
+          "title": "Dtype",
+          "type": "string"
+        },
+        "shape": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "maxItems": 4,
+          "title": "Shape",
+          "type": "array"
+        }
+      },
+      "title": "ValueType",
+      "type": "object"
+    },
+    "Workflow": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0",
+          "enum": [
+            "1.0",
+            "2.0",
+            "3.0"
+          ],
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "project_id": {
+          "default": "",
+          "title": "Project Id",
+          "type": "string"
+        },
+        "inputs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Port"
+          },
+          "title": "Inputs",
+          "type": "object"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/Node"
+          },
+          "maxItems": 200,
+          "title": "Nodes",
+          "type": "array"
+        },
+        "outputs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Binding"
+          },
+          "title": "Outputs",
+          "type": "object"
+        },
+        "output_ports": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Port"
+          },
+          "title": "Output Ports",
+          "type": "object"
+        },
+        "layout": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object"
+          },
+          "title": "Layout",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "outputs",
+        "output_ports"
+      ],
+      "title": "Workflow",
+      "type": "object"
+    }
+  },
+  "$ref": "#/$defs/Workflow"
+}

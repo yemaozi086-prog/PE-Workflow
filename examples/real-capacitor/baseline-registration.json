@@ -1,0 +1,319 @@
+{
+  "module": {
+    "id": "legacy_cr_group_loss",
+    "version": 1,
+    "name": "真实旧流程 · 单组谐振电容损耗",
+    "description": "提取旧 calc_Cr_loss 的单组有效输入公式；非完整 DBSRC，未做器件物理标定。",
+    "inputs": {
+      "fs": {
+        "type": "number",
+        "kind": "bare",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "frequency",
+        "characteristic": "",
+        "scope": "resonant_capacitor",
+        "role": "",
+        "index": "",
+        "unit": "Hz",
+        "description": "用于旧公式的开关频率，不是谐振频率",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "C": {
+        "type": "number",
+        "kind": "bare",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "capacitance",
+        "characteristic": "",
+        "scope": "capacitor_group_1",
+        "role": "",
+        "index": "",
+        "unit": "F",
+        "description": "所选电容组的等效电容",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "i_rms": {
+        "type": "number",
+        "kind": "bare",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "current",
+        "characteristic": "rms",
+        "scope": "capacitor_group_1",
+        "role": "",
+        "index": "",
+        "unit": "A",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "tan_delta": {
+        "type": "number",
+        "kind": "bare",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "loss_tangent",
+        "characteristic": "",
+        "scope": "capacitor_group_1",
+        "role": "",
+        "index": "",
+        "unit": "1",
+        "description": "旧函数参数 tanx，损耗角正切",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      }
+    },
+    "outputs": {
+      "loss": {
+        "type": "flat_dict",
+        "kind": "flat_dict",
+        "value_type": null,
+        "axes": [],
+        "definition_ref": null,
+        "unit_definition": null,
+        "quantity": "",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {
+          "cap1_loss": {
+            "type": "number",
+            "kind": "bare",
+            "value_type": null,
+            "axes": [],
+            "definition_ref": null,
+            "unit_definition": null,
+            "quantity": "power",
+            "characteristic": "loss",
+            "scope": "capacitor_group_1",
+            "role": "",
+            "index": "",
+            "unit": "W",
+            "description": "",
+            "required": true,
+            "default": null,
+            "fields": {},
+            "item": null
+          },
+          "p_cap_total": {
+            "type": "number",
+            "kind": "bare",
+            "value_type": null,
+            "axes": [],
+            "definition_ref": null,
+            "unit_definition": null,
+            "quantity": "power",
+            "characteristic": "loss",
+            "scope": "capacitor_group_1",
+            "role": "",
+            "index": "",
+            "unit": "W",
+            "description": "",
+            "required": true,
+            "default": null,
+            "fields": {},
+            "item": null
+          }
+        },
+        "item": null
+      }
+    },
+    "contract_version": "2.0",
+    "implementation": "python_function",
+    "expressions": {},
+    "source": "\"\"\"单组公式提取自旧 calc_Cr_loss；只处理契约已校验的有效输入。\n\n这是平台迁移实现，非逐字复制。完整原函数另存于 reference/。\nfs_hz: Hz; capacitance_f: F; i_rms_a: A; tan_delta: 无量纲。\n返回一组电容的损耗和所选单组的总损耗，单位 W。\n\"\"\"\nimport math\n\n\ndef capacitor_group_loss(fs_hz, capacitance_f, i_rms_a, tan_delta):\n    resistance = tan_delta / (2 * math.pi * fs_hz * capacitance_f)\n    loss = i_rms_a * i_rms_a * resistance\n    return {\"cap1_loss\": loss, \"p_cap_total\": loss}\n",
+    "provenance": "旧 DBSRC_env_main 调用 calc_Cr_loss；参考源码 SHA256 e73c97834a588101cc427614b98f7b6371befa5bec924b1ea59786a3795c837d；仅有效输入单组切片",
+    "entrypoint": "capacitor_group_loss",
+    "adapter": {
+      "arguments": {
+        "fs_hz": {
+          "from_path": [
+            "inputs",
+            "fs"
+          ],
+          "assemble": null,
+          "conversion": null
+        },
+        "capacitance_f": {
+          "from_path": [
+            "inputs",
+            "C"
+          ],
+          "assemble": null,
+          "conversion": null
+        },
+        "i_rms_a": {
+          "from_path": [
+            "inputs",
+            "i_rms"
+          ],
+          "assemble": null,
+          "conversion": null
+        },
+        "tan_delta": {
+          "from_path": [
+            "inputs",
+            "tan_delta"
+          ],
+          "assemble": null,
+          "conversion": null
+        }
+      },
+      "returns": {
+        "loss": {
+          "from_path": [
+            "return"
+          ],
+          "assemble": null,
+          "conversion": null
+        }
+      }
+    },
+    "capabilities": [
+      "resonant_capacitor_loss"
+    ],
+    "applies_to": {
+      "model": [
+        "legacy_loss_tangent"
+      ],
+      "group_count": [
+        "one"
+      ]
+    },
+    "domains": {
+      "fs": {
+        "minimum": 1.0,
+        "maximum": null
+      },
+      "C": {
+        "minimum": 1e-15,
+        "maximum": null
+      },
+      "i_rms": {
+        "minimum": 0.0,
+        "maximum": null
+      },
+      "tan_delta": {
+        "minimum": 0.0,
+        "maximum": null
+      }
+    },
+    "transforms": []
+  },
+  "anchors": [
+    {
+      "inputs": {
+        "fs": 70000,
+        "C": 2e-07,
+        "i_rms": 10,
+        "tan_delta": 0.001
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 1.1368210220849668,
+          "p_cap_total": 1.1368210220849668
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 100000,
+        "C": 1e-07,
+        "i_rms": 8,
+        "tan_delta": 0.001
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 1.0185916357881304,
+          "p_cap_total": 1.0185916357881304
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 50000,
+        "C": 4.7e-07,
+        "i_rms": 15,
+        "tan_delta": 0.002
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 3.047647846440549,
+          "p_cap_total": 3.047647846440549
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 200000,
+        "C": 4.7e-08,
+        "i_rms": 3,
+        "tan_delta": 0.0005
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 0.07619119616101375,
+          "p_cap_total": 0.07619119616101375
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 70000,
+        "C": 2e-07,
+        "i_rms": 0,
+        "tan_delta": 0.001
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 0.0,
+          "p_cap_total": 0.0
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 70000,
+        "C": 2e-07,
+        "i_rms": 10,
+        "tan_delta": 0
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 0.0,
+          "p_cap_total": 0.0
+        }
+      },
+      "tolerance": 1e-10
+    }
+  ]
+}

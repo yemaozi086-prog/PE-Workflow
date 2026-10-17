@@ -1,0 +1,130 @@
+{
+  "id": "switch_loss",
+  "version": 2,
+  "name": "开关损耗 · 简化演示",
+  "description": "演示假设：导通压降每升高 1 ℃ 增加 1.8 mV；25 ℃ 退化为 v1",
+  "inputs": {
+    "i_rms": {
+      "type": "number",
+      "quantity": "current",
+      "characteristic": "",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "A",
+      "description": "",
+      "required": true,
+      "default": null,
+      "fields": {},
+      "item": null
+    },
+    "fs": {
+      "type": "number",
+      "quantity": "frequency",
+      "characteristic": "",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "Hz",
+      "description": "",
+      "required": true,
+      "default": null,
+      "fields": {},
+      "item": null
+    },
+    "vce": {
+      "type": "number",
+      "quantity": "voltage",
+      "characteristic": "",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "V",
+      "description": "",
+      "required": true,
+      "default": null,
+      "fields": {},
+      "item": null
+    },
+    "e_sw": {
+      "type": "number",
+      "quantity": "energy",
+      "characteristic": "",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "J",
+      "description": "",
+      "required": true,
+      "default": null,
+      "fields": {},
+      "item": null
+    },
+    "Tj": {
+      "type": "number",
+      "quantity": "temperature",
+      "characteristic": "",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "degC",
+      "description": "",
+      "required": true,
+      "default": null,
+      "fields": {},
+      "item": null
+    }
+  },
+  "outputs": {
+    "p_cond": {
+      "type": "number",
+      "quantity": "power",
+      "characteristic": "loss_conduction",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "W",
+      "description": "",
+      "required": true,
+      "default": null,
+      "fields": {},
+      "item": null
+    },
+    "p_sw": {
+      "type": "number",
+      "quantity": "power",
+      "characteristic": "loss_switching",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "W",
+      "description": "",
+      "required": true,
+      "default": null,
+      "fields": {},
+      "item": null
+    },
+    "p_total": {
+      "type": "number",
+      "quantity": "power",
+      "characteristic": "loss_total",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "W",
+      "description": "",
+      "required": true,
+      "default": null,
+      "fields": {},
+      "item": null
+    }
+  },
+  "implementation": "expressions",
+  "expressions": {
+    "p_cond": "(vce + 0.0018 * (Tj - 25)) * i_rms * 0.5",
+    "p_sw": "e_sw * fs",
+    "p_total": "(vce + 0.0018 * (Tj - 25)) * i_rms * 0.5 + e_sw * fs"
+  },
+  "source": "",
+  "provenance": "迁移旧 demo 的简化公式；导通系数 0.5 为演示假设，非已核验器件模型"
+}

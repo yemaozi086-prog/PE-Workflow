@@ -1,0 +1,765 @@
+{
+  "$defs": {
+    "Adapter": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Mapping"
+          },
+          "title": "Arguments",
+          "type": "object"
+        },
+        "returns": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Mapping"
+          },
+          "title": "Returns",
+          "type": "object"
+        }
+      },
+      "required": [
+        "arguments",
+        "returns"
+      ],
+      "title": "Adapter",
+      "type": "object"
+    },
+    "Axis": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "coordinate_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Coordinate Ref"
+        },
+        "monotonic": {
+          "default": false,
+          "title": "Monotonic",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Axis",
+      "type": "object"
+    },
+    "CatalogRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "name"
+      ],
+      "title": "CatalogRef",
+      "type": "object"
+    },
+    "Conversion": {
+      "additionalProperties": false,
+      "properties": {
+        "from_unit": {
+          "title": "From Unit",
+          "type": "string"
+        },
+        "to_unit": {
+          "title": "To Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_unit",
+        "to_unit"
+      ],
+      "title": "Conversion",
+      "type": "object"
+    },
+    "DefinitionRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "title": "DefinitionRef",
+      "type": "object"
+    },
+    "Mapping": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "From"
+        },
+        "assemble": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/$defs/Mapping"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assemble"
+        },
+        "conversion": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Conversion"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "Mapping",
+      "type": "object"
+    },
+    "NamingRule": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,99}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "scope": {
+          "default": "module",
+          "enum": [
+            "module",
+            "project",
+            "shared"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "scope_id": {
+          "minLength": 1,
+          "title": "Scope Id",
+          "type": "string"
+        },
+        "source_pattern": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Source Pattern",
+          "type": "string"
+        },
+        "target_pattern": {
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Target Pattern",
+          "type": "string"
+        },
+        "declaration": {
+          "$ref": "#/$defs/Port"
+        },
+        "evidence": {
+          "minLength": 1,
+          "title": "Evidence",
+          "type": "string"
+        },
+        "examples": {
+          "items": {
+            "$ref": "#/$defs/RuleExample"
+          },
+          "maxItems": 30,
+          "minItems": 2,
+          "title": "Examples",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "scope_id",
+        "source_pattern",
+        "target_pattern",
+        "declaration",
+        "evidence",
+        "examples"
+      ],
+      "title": "NamingRule",
+      "type": "object"
+    },
+    "NumericRange": {
+      "additionalProperties": false,
+      "properties": {
+        "minimum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum"
+        }
+      },
+      "title": "NumericRange",
+      "type": "object"
+    },
+    "Port": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "default": "number",
+          "enum": [
+            "number",
+            "string",
+            "boolean",
+            "array",
+            "flat_dict",
+            "collection"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "kind": {
+          "anyOf": [
+            {
+              "enum": [
+                "bare",
+                "flat_dict",
+                "collection"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Kind"
+        },
+        "value_type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "axes": {
+          "items": {
+            "$ref": "#/$defs/Axis"
+          },
+          "title": "Axes",
+          "type": "array"
+        },
+        "definition_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DefinitionRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "unit_definition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UnitDefinition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "catalog_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CatalogRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "chinese_name": {
+          "default": "",
+          "title": "Chinese Name",
+          "type": "string"
+        },
+        "family_id": {
+          "default": "",
+          "title": "Family Id",
+          "type": "string"
+        },
+        "entry_type": {
+          "default": "quantity",
+          "enum": [
+            "quantity",
+            "reference",
+            "control"
+          ],
+          "title": "Entry Type",
+          "type": "string"
+        },
+        "device": {
+          "default": "",
+          "title": "Device",
+          "type": "string"
+        },
+        "nature": {
+          "default": "",
+          "title": "Nature",
+          "type": "string"
+        },
+        "statistic": {
+          "default": "",
+          "title": "Statistic",
+          "type": "string"
+        },
+        "event": {
+          "default": "",
+          "title": "Event",
+          "type": "string"
+        },
+        "direction": {
+          "default": "",
+          "title": "Direction",
+          "type": "string"
+        },
+        "aggregation": {
+          "default": "",
+          "title": "Aggregation",
+          "type": "string"
+        },
+        "loss_component": {
+          "default": "",
+          "title": "Loss Component",
+          "type": "string"
+        },
+        "instance_id": {
+          "default": "",
+          "title": "Instance Id",
+          "type": "string"
+        },
+        "semantic_id": {
+          "default": "",
+          "title": "Semantic Id",
+          "type": "string"
+        },
+        "semantic_evidence": {
+          "default": "",
+          "title": "Semantic Evidence",
+          "type": "string"
+        },
+        "quantity": {
+          "default": "",
+          "title": "Quantity",
+          "type": "string"
+        },
+        "characteristic": {
+          "default": "",
+          "title": "Characteristic",
+          "type": "string"
+        },
+        "scope": {
+          "default": "",
+          "title": "Scope",
+          "type": "string"
+        },
+        "role": {
+          "default": "",
+          "title": "Role",
+          "type": "string"
+        },
+        "index": {
+          "default": "",
+          "title": "Index",
+          "type": "string"
+        },
+        "unit": {
+          "default": "",
+          "title": "Unit",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "default": {
+          "default": null,
+          "title": "Default"
+        },
+        "fields": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Port"
+          },
+          "title": "Fields",
+          "type": "object"
+        },
+        "item": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Port"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "Port",
+      "type": "object"
+    },
+    "RuleExample": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "RuleExample",
+      "type": "object"
+    },
+    "TransformEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "operation": {
+          "enum": [
+            "transpose",
+            "reshape",
+            "resample",
+            "slice"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "preconditions": {
+          "minLength": 1,
+          "title": "Preconditions",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "operation",
+        "preconditions",
+        "rationale"
+      ],
+      "title": "TransformEvidence",
+      "type": "object"
+    },
+    "UnitDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "title": "Dimension",
+          "type": "string"
+        },
+        "scale": {
+          "exclusiveMinimum": 0,
+          "title": "Scale",
+          "type": "number"
+        },
+        "offset": {
+          "default": 0,
+          "title": "Offset",
+          "type": "number"
+        }
+      },
+      "required": [
+        "dimension",
+        "scale"
+      ],
+      "title": "UnitDefinition",
+      "type": "object"
+    },
+    "ValueType": {
+      "additionalProperties": false,
+      "properties": {
+        "dtype": {
+          "default": "float64",
+          "enum": [
+            "float64",
+            "float32",
+            "int64"
+          ],
+          "title": "Dtype",
+          "type": "string"
+        },
+        "shape": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "maxItems": 4,
+          "title": "Shape",
+          "type": "array"
+        }
+      },
+      "title": "ValueType",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "version": {
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+    },
+    "inputs": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Port"
+      },
+      "title": "Inputs",
+      "type": "object"
+    },
+    "outputs": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Port"
+      },
+      "title": "Outputs",
+      "type": "object"
+    },
+    "contract_version": {
+      "default": "1.0",
+      "enum": [
+        "1.0",
+        "2.0",
+        "3.0"
+      ],
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "project_id": {
+      "default": "",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "naming_rules": {
+      "items": {
+        "$ref": "#/$defs/NamingRule"
+      },
+      "maxItems": 100,
+      "title": "Naming Rules",
+      "type": "array"
+    },
+    "implementation": {
+      "default": "expressions",
+      "enum": [
+        "expressions",
+        "python_subset",
+        "python_function"
+      ],
+      "title": "Implementation",
+      "type": "string"
+    },
+    "expressions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Expressions",
+      "type": "object"
+    },
+    "source": {
+      "default": "",
+      "title": "Source",
+      "type": "string"
+    },
+    "provenance": {
+      "title": "Provenance",
+      "type": "string"
+    },
+    "entrypoint": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Entrypoint"
+    },
+    "adapter": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Adapter"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "capabilities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Capabilities",
+      "type": "array"
+    },
+    "applies_to": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "title": "Applies To",
+      "type": "object"
+    },
+    "domains": {
+      "additionalProperties": {
+        "$ref": "#/$defs/NumericRange"
+      },
+      "title": "Domains",
+      "type": "object"
+    },
+    "transforms": {
+      "items": {
+        "$ref": "#/$defs/TransformEvidence"
+      },
+      "title": "Transforms",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "version",
+    "name",
+    "inputs",
+    "outputs",
+    "provenance"
+  ],
+  "title": "Module",
+  "type": "object"
+}

@@ -1,0 +1,470 @@
+{
+  "id": "cr_loss_flat",
+  "version": 2,
+  "name": "真实电容损耗 · 双字典接口",
+  "description": "",
+  "inputs": {
+    "electrical": {
+      "type": "flat_dict",
+      "kind": "flat_dict",
+      "value_type": null,
+      "axes": [],
+      "definition_ref": null,
+      "unit_definition": null,
+      "catalog_ref": null,
+      "chinese_name": "",
+      "family_id": "",
+      "entry_type": "quantity",
+      "device": "",
+      "nature": "",
+      "statistic": "",
+      "event": "",
+      "direction": "",
+      "aggregation": "",
+      "loss_component": "",
+      "instance_id": "",
+      "semantic_id": "",
+      "semantic_evidence": "",
+      "quantity": "",
+      "characteristic": "",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "",
+      "description": "只依赖开关频率和第 1 组电容 RMS 电流",
+      "required": true,
+      "default": null,
+      "fields": {
+        "fs": {
+          "type": "number",
+          "kind": "bare",
+          "value_type": null,
+          "axes": [],
+          "definition_ref": null,
+          "unit_definition": null,
+          "catalog_ref": {
+            "id": "team_parameters",
+            "version": 1,
+            "name": "fs"
+          },
+          "chinese_name": "开关频率",
+          "family_id": "fs",
+          "entry_type": "quantity",
+          "device": "",
+          "nature": "",
+          "statistic": "",
+          "event": "",
+          "direction": "",
+          "aggregation": "",
+          "loss_component": "",
+          "instance_id": "",
+          "semantic_id": "",
+          "semantic_evidence": "",
+          "quantity": "frequency",
+          "characteristic": "",
+          "scope": "",
+          "role": "",
+          "index": "",
+          "unit": "Hz",
+          "description": "开关频率 (Hz)（由模型内部计算并返回） | 开关频率 fs，单位 Hz。 | 开关频率 fs，输入单位为 Hz；90 kHz 应输入 90000。 | 开关频率，单位 Hz。",
+          "required": true,
+          "default": null,
+          "fields": {},
+          "item": null
+        },
+        "i_rms_c1": {
+          "type": "number",
+          "kind": "bare",
+          "value_type": null,
+          "axes": [],
+          "definition_ref": null,
+          "unit_definition": null,
+          "catalog_ref": {
+            "id": "team_parameters",
+            "version": 1,
+            "name": "i_rms_c1"
+          },
+          "chinese_name": "谐振电容 RMS 电流",
+          "family_id": "i_rms_c1",
+          "entry_type": "quantity",
+          "device": "capacitor",
+          "nature": "",
+          "statistic": "rms",
+          "event": "",
+          "direction": "",
+          "aggregation": "",
+          "loss_component": "",
+          "instance_id": "1",
+          "semantic_id": "",
+          "semantic_evidence": "",
+          "quantity": "current",
+          "characteristic": "",
+          "scope": "",
+          "role": "rms",
+          "index": "",
+          "unit": "A",
+          "description": "第一个电容电流有效值 | 谐振电容 RMS 电流，单位 A。",
+          "required": true,
+          "default": null,
+          "fields": {},
+          "item": null
+        }
+      },
+      "item": null
+    },
+    "component": {
+      "type": "flat_dict",
+      "kind": "flat_dict",
+      "value_type": null,
+      "axes": [],
+      "definition_ref": null,
+      "unit_definition": null,
+      "catalog_ref": null,
+      "chinese_name": "",
+      "family_id": "",
+      "entry_type": "quantity",
+      "device": "",
+      "nature": "",
+      "statistic": "",
+      "event": "",
+      "direction": "",
+      "aggregation": "",
+      "loss_component": "",
+      "instance_id": "",
+      "semantic_id": "",
+      "semantic_evidence": "",
+      "quantity": "",
+      "characteristic": "",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "",
+      "description": "只依赖电容和损耗角正切",
+      "required": true,
+      "default": null,
+      "fields": {
+        "C_total": {
+          "type": "number",
+          "kind": "bare",
+          "value_type": null,
+          "axes": [],
+          "definition_ref": null,
+          "unit_definition": null,
+          "catalog_ref": {
+            "id": "team_parameters",
+            "version": 1,
+            "name": "C_total"
+          },
+          "chinese_name": "谐振电容并联组合总容量 C_total",
+          "family_id": "C_total",
+          "entry_type": "quantity",
+          "device": "capacitor",
+          "nature": "",
+          "statistic": "",
+          "event": "",
+          "direction": "",
+          "aggregation": "",
+          "loss_component": "",
+          "instance_id": "",
+          "semantic_id": "",
+          "semantic_evidence": "真实电容实验明确声明：第 1 组电容，数值及单位由实验夹具给出；保留原词典含义与来源。",
+          "quantity": "capacitance",
+          "characteristic": "",
+          "scope": "",
+          "role": "total",
+          "index": "",
+          "unit": "F",
+          "description": "并联组合总容量，单位 nF。 | 谐振电容并联组合总容量 C_total，单位 nF；取谐振电容选型结果的 C_total。",
+          "required": true,
+          "default": null,
+          "fields": {},
+          "item": null
+        },
+        "tan_delta": {
+          "type": "number",
+          "kind": "bare",
+          "value_type": null,
+          "axes": [],
+          "definition_ref": null,
+          "unit_definition": null,
+          "catalog_ref": {
+            "id": "team_parameters",
+            "version": 1,
+            "name": "tan_delta"
+          },
+          "chinese_name": "介质损耗角正切（无量纲）",
+          "family_id": "tan_delta",
+          "entry_type": "quantity",
+          "device": "capacitor",
+          "nature": "",
+          "statistic": "",
+          "event": "",
+          "direction": "",
+          "aggregation": "",
+          "loss_component": "",
+          "instance_id": "",
+          "semantic_id": "",
+          "semantic_evidence": "",
+          "quantity": "ratio",
+          "characteristic": "",
+          "scope": "",
+          "role": "",
+          "index": "",
+          "unit": "1",
+          "description": "介质损耗角正切（无量纲），PP 聚丙烯薄膜电容典型值 0.001。 | 介质损耗角正切，无量纲。",
+          "required": true,
+          "default": null,
+          "fields": {},
+          "item": null
+        }
+      },
+      "item": null
+    }
+  },
+  "outputs": {
+    "loss": {
+      "type": "flat_dict",
+      "kind": "flat_dict",
+      "value_type": null,
+      "axes": [],
+      "definition_ref": null,
+      "unit_definition": null,
+      "catalog_ref": null,
+      "chinese_name": "",
+      "family_id": "",
+      "entry_type": "quantity",
+      "device": "",
+      "nature": "",
+      "statistic": "",
+      "event": "",
+      "direction": "",
+      "aggregation": "",
+      "loss_component": "",
+      "instance_id": "",
+      "semantic_id": "",
+      "semantic_evidence": "",
+      "quantity": "",
+      "characteristic": "",
+      "scope": "",
+      "role": "",
+      "index": "",
+      "unit": "",
+      "description": "单组有效输入下的两项旧函数返回，单位 W",
+      "required": true,
+      "default": null,
+      "fields": {
+        "cap1_loss": {
+          "type": "number",
+          "kind": "bare",
+          "value_type": null,
+          "axes": [],
+          "definition_ref": null,
+          "unit_definition": null,
+          "catalog_ref": {
+            "id": "team_parameters",
+            "version": 1,
+            "name": "cap1_loss"
+          },
+          "chinese_name": "第 1 个谐振电容或电容组损耗",
+          "family_id": "cap1_loss",
+          "entry_type": "quantity",
+          "device": "capacitor",
+          "nature": "",
+          "statistic": "",
+          "event": "",
+          "direction": "",
+          "aggregation": "",
+          "loss_component": "",
+          "instance_id": "1",
+          "semantic_id": "",
+          "semantic_evidence": "",
+          "quantity": "power",
+          "characteristic": "",
+          "scope": "",
+          "role": "loss",
+          "index": "",
+          "unit": "W",
+          "description": "第 1 个谐振电容或电容组损耗，单位 W。",
+          "required": true,
+          "default": null,
+          "fields": {},
+          "item": null
+        },
+        "p_cap_total": {
+          "type": "number",
+          "kind": "bare",
+          "value_type": null,
+          "axes": [],
+          "definition_ref": null,
+          "unit_definition": null,
+          "catalog_ref": {
+            "id": "team_parameters",
+            "version": 1,
+            "name": "p_cap_total"
+          },
+          "chinese_name": "谐振电容组总损耗",
+          "family_id": "p_cap_total",
+          "entry_type": "quantity",
+          "device": "capacitor",
+          "nature": "",
+          "statistic": "",
+          "event": "",
+          "direction": "",
+          "aggregation": "",
+          "loss_component": "",
+          "instance_id": "",
+          "semantic_id": "",
+          "semantic_evidence": "",
+          "quantity": "power",
+          "characteristic": "",
+          "scope": "",
+          "role": "loss",
+          "index": "",
+          "unit": "W",
+          "description": "谐振电容组的总损耗，单位 W。",
+          "required": true,
+          "default": null,
+          "fields": {},
+          "item": null
+        }
+      },
+      "item": null
+    }
+  },
+  "contract_version": "3.0",
+  "project_id": "",
+  "naming_rules": [],
+  "implementation": "python_function",
+  "expressions": {},
+  "source": "\"\"\"研究人员上传实验样例：人为制作的接口变体，计算公式不变。\n\noperating = {\n    \"switching\": {\"frequency_khz\": 开关频率，kHz},\n    \"current_ma\": 电容组有效值电流，mA\n}\ncomponent = {\n    \"capacitance_nf\": 同一组电容的等效电容，nF,\n    \"dissipation_factor\": 损耗角正切，无量纲\n}\n返回单元素元组，内部 capacitor.dissipation_mw 为该组损耗，mW。\n只适用于一组电容、频率及电容为正、电流和损耗角正切非负的情况。\n\"\"\"\nimport math\n\n\ndef calculate_uploaded_loss(operating, component):\n    frequency = operating[\"switching\"][\"frequency_khz\"] * 1000\n    current = operating[\"current_ma\"] / 1000\n    capacitance = component[\"capacitance_nf\"] * 1e-9\n    tangent = component[\"dissipation_factor\"]\n    resistance = tangent / (2 * math.pi * frequency * capacitance)\n    watts = current * current * resistance\n    return ({\"capacitor\": {\"dissipation_mw\": watts * 1000}},)\n",
+  "provenance": "双上游字典接口演示；源自旧 DBSRC 单组 calc_Cr_loss 有效输入公式，不是完整拓扑或实测器件模型",
+  "entrypoint": "calculate_uploaded_loss",
+  "adapter": {
+    "arguments": {
+      "operating": {
+        "from_path": null,
+        "assemble": {
+          "switching": {
+            "from_path": null,
+            "assemble": {
+              "frequency_khz": {
+                "from_path": [
+                  "inputs",
+                  "electrical",
+                  "fs"
+                ],
+                "assemble": null,
+                "conversion": {
+                  "from_unit": "Hz",
+                  "to_unit": "kHz"
+                }
+              }
+            },
+            "conversion": null
+          },
+          "current_ma": {
+            "from_path": [
+              "inputs",
+              "electrical",
+              "i_rms_c1"
+            ],
+            "assemble": null,
+            "conversion": {
+              "from_unit": "A",
+              "to_unit": "mA"
+            }
+          }
+        },
+        "conversion": null
+      },
+      "component": {
+        "from_path": null,
+        "assemble": {
+          "capacitance_nf": {
+            "from_path": [
+              "inputs",
+              "component",
+              "C_total"
+            ],
+            "assemble": null,
+            "conversion": {
+              "from_unit": "F",
+              "to_unit": "nF"
+            }
+          },
+          "dissipation_factor": {
+            "from_path": [
+              "inputs",
+              "component",
+              "tan_delta"
+            ],
+            "assemble": null,
+            "conversion": null
+          }
+        },
+        "conversion": null
+      }
+    },
+    "returns": {
+      "loss": {
+        "from_path": null,
+        "assemble": {
+          "cap1_loss": {
+            "from_path": [
+              "return",
+              0,
+              "capacitor",
+              "dissipation_mw"
+            ],
+            "assemble": null,
+            "conversion": {
+              "from_unit": "mW",
+              "to_unit": "W"
+            }
+          },
+          "p_cap_total": {
+            "from_path": [
+              "return",
+              0,
+              "capacitor",
+              "dissipation_mw"
+            ],
+            "assemble": null,
+            "conversion": {
+              "from_unit": "mW",
+              "to_unit": "W"
+            }
+          }
+        },
+        "conversion": null
+      }
+    }
+  },
+  "capabilities": [
+    "resonant_capacitor_loss"
+  ],
+  "applies_to": {
+    "group_count": [
+      "one"
+    ]
+  },
+  "domains": {
+    "electrical.fs": {
+      "minimum": 1.0,
+      "maximum": null
+    },
+    "electrical.i_rms_c1": {
+      "minimum": 0.0,
+      "maximum": null
+    },
+    "component.C_total": {
+      "minimum": 1e-15,
+      "maximum": null
+    },
+    "component.tan_delta": {
+      "minimum": 0.0,
+      "maximum": null
+    }
+  },
+  "transforms": []
+}

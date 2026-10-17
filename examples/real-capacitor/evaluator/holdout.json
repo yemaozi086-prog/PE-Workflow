@@ -1,0 +1,34 @@
+{
+  "anchors": [
+    {
+      "inputs": {
+        "fs": 83000,
+        "C": 3.3e-07,
+        "i_rms": 7.3,
+        "tan_delta": 0.0017
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 0.5264083154262167,
+          "p_cap_total": 0.5264083154262167
+        }
+      },
+      "tolerance": 1e-10
+    },
+    {
+      "inputs": {
+        "fs": 137000,
+        "C": 6.8e-08,
+        "i_rms": 11.2,
+        "tan_delta": 0.0008
+      },
+      "expected": {
+        "loss": {
+          "cap1_loss": 1.7144178670199528,
+          "p_cap_total": 1.7144178670199528
+        }
+      },
+      "tolerance": 1e-10
+    }
+  ]
+}

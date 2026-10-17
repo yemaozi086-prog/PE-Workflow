@@ -1,0 +1,311 @@
+﻿standard_name,quantity,entry_type,chinese_name,unit,dimension,device,role,nature,kind,used_by,descriptions,fill_stage,notes
+Ae,Ae,quantity,磁芯有效截面积,m^2,area,,,,input,2,磁芯有效截面积，单位 m²。,,中文名取自描述
+Ae_L,Ae_L,quantity,电感磁芯有效截面积,m^2,area,inductor,,,output,1,电感磁芯有效截面积，单位 m^2。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+Ae_T,Ae_T,quantity,变压器磁芯有效截面积,m^2,area,transformer,,,output,1,变压器磁芯有效截面积，单位 m^2。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+Ap_core,Ap_core,quantity,磁芯面积乘积,m^4,area_product,,,,output,2,磁芯面积乘积，单位 m^4。,,中文名取自描述
+Ap_target,Ap_target,quantity,目标面积乘积,m^4,area_product,,,target,output,2,目标面积乘积，单位 m^4。,,中文名取自描述
+B,B,quantity,电感计算磁通密度,T,flux_density,,,,input+output,4,变压器磁通密度，单位 T。 | 变压器计算磁通密度，单位 T。 | 电感磁通密度，单位 T。 | 电感计算磁通密度，单位 T。,,中文名取自描述
+B_limit,B_limit,quantity,电感磁通密度上限,T,flux_density,,,limit,input+output,2,变压器磁通密度上限，单位 T。 | 电感磁通密度上限，单位 T。,,中文名取自描述
+B_margin,B_margin,quantity,电感磁通密度裕量,T,flux_density,,,margin,output,2,变压器磁通密度裕量，单位 T。 | 电感磁通密度裕量，单位 T。,,中文名取自描述
+C_nom,C_nom,quantity,单只电容标称容量,nF,capacitance,capacitor,,nominal,output,1,单只电容标称容量，单位 nF。,,中文名取自描述
+C_target,Cr,quantity,目标谐振电容值,nF,capacitance,capacitor,,target,input+output,1,目标谐振电容值，输入单位为 nF。 | 目标谐振电容量，单位 nF。,,中文名取自描述
+C_total,C_total,quantity,谐振电容并联组合总容量 C_total,nF,capacitance,capacitor,total,,input+output,2,并联组合总容量，单位 nF。 | 谐振电容并联组合总容量 C_total，单位 nF；取谐振电容选型结果的 C_total。,,中文名取自描述
+C_value,C_value,quantity,所需滤波电容值,uF,capacitance,filter_capacitor,,,input+output,1,所需滤波电容值，输入单位为 uF；工具内部会按旧内核增加 1.5 倍容量裕量。 | 输入目标滤波电容量，单位 uF。,,中文名取自描述
+Cr,Cr,quantity,DBSRC 谐振电容 Cr,nF,capacitance,capacitor,,,input,6,DBSRC 谐振电容 Cr，输入单位为 nF。 | 谐振电容 (F) | 谐振电容 Cr，单位 nF。,,中文名取自描述；单位多数为 nF，少数派：F(1)
+D1,D1,quantity,DAB-EPS 原边内移相占比 D1,,ratio,,,,input+output,5,DAB-EPS 原边内移相占比 D1，取值范围为 0~0.5。 | DBSRC 内移相角占比 D1，无量纲。 | EPS 内移相占比 D1，无量纲。 | EPS 调制的内移相角占比 D1，取值范围为 0~0.5。 | SPS 固定内移相角占比，无量纲。 | 内移相角占比，无量纲。,,中文名取自描述
+D2,D2,quantity,求解得到的外移相角占比,,ratio,,,,input+output,4,DBSRC 外移相角占比 D2，无量纲。 | 求解得到的外移相角占比，无量纲。,,中文名取自描述
+EPS,EPS,quantity,EPS 模式编号,,ratio,,,,output,3,EPS 模式编号，无量纲。,,中文名取自描述
+I_limit,I_limit,quantity,输出限流值,A,current,,,limit,input,2,输出限流值，单位 A，默认 22。注意：某工况的 Pout/Vout 超过该值时，该工况的评估功率会被削顶为 Vout×I_limit，不报错。,,中文名取自描述；无描述给出该列；降级采用 current
+Lm,Lm,quantity,励磁电感 (H),H,inductance,inductor,,,input,2,励磁电感 (H),,中文名取自描述
+Lr,Lr,quantity,DAB 串联电感 Lr,uH,inductance,inductor,,,input,8,DAB 串联电感 Lr，输入单位为 uH。 | DBSRC 谐振电感 Lr，输入单位为 uH。 | 谐振电感 (H) | 谐振电感 Lr，单位 uH。,,中文名取自描述；单位多数为 uH，少数派：H(1)
+NL,NL,quantity,电感绕组匝数,匝,turns,inductor,,,input+output,2,电感绕组匝数，单位 匝。 | 绕组匝数。,,中文名取自描述
+Np,Np,quantity,原边匝数,匝,turns,transformer_primary,,,output,1,原边匝数，单位 匝。,,中文名取自描述
+Ns,Ns,quantity,副边匝数,匝,turns,transformer_secondary,,,input+output,2,副边匝数 Ns。 | 副边匝数，单位 匝。,,中文名取自描述
+Pout,Pout,quantity,输出功率 Pout,W,power,,,,input,10,输出功率 (W) | 输出功率 Pout，单位 W。 | 输出功率 Pout，输入单位为 W。 | 额定输出功率 Pout，单位 W，须大于 0。,,中文名取自描述
+TPS,TPS,quantity,TPS 模式编号,,ratio,,,,output,1,TPS 模式编号，无量纲。,,中文名取自描述
+V_L,V_L,quantity,电感总体积,mm^3,volume,inductor,,,output,1,电感总体积，单位 mm^3。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+V_T,V_T,quantity,变压器总体积,mm^3,volume,transformer,,,output,1,变压器总体积，单位 mm^3。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+Ve,Ve,quantity,磁芯有效体积,m^3,volume,,,,input,2,磁芯有效体积，单位 m³。,,中文名取自描述
+Ve_L,Ve_L,quantity,电感磁芯有效体积,m^3,volume,inductor,,,output,1,电感磁芯有效体积，单位 m^3。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+Ve_T,Ve_T,quantity,变压器磁芯有效体积,m^3,volume,transformer,,,output,1,变压器磁芯有效体积，单位 m^3。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+Vin,Vin,quantity,输入电压 Vin,V,voltage,,,,input+output,10,输入侧电压 | 输入电压 (V) | 输入电压 Vin，单位 V。 | 输入电压 Vin，单位 V，须大于 0。可省略，由 design_request 解析。 | 输入电压 Vin，输入单位为 V。,,中文名取自描述
+Vout,Vout,quantity,输出电压 Vout,V,voltage,,,,input,8,输出电压 (V) | 输出电压 Vout，单位 V。 | 输出电压 Vout，输入单位为 V。,,中文名取自描述
+Vout_max,Vout_max,quantity,输出电压扫描范围上限,V,voltage,,max,limit,input,2,输出电压扫描范围上限，单位 V，须大于 0 且不低于 Vout_min。,,中文名取自描述
+Vout_min,Vout_min,quantity,输出电压扫描范围下限,V,voltage,,min,limit,input,2,输出电压扫描范围下限，单位 V，须大于 0 且不超过 Vout_max。,,中文名取自描述
+Vout_step,Vout_step,quantity,扫描区间内的工况步长,V,voltage,,,,input,2,扫描区间内的工况步长，单位 V，须大于 0，默认 50。,,中文名取自描述；无描述给出该列；降级采用 voltage
+algorithm_context,algorithm_context,control,优化算法超参覆盖字典,,text,,,,input,2,优化算法超参覆盖字典，只覆盖同名键、其余沿用默认。DE 识别 maxiter/popsize/tol/polish/updating/workers；PPO 识别 total_timesteps/num_envs/num_steps/num_minibatches/update_epochs/int_seed/cuda。,,中文名取自描述
+alpha,alpha,quantity,求解得到的外移相角占比,,ratio,,,,output,1,求解得到的外移相角占比，无量纲。,,中文名取自描述
+apply_changes,apply_changes,control,,,,,,,input,2,透传给器件注册工具：True 表示运行时注册并写回源码文件（需版本控制），False 仅运行时注册。注意：为 True 时前置缓存实际失效。,,中文名需人工（描述未给出可用名称，量纲也未识别）；无描述给出该列；降级采用 空
+artifact_type,artifact_type,control,按产物语义分类精确匹配（大小写敏感）,,,,,,input,1,按产物语义分类精确匹配（大小写敏感）。可选值：inductor_design、inductor_loss、topology_optimization、topology_comparison、device_loss_from_xml、power_electronics_workflow、generic_tool_result。留空不筛选。与 tool_name 的区别：本参数是语义分类，tool_name 是产生结果的工具名。,,中文名取自描述；无描述给出该列；降级采用 空
+assumption,assumption,control,计算采用的假设条件,,text,,,,output,4,计算采用的假设条件。,,中文名取自描述
+assumptions,assumption,control,计算采用的假设条件,,text,,,,input+output,5,本次规划的假设列表（自然语言句子），原样展示给用户。 | 计算采用的假设条件。,,中文名取自描述
+beta,beta,quantity,DAB-TPS 原边内移相占比 beta,,ratio,transformer_primary,,,input+output,1,DAB-TPS 原边内移相占比 beta，取值范围为 0~0.5。 | 原边内移相角占比，无量纲。,,中文名取自描述
+calculated_power,calculated_power,quantity,模型回算功率,W,power,,,,output,3,模型回算功率，单位 W。,,中文名取自描述
+candidate_count,candidate_count,quantity,满足要求的候选器件数量,个,count,,,,output,1,满足要求的候选器件数量，单位 个。,,中文名取自描述
+candidate_topologies,candidate_topologies,control,参与对比的拓扑名列表,,text,,,,input,1,参与对比的拓扑名列表，当前支持 DAB、DBSRC。留空表示对比全部已注册拓扑。与 optimizer 的区别：本参数选「比哪些拓扑」，optimizer 选「用什么算法」。,,中文名取自描述
+cap1_loss,cap1_loss,quantity,第 1 个谐振电容或电容组损耗,W,power,capacitor,loss,,input,1,第 1 个谐振电容或电容组损耗，单位 W。,,中文名取自描述
+cap2_loss,cap1_loss,quantity,第 2 个谐振电容或电容组损耗,W,power,capacitor,loss,,input,1,第 2 个谐振电容或电容组损耗，单位 W；没有时输入 0。,,中文名取自描述
+cap3_loss,cap1_loss,quantity,第 3 个谐振电容或电容组损耗,W,power,capacitor,loss,,input,1,第 3 个谐振电容或电容组损耗，单位 W；没有时输入 0。,,中文名取自描述
+cap4_loss,cap1_loss,quantity,第 4 个谐振电容或电容组损耗,W,power,capacitor,loss,,input,1,第 4 个谐振电容或电容组损耗，单位 W；没有时输入 0。,,中文名取自描述
+capacitance,Cr,quantity,谐振电容,F,capacitance,capacitor,,,output,1,谐振电容，单位 F。,,中文名取自描述
+capacitance1,Cr,quantity,谐振电容,F,capacitance,capacitor,,,output,3,电容1 | 谐振电容，单位 F。,,中文名取自描述
+class_code,,control,,,,,,,input,1,,,中文名需人工（描述未给出可用名称，量纲也未识别）；无描述给出该列；降级采用 空；无任何描述；未能归入标准量（无描述或无词根），待人工
+class_name,,control,,,,,,,input,1,,,中文名需人工（描述未给出可用名称，量纲也未识别）；无描述给出该列；降级采用 空；无任何描述；未能归入标准量（无描述或无词根），待人工
+component,component,control,按器件/拓扑标签过滤（忽略大小写全等匹配）,,,,,,input,1,按器件/拓扑标签过滤（忽略大小写全等匹配），如 DBSRC、DAB、inductor。留空不筛选。,,中文名取自描述；无描述给出该列；降级采用 空
+constraint_passed,constraint_passed,control,损耗约束是否通过,,boolean,,,,output,1,损耗约束是否通过。,,中文名取自描述
+constraint_status,constraint_status,control,约束状态,,text,,,,output,5,损耗约束状态。 | 约束状态。,,中文名取自描述
+core_L,core_L,reference,电感磁芯型号,,model,inductor,,,output,1,电感磁芯型号。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+core_T,core_T,reference,变压器磁芯型号,,model,transformer,,,output,1,变压器磁芯型号。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+cost,cost,quantity,电容组合成本,元,cost,capacitor,,,output,1,电容组合成本，单位 元。,,中文名取自描述
+current_derating,current_derating,quantity,电流降额系数,,ratio,,,,input,1,电流降额系数，例如 0.8 表示只使用额定值的 80%。,,中文名取自描述
+current_dict,,control,,,,,,,input,4,,,中文名需人工（描述未给出可用名称，量纲也未识别）；bundle 参数（整包数据），阶段 2 处理键空间；无任何描述；未能归入标准量（无描述或无词根），待人工
+current_limit,current_limit,quantity,降额后的电流上限,A,current,,,limit,output,1,降额后的电流上限，单位 A。,,中文名取自描述
+current_margin,current_margin,quantity,电流裕量,A,current,,,margin,output,2,电流裕量，单位 A。 | 额定电流裕量，单位 A。,,中文名取自描述
+current_safety_factor,current_safety_factor,quantity,电流安全系数,,ratio,,,,input,1,电流安全系数，无量纲，默认 1.2。,,中文名取自描述
+default_operating_point,default_operating_point,quantity,对每个工况预设做整体覆盖的字典,,ratio,,,,input,1,对每个工况预设做整体覆盖的字典，键名须匹配解析损耗工具的 schema：Lr(uH)、Cr(nF)、fs(Hz)、n(变比)、Vin(V)、Vout(V)、Pout(W)、D1(无量纲 0~0.5)。仅影响解析损耗路径，不影响 PLECS 与校验环节。,,中文名取自描述
+design_request,design_request,control,用户原话级的需求描述（应用场景、工况、约束）,,text,switch,,,input,2,用户原话级的需求描述（应用场景、工况、约束）。既用于解析工程参数，也原样透传给每个拓扑的优化入口。高级约束（如「把开关管损耗限制改成 60W」）必须写在这段文本里。 | 用户原话级的需求描述（应用场景、工况、约束）。本工具优先使用显式参数，未给出的才从这段文本解析。高级约束（如「把开关管损耗限制改成 60W」）必须写在这段文本里。,,中文名取自描述
+device_current_rating,device_current_rating,quantity,候选开关管额定电流,A,current,switch,,rating,input,1,候选开关管额定电流，单位 A。,,中文名取自描述
+device_model,device_model,reference,已注册的 IGBT 器件型号,,model,,,,input+output,5,器件型号。 | 已注册的 IGBT 器件型号。 | 已注册的 IGBT 器件型号，必须与损耗模型注册名一致。 | 选定的开关管型号。,,中文名取自描述
+device_name,device_name,reference,谐振电容型号,,model,capacitor,,,output,1,谐振电容型号。,,中文名取自描述
+device_technology,device_technology,control,器件技术类型,,text,,,,output,1,器件技术类型。,,中文名取自描述
+device_voltage_rating,device_voltage_rating,quantity,候选开关管额定耐压,V,voltage,switch,,rating,input,1,候选开关管额定耐压，单位 V。,,中文名取自描述；无描述给出该列；降级采用 voltage
+diode_device_name,diode_device_name,reference,可选 Diode 器件名称或器件标识,,model,,,,input,1,可选 Diode 器件名称或器件标识。,,中文名取自描述
+diode_resolution,diode_resolution,control,二极管 XML 解析结果,,,diode,,,output,1,二极管 XML 解析结果。,,中文名取自描述；无描述给出该列；降级采用 空
+diode_xml_file_path,diode_xml_file_path,control,二极管 XML 文件路径,,text,diode,,,input,3,二极管 XML 文件路径，语义同上。 | 二极管 XML 的绝对路径。注意：二极管 XML 不参与门极电阻提取，只提供二极管特性。,,中文名取自描述
+diode_xml_var_name,diode_xml_var_name,control,PLECS 模型中二极管 XML 的变量名,,,diode,,,input,1,PLECS 模型中二极管 XML 的变量名，默认 d1_xml。与 sw_xml_var_name 同走「文件路径注入」通道。,,中文名取自描述；无描述给出该列；降级采用 空
+dry_run,dry_run,control,文本,,text,,,,input,1,为 True 时只做参数组装（读 XML、算工作点、解析模型路径），不连接 PLECS、不仿真。用于离线自检。,,中文名自动拼接（缺器件角色，请复核）
+engineering_note,engineering_note,control,工程适用范围说明,,text,,,,output,7,工程适用范围说明。,,中文名取自描述
+env_context_overrides,env_context_overrides,control,环境（奖励权重、约束、搜索范围）覆盖字典,,text,capacitor,,,input,2,环境（奖励权重、约束、搜索范围）覆盖字典。常用键：inductance_range(μH)、capacitance_range(nF)、frequency_range(kHz)、n_range(变比范围)、Pout_level_list(负载比例)、weight_efficiency/weight_volume/weight_cost、ripple_limit(%)、p_s_limit(W，单管损耗上限)、p_cap_limit(W，谐振电容损耗上限)、trans_loss_density/inductor_loss_density(kW/m³)。,,中文名取自描述
+esr,esr,quantity,等效串联电阻,ohm,resistance,,,,output,1,等效串联电阻，单位 ohm。,,中文名取自描述
+evalution,,control,,,,,,,input,1,,,中文名需人工（描述未给出可用名称，量纲也未识别）；无描述给出该列；降级采用 空；无任何描述；未能归入标准量（无描述或无词根），待人工
+failed_constraint_count,failed_constraint_count,quantity,未通过的约束数量,个,count,,,,output,4,未通过的约束数量，单位 个。,,中文名取自描述
+forward_ratio,forward_ratio,quantity,正向导电区间占比,,ratio,,forward,,input,1,正向导电区间占比，无量纲，范围 0~1。,,中文名取自描述
+fs,fs,quantity,开关频率,Hz,frequency,,,,input+output,12,开关频率 (Hz)（由模型内部计算并返回） | 开关频率 fs，单位 Hz。 | 开关频率 fs，输入单位为 Hz；90 kHz 应输入 90000。 | 开关频率，单位 Hz。,,中文名取自描述
+fs_min,fs_min,quantity,最低或设计开关频率,Hz,frequency,,min,limit,input,1,最低或设计开关频率，输入单位为 Hz；90 kHz 应输入 90000。,,中文名取自描述
+gamma,gamma,quantity,DAB-TPS 副边内移相占比 gamma,,ratio,transformer_secondary,,,input+output,1,DAB-TPS 副边内移相占比 gamma，取值范围为 0~0.5。 | 副边内移相角占比，无量纲。,,中文名取自描述
+i_max_ind,i_max_ind,quantity,谐振电感峰值电流,A,current,inductor,peak,,output,1,谐振电感峰值电流，单位 A。,,中文名取自描述
+i_mean_backward,i_mean_backward,quantity,该开关管反向导电区间的平均电流,A,current,switch,mean,,input,1,该开关管反向导电区间的平均电流，单位 A。,,中文名取自描述
+i_mean_d1,i_mean_d1,quantity,二极管1电流平均值,A,current,diode,mean,,output,2,二极管1电流平均值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_mean_d2,i_mean_d1,quantity,二极管2电流平均值,A,current,diode,mean,,output,2,二极管2电流平均值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_mean_d3,i_mean_d1,quantity,二极管3电流平均值,A,current,diode,mean,,output,2,二极管3电流平均值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_mean_d4,i_mean_d1,quantity,二极管4电流平均值,A,current,diode,mean,,output,2,二极管4电流平均值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_mean_forward,i_mean_forward,quantity,该开关管正向导电区间的平均电流,A,current,switch,mean,,input,1,该开关管正向导电区间的平均电流，单位 A。,,中文名取自描述
+i_mean_s1,i_mean_s1,quantity,开关管1电流平均值,A,current,switch,mean,,output,2,开关管1电流平均值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_mean_s1_backward,i_mean_s1_backward,quantity,S1 反向平均电流,A,current,switch,mean,,output,4,S1 反向平均电流，单位 A。,,中文名取自描述
+i_mean_s1_forward,i_mean_s1_forward,quantity,S1 正向平均电流,A,current,switch,mean,,output,4,S1 正向平均电流，单位 A。,,中文名取自描述
+i_mean_s2,i_mean_s1,quantity,开关管2电流平均值,A,current,switch,mean,,output,2,开关管2电流平均值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_mean_s2_backward,i_mean_s1_backward,quantity,S2 反向平均电流,A,current,switch,mean,,output,4,S2 反向平均电流，单位 A。,,中文名取自描述
+i_mean_s2_forward,i_mean_s1_forward,quantity,S2 正向平均电流,A,current,switch,mean,,output,4,S2 正向平均电流，单位 A。,,中文名取自描述
+i_mean_s3,i_mean_s1,quantity,开关管3电流平均值,A,current,switch,mean,,output,2,开关管3电流平均值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_mean_s3_backward,i_mean_s1_backward,quantity,S3 反向平均电流,A,current,switch,mean,,output,4,S3 反向平均电流，单位 A。,,中文名取自描述
+i_mean_s3_forward,i_mean_s1_forward,quantity,S3 正向平均电流,A,current,switch,mean,,output,4,S3 正向平均电流，单位 A。,,中文名取自描述
+i_mean_s4,i_mean_s1,quantity,开关管4电流平均值,A,current,switch,mean,,output,2,开关管4电流平均值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_mean_s4_backward,i_mean_s1_backward,quantity,S4 反向平均电流,A,current,switch,mean,,output,4,S4 反向平均电流，单位 A。,,中文名取自描述
+i_mean_s4_forward,i_mean_s1_forward,quantity,S4 正向平均电流,A,current,switch,mean,,output,4,S4 正向平均电流，单位 A。,,中文名取自描述
+i_mean_s5_backward,i_mean_s1_backward,quantity,S5 反向平均电流,A,current,switch,mean,,output,4,S5 反向平均电流，单位 A。,,中文名取自描述
+i_mean_s5_forward,i_mean_s1_forward,quantity,S5 正向平均电流,A,current,switch,mean,,output,4,S5 正向平均电流，单位 A。,,中文名取自描述
+i_mean_s6_backward,i_mean_s1_backward,quantity,S6 反向平均电流,A,current,switch,mean,,output,4,S6 反向平均电流，单位 A。,,中文名取自描述
+i_mean_s6_forward,i_mean_s1_forward,quantity,S6 正向平均电流,A,current,switch,mean,,output,4,S6 正向平均电流，单位 A。,,中文名取自描述
+i_mean_s7_backward,i_mean_s1_backward,quantity,S7 反向平均电流,A,current,switch,mean,,output,4,S7 反向平均电流，单位 A。,,中文名取自描述
+i_mean_s7_forward,i_mean_s1_forward,quantity,S7 正向平均电流,A,current,switch,mean,,output,4,S7 正向平均电流，单位 A。,,中文名取自描述
+i_mean_s8_backward,i_mean_s1_backward,quantity,S8 反向平均电流,A,current,switch,mean,,output,4,S8 反向平均电流，单位 A。,,中文名取自描述
+i_mean_s8_forward,i_mean_s1_forward,quantity,S8 正向平均电流,A,current,switch,mean,,output,4,S8 正向平均电流，单位 A。,,中文名取自描述
+i_off,i_off,quantity,关断瞬时电流,A,current,,off,,input,1,关断瞬时电流，单位 A。必须直接传入上游 i_off_s<N> 的带符号值，不得取绝对值；负值用于判断 ZVS 关断。,,中文名取自描述
+i_off_s1,i_off_s1,quantity,S1 关断时刻器件侧电流,A,current,switch,off,,output,6,S1 关断时刻器件侧电流，单位 A。 | 开关管1关断电流,,中文名取自描述
+i_off_s2,i_off_s1,quantity,S2 关断时刻器件侧电流,A,current,switch,off,,output,6,S2 关断时刻器件侧电流，单位 A。 | 开关管2关断电流,,中文名取自描述
+i_off_s3,i_off_s1,quantity,S3 关断时刻器件侧电流,A,current,switch,off,,output,6,S3 关断时刻器件侧电流，单位 A。 | 开关管3关断电流,,中文名取自描述
+i_off_s4,i_off_s1,quantity,S4 关断时刻器件侧电流,A,current,switch,off,,output,6,S4 关断时刻器件侧电流，单位 A。 | 开关管4关断电流,,中文名取自描述
+i_off_s5,i_off_s1,quantity,S5 关断时刻器件侧电流,A,current,switch,off,,output,4,S5 关断时刻器件侧电流，单位 A。,,中文名取自描述
+i_off_s6,i_off_s1,quantity,S6 关断时刻器件侧电流,A,current,switch,off,,output,4,S6 关断时刻器件侧电流，单位 A。,,中文名取自描述
+i_off_s7,i_off_s1,quantity,S7 关断时刻器件侧电流,A,current,switch,off,,output,4,S7 关断时刻器件侧电流，单位 A。,,中文名取自描述
+i_off_s8,i_off_s1,quantity,S8 关断时刻器件侧电流,A,current,switch,off,,output,4,S8 关断时刻器件侧电流，单位 A。,,中文名取自描述
+i_on,i_on,quantity,开通瞬时电流,A,current,,on,,input,1,开通瞬时电流，单位 A。必须直接传入上游 i_on_s<N> 的带符号值，不得取绝对值；负值用于判断 ZVS 开通。,,中文名取自描述
+i_on_s1,i_on_s1,quantity,S1 开通时刻器件侧电流,A,current,switch,on,,output,6,S1 开通时刻器件侧电流，单位 A。 | 开关管1开通电流,,中文名取自描述
+i_on_s2,i_on_s1,quantity,S2 开通时刻器件侧电流,A,current,switch,on,,output,6,S2 开通时刻器件侧电流，单位 A。 | 开关管2开通电流,,中文名取自描述
+i_on_s3,i_on_s1,quantity,S3 开通时刻器件侧电流,A,current,switch,on,,output,6,S3 开通时刻器件侧电流，单位 A。 | 开关管3开通电流,,中文名取自描述
+i_on_s4,i_on_s1,quantity,S4 开通时刻器件侧电流,A,current,switch,on,,output,6,S4 开通时刻器件侧电流，单位 A。 | 开关管4开通电流,,中文名取自描述
+i_on_s5,i_on_s1,quantity,S5 开通时刻器件侧电流,A,current,switch,on,,output,4,S5 开通时刻器件侧电流，单位 A。,,中文名取自描述
+i_on_s6,i_on_s1,quantity,S6 开通时刻器件侧电流,A,current,switch,on,,output,4,S6 开通时刻器件侧电流，单位 A。,,中文名取自描述
+i_on_s7,i_on_s1,quantity,S7 开通时刻器件侧电流,A,current,switch,on,,output,4,S7 开通时刻器件侧电流，单位 A。,,中文名取自描述
+i_on_s8,i_on_s1,quantity,S8 开通时刻器件侧电流,A,current,switch,on,,output,4,S8 开通时刻器件侧电流，单位 A。,,中文名取自描述
+i_peak,i_peak,quantity,电感峰值电流,A,current,inductor,peak,,input,2,电感峰值电流，单位 A；未知时输入 0。 | 绕组峰值电流，单位 A。,,中文名取自描述
+i_peak_ind1,i_peak_ind1,quantity,串联电感峰值电流,A,current,inductor,peak,,output,5,串联电感峰值电流，单位 A。 | 串联谐振电感峰值电流，单位 A。 | 第一个电感电流峰值,,中文名取自描述
+i_peak_ind_max,i_peak_ind_max,quantity,电感峰值电流,A,current,inductor,peak,actual,input,1,电感峰值电流，输入单位为 A。,,中文名取自描述
+i_rating,i_rating,quantity,器件额定电流,A,current,,,rating,output,1,器件额定电流，单位 A。,,中文名取自描述
+i_rms,i_rms,quantity,谐振电容 RMS 电流,A,current,,rms,,input+output,6,器件 RMS 电流，单位 A。 | 绕组 RMS 电流，单位 A。 | 该开关管 RMS 电流，单位 A。 | 该开关管的 RMS 电流，单位 A。 | 谐振电容 RMS 电流，单位 A。 | 谐振电容 RMS 电流，单位 A；未知时输入 0。 | 选型依据的 RMS 电流：单器件取其 RMS 电流；统一选型取整组最大 RMS 电流，单位 A。,,中文名取自描述
+i_rms_c1,i_rms_c1,quantity,谐振电容 RMS 电流,A,current,capacitor,rms,,output,4,第一个电容电流有效值 | 谐振电容 RMS 电流，单位 A。,,中文名取自描述
+i_rms_d1,i_rms_d1,quantity,二极管1电流有效值,A,current,diode,rms,,output,2,二极管1电流有效值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_rms_d2,i_rms_d1,quantity,二极管2电流有效值,A,current,diode,rms,,output,2,二极管2电流有效值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_rms_d3,i_rms_d1,quantity,二极管3电流有效值,A,current,diode,rms,,output,2,二极管3电流有效值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_rms_d4,i_rms_d1,quantity,二极管4电流有效值,A,current,diode,rms,,output,2,二极管4电流有效值,,中文名取自描述；单位未识别；单位为平台惯例（current → A），非描述声明
+i_rms_ind,i_rms_ind,quantity,谐振电感 RMS 电流,A,current,inductor,rms,,output,1,谐振电感 RMS 电流，单位 A。,,中文名取自描述
+i_rms_ind1,i_rms_ind1,quantity,串联电感 RMS 电流,A,current,inductor,rms,,output,5,串联电感 RMS 电流，单位 A。 | 串联谐振电感 RMS 电流，单位 A。 | 第一个电感电流有效值,,中文名取自描述
+i_rms_ind_max,i_rms_ind_max,quantity,电感 RMS 电流,A,current,inductor,max,actual,input,1,电感 RMS 电流，输入单位为 A。,,中文名取自描述
+i_rms_p,i_rms_p,quantity,变压器原边 RMS 电流,A,current,transformer_primary,rms,,input+output,7,原边绕组 RMS 电流，单位 A。 | 变压器原边 RMS 电流，单位 A。 | 变压器原边电流有效值,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+i_rms_p_max,i_rms_p_max,quantity,原边 RMS 电流,A,current,transformer_primary,max,actual,input,1,原边 RMS 电流，输入单位为 A。,,中文名取自描述
+i_rms_s1,i_rms_s1,quantity,S1 器件侧 RMS 电流,A,current,switch,rms,,output,6,S1 器件侧 RMS 电流，单位 A。 | 开关管1电流有效值,,中文名取自描述
+i_rms_s2,i_rms_s1,quantity,S2 器件侧 RMS 电流,A,current,switch,rms,,output,6,S2 器件侧 RMS 电流，单位 A。 | 开关管2电流有效值,,中文名取自描述
+i_rms_s3,i_rms_s1,quantity,S3 器件侧 RMS 电流,A,current,switch,rms,,output,6,S3 器件侧 RMS 电流，单位 A。 | 开关管3电流有效值,,中文名取自描述
+i_rms_s4,i_rms_s1,quantity,S4 器件侧 RMS 电流,A,current,switch,rms,,output,6,S4 器件侧 RMS 电流，单位 A。 | 开关管4电流有效值,,中文名取自描述
+i_rms_s5,i_rms_s1,quantity,S5 器件侧 RMS 电流,A,current,switch,rms,,output,4,S5 器件侧 RMS 电流，单位 A。,,中文名取自描述
+i_rms_s6,i_rms_s1,quantity,S6 器件侧 RMS 电流,A,current,switch,rms,,output,4,S6 器件侧 RMS 电流，单位 A。,,中文名取自描述
+i_rms_s7,i_rms_s1,quantity,S7 器件侧 RMS 电流,A,current,switch,rms,,output,4,S7 器件侧 RMS 电流，单位 A。,,中文名取自描述
+i_rms_s8,i_rms_s1,quantity,S8 器件侧 RMS 电流,A,current,switch,rms,,output,4,S8 器件侧 RMS 电流，单位 A。,,中文名取自描述
+igbt_device_name,igbt_device_name,reference,IGBT 器件名称或器件标识,,model,,,,input,1,IGBT 器件名称或器件标识。,,中文名取自描述
+igbt_model_mode_hint,igbt_model_mode_hint,control,IGBT 损耗模型模式提示,,text,,,,input,1,IGBT 损耗模型模式提示，取值 table_only/formula_only/mixed/unknown。留空则从 XML 自动识别。唯一作用是决定是否注入门极电阻：table_only 不注入，其余都注入。,,中文名取自描述
+igbt_resolution,igbt_resolution,control,IGBT XML 解析结果,,,,,,output,1,IGBT XML 解析结果。,,中文名取自描述；无描述给出该列；降级采用 空
+igbt_xml_file_path,igbt_xml_file_path,control,IGBT XML 文件路径,Ω,text,,,,input,3,IGBT XML 文件路径。本工具自身不校验绝对路径，直接透传给读取工具；但会先读取文件属性用于缓存键，因此路径必须存在。 | IGBT 半导体 XML 的绝对路径。同时用于提取门极电阻（RGONNOM/RGOFFNOM，单位 Ω）和识别损耗计算模式。必须是存在的 .xml 文件。,,中文名取自描述
+inductance,Lr,quantity,谐振电感,H,inductance,inductor,,,input+output,3,电感值，单位 H。 | 目标电感值，输入单位为 H；10 uH 应输入 10e-6。 | 谐振电感，单位 H。,,中文名取自描述
+inductance1,Lr,quantity,串联电感,H,inductance,inductor,,,output,5,串联电感，单位 H。 | 串联谐振电感，单位 H。 | 电感1,,中文名取自描述
+input_design,input_design,quantity,比值,,ratio,,,,output,1,仿真输入快照：Lr 单位 uH、Cr 单位 nF、fs 单位 Hz、Vin/Vout 单位 V、Pout 单位 W，n/D1/D2 无量纲。,,中文名自动拼接（缺器件角色，请复核）
+latest,latest,control,默认 True,,,,,,input,1,默认 True，只返回最新一条，此时 limit 被完全忽略。注意名字易误解：它是「只要最新一条」，不是「按时间倒序」。,,中文名取自描述；无描述给出该列；降级采用 空
+limit,limit,quantity,仅在 latest=False 时生效的最大返回条数,,count,,max,,input,1,仅在 latest=False 时生效的最大返回条数，内部钳制到 1~20，默认 5。,,中文名取自描述
+limit_utilization,limit_utilization,quantity,损耗限值利用率,%,ratio,,,,output,1,损耗限值利用率，单位 %。,,中文名取自描述
+loss_density,loss_density,quantity,电感损耗密度,kW/m^3,power_density,,loss,,output,2,变压器损耗密度，单位 kW/m^3。 | 电感损耗密度，单位 kW/m^3。,,中文名取自描述；量纲订正：单位是 kW/m³，不是 power 而是 power_density
+loss_density_limit,loss_density_limit,quantity,电感损耗密度上限,kW/m^3,power_density,,loss,limit,input+output,2,变压器损耗密度上限，单位 kW/m^3。 | 电感损耗密度上限，单位 kW/m^3。,,中文名取自描述；量纲订正：单位是 kW/m³，不是 power 而是 power_density
+loss_density_margin,loss_density_margin,quantity,电感损耗密度裕量,kW/m^3,power_density,,,margin,output,2,变压器损耗密度裕量，单位 kW/m^3。 | 电感损耗密度裕量，单位 kW/m^3。,,中文名取自描述；量纲订正：单位是 kW/m³，不是 power 而是 power_density
+loss_limit,loss_limit,quantity,单组电容损耗上限,W,power,capacitor,loss,limit,output,2,单管损耗上限，单位 W。 | 单组电容损耗上限，单位 W。,,中文名取自描述
+loss_margin,loss_margin,quantity,电容损耗裕量,W,power,capacitor,,margin,output,3,损耗裕量，单位 W。 | 电容损耗裕量，单位 W。,,中文名取自描述
+loss_result,loss_result,quantity,仿真损耗结果,W,power,,loss,,output,1,仿真损耗结果；各损耗值单位 W。,,中文名取自描述
+max_capacitor_loss,max_capacitor_loss,quantity,最大单组电容损耗,W,power,capacitor,max,actual,output,1,最大单组电容损耗，单位 W。,,中文名取自描述
+max_parallel,max_parallel,quantity,允许的最大并联只数,,count,,max,,input,1,允许的最大并联只数，默认 14。,,中文名取自描述
+max_switches,,control,,,,,max,,input,1,,,中文名需人工（描述未给出可用名称，量纲也未识别）；无描述给出该列；降级采用 空；无任何描述；未能归入标准量（无描述或无词根），待人工
+message,message,control,仿真或器件解析说明,,text,,,,output,1,仿真或器件解析说明。,,中文名取自描述
+min_parallel,min_parallel,quantity,允许的最小并联只数,,count,,min,,input,1,允许的最小并联只数，默认 3。,,中文名取自描述
+missing_inputs,missing_inputs,control,旧调用兼容字段,,,,,,input,1,旧调用兼容字段，新预览不要填写。缺参只在执行期由 Step Agent 判断并暂停追问。,,中文名取自描述；无描述给出该列；降级采用 空
+mode,mode,quantity,工作模式编号,,ratio,,,,output,3,工作模式编号，无量纲。,,中文名取自描述
+model_file_path,model_file_path,control,.plecs 模型文件路径,,text,,,,input,1,.plecs 模型文件路径。留空则自动使用 <repo>/src/deep_agent/DBSRC.plecs。解析后必须存在。,,中文名取自描述
+model_name,model_name,control,PLECS 服务器内已加载模型的名字,,,,,,input,1,PLECS 服务器内已加载模型的名字，默认 DBSRC，作为所有 RPC 参数路径的前缀。必须与 PLECS 中 plecs.load() 后的模型名一致。,,中文名取自描述；无描述给出该列；降级采用 空
+modulation,modulation,control,调制方式,,text,,,,input+output,6,电压电流计算所用调制方式。DBSRC 支持 EPS/SPS，DAB 支持 EPS/TPS，默认 EPS。传非法值不报错，只会导致电流模型落空。 | 调制方式。,,中文名取自描述
+n,n,quantity,变压器等效变比 n,,ratio,,,,input+output,10,变压器原副边匝比，无量纲。 | 变压器变比 | 变压器变比 n，原边匝数/副边匝数。 | 变压器变比 n，定义为原边匝数/副边匝数。 | 变压器等效匝比 n。 | 变压器等效变比 n，定义为原边匝数/副边匝数。 | 实际原副边整数匝比，无量纲。 | 无 | 目标变比 n，定义为原边匝数/副边匝数。,,中文名取自描述
+n_parallel,n_parallel,quantity,并联电容数量,只,count,capacitor,,,output,1,并联电容数量，单位 只。,,中文名取自描述
+normalized_device_params,,control,,,,,,,input,1,,,中文名需人工（描述未给出可用名称，量纲也未识别）；bundle 参数（整包数据），阶段 2 处理键空间；无任何描述；未能归入标准量（无描述或无词根），待人工
+operating_preset_name,operating_preset_name,control,主工况预设名,,,,,,input,2,主工况预设名，默认 baseline。优先级：run_all_operating_presets > operating_preset_names > 本参数。 | 单工况预设名，取值 baseline/high_voltage/low_power，默认 baseline。仅当 run_all_operating_presets=False 且 operating_preset_names 为空时生效。,,中文名取自描述；无描述给出该列；降级采用 空
+operating_preset_names,operating_preset_names,control,多工况预设名列表,,text,,,,input,2,多工况预设名列表，覆盖 operating_preset_name。优先级：run_all_operating_presets > 本参数 > operating_preset_name。 | 多工况预设名列表，覆盖 operating_preset_name。每个名字须存在于预设表。,,中文名取自描述
+optimizer,optimizer,control,参数优化算法,,,,,,input,2,参数优化算法，取值 DE 或 PPO，留空默认 DE。,,中文名取自描述；无描述给出该列；降级采用 空
+original_request,original_request,control,用户的完整原始请求,一致,,,,,input,1,用户的完整原始请求。执行阶段理解参数的主要依据，因此用户的全部数值、单位、约束必须保留在这段文本中，不要求与任何工具字段名或单位一致。,,中文名取自描述；无描述给出该列；降级采用 空
+output_dir,output_dir,control,结果 CSV 的输出目录,,text,,,,input,1,结果 CSV 的输出目录，须可写。每个工况生成 dbsrc_device_loss_<preset>.csv。,,中文名取自描述
+over_ratio,over_ratio,quantity,容量超配比例,,ratio,,,,output,1,容量超配比例，无量纲。,,中文名取自描述
+p_cap,p_cap,quantity,谐振电容损耗,W,power,capacitor,,,output,1,谐振电容损耗，单位 W。,,中文名取自描述
+p_cap_limit,p_cap_limit,quantity,单个谐振电容或电容组损耗上限,W,power,capacitor,,limit,input,1,单个谐振电容或电容组损耗上限，单位 W。,,中文名取自描述
+p_cond,p_cond,quantity,导通损耗,W,power,,on,,output,1,导通损耗，单位 W。,,中文名取自描述
+p_cu,p_cu,quantity,电感铜损,W,power,,,,input+output,4,变压器铜损，单位 W。 | 电感铜损，单位 W。,,中文名取自描述
+p_fe,p_fe,quantity,电感铁损,W,power,,,,input+output,4,变压器铁损，单位 W。 | 电感铁损，单位 W。,,中文名取自描述
+p_limit,p_limit,quantity,前期筛选使用的单管损耗上限,W,power,,,limit,input+output,2,前期筛选使用的单管损耗上限，单位 W。 | 前期筛选使用的单管损耗限值，单位 W，默认 80 W。 | 单管损耗上限，单位 W。,,中文名取自描述
+p_off,p_off,quantity,关断损耗,W,power,,off,,output,1,关断损耗，单位 W。,,中文名取自描述
+p_on,p_on,quantity,开通损耗,W,power,,on,,output,1,开通损耗，单位 W。,,中文名取自描述
+p_total,p_total,quantity,谐振电容组总损耗,W,power,,total,,input+output,6,单管总损耗，单位 W。 | 变压器总损耗，单位 W。 | 电感总损耗，单位 W。 | 该开关管总损耗，单位 W。 | 该开关管的总损耗，单位 W。 | 谐振电容组总损耗，单位 W。,,中文名取自描述
+passed,passed,control,约束是否通过,,boolean,,,,output,4,约束是否通过。,,中文名取自描述
+plecs_output_dir,plecs_output_dir,control,透传给 PLECS 工具的 CSV 输出目录,,text,,,,input,1,透传给 PLECS 工具的 CSV 输出目录，须可写。,,中文名取自描述
+poll_timeout_s,poll_timeout_s,quantity,仿真后轮询等待结果 CSV 出现的最长秒数,s,time,,,,input,1,仿真后轮询等待结果 CSV 出现的最长秒数，单位 s，默认 4.0。超时抛错。,,中文名取自描述；无描述给出该列；降级采用 time；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+power_error,power_error,quantity,功率相对误差,%,ratio,,,,output,3,功率相对误差，单位 %。,,中文名取自描述
+required_V,required_V,quantity,计入裕量后的所需额定电压,V,voltage,,,rating,output,1,计入裕量后的所需额定电压，单位 V。,,中文名取自描述
+required_capacitance,required_capacitance,quantity,计入裕量后的所需电容量,uF,capacitance,capacitor,,target,output,1,计入裕量后的所需电容量，单位 uF。,,中文名取自描述
+required_i_rating,required_i_rating,quantity,计入裕量后的所需额定电流,A,current,,,rating,output,1,计入裕量后的所需额定电流，单位 A。,,中文名取自描述
+required_input,required_input,control,业务失败时缺少的输入字段,,,,,,output,1,业务失败时缺少的输入字段。,,中文名取自描述；无描述给出该列；降级采用 空
+required_v_rating,required_V,quantity,计入裕量后的所需额定电压,V,voltage,,,rating,output,1,计入裕量后的所需额定电压，单位 V。,,中文名取自描述
+rgoff_hint,rgoff_hint,quantity,关断门极电阻,Ω,resistance,,off,,input,1,关断门极电阻，单位 Ω，须与 rgon_hint 成对给出。,,中文名取自描述
+rgon_hint,rgon_hint,control,开通门极电阻提示值,Ω,text,,on,,input,1,开通门极电阻提示值，单位 Ω。必须与 rgoff_hint 成对给出，只给一个则两者都被忽略、回落到 XML 注释值。,,中文名取自描述
+ripple_current,ripple_current,quantity,滤波电容纹波电流 RMS,A,current,filter_capacitor,ripple,,input+output,1,滤波电容纹波电流 RMS，输入单位为 A；当前仅记录，不参与旧内核筛选。 | 记录的纹波 RMS 电流，单位 A。,,中文名取自描述
+ripple_current_checked,ripple_current_checked,control,是否执行纹波电流校核,,boolean,,ripple,,output,1,是否执行纹波电流校核。,,中文名取自描述
+ripple_current_margin,ripple_current_margin,quantity,纹波电流裕量,A,current,,ripple,margin,output,1,纹波电流裕量，单位 A。,,中文名取自描述
+ripple_current_rating,ripple_current_rating,quantity,候选电容纹波电流额定值,A,current,capacitor,,rating,input,1,候选电容纹波电流额定值，单位 A；未知时输入 0。,,中文名取自描述
+rpc_url,rpc_url,control,PLECS XML-RPC 端点,,,,,,input,1,PLECS XML-RPC 端点，默认 http://localhost:1080/RPC2。需本机 PLECS 已开启 RPC 服务。,,中文名取自描述；无描述给出该列；降级采用 空
+run_all_operating_presets,run_all_operating_presets,control,是否跑全部工况预设,,boolean,,,,input,2,是否跑全部工况预设，默认 False，为 True 时忽略上面两个。注意它不影响 validation_preset_name。 | 是否跑全部预设（baseline + high_voltage + low_power），默认 False。为 True 时忽略上面两个工况参数。,,中文名取自描述
+run_plecs_simulation,run_plecs_simulation,control,是否执行 PLECS 仿真对照,,boolean,,,,input,1,是否执行 PLECS 仿真对照，默认 True。与解析损耗路径并行执行。仿真失败不中断整体，只把 plecs_execution.status 置为 error。,,中文名取自描述
+s1_forward_ratio,s1_forward_ratio,quantity,S1 正向电流占比,,ratio,switch,forward,,output,4,S1 正向电流占比，无量纲。,,中文名取自描述
+s2_forward_ratio,s1_forward_ratio,quantity,S2 正向电流占比,,ratio,switch,forward,,output,4,S2 正向电流占比，无量纲。,,中文名取自描述
+s3_forward_ratio,s1_forward_ratio,quantity,S3 正向电流占比,,ratio,switch,forward,,output,4,S3 正向电流占比，无量纲。,,中文名取自描述
+s4_forward_ratio,s1_forward_ratio,quantity,S4 正向电流占比,,ratio,switch,forward,,output,4,S4 正向电流占比，无量纲。,,中文名取自描述
+s5_forward_ratio,s1_forward_ratio,quantity,S5 正向电流占比,,ratio,switch,forward,,output,4,S5 正向电流占比，无量纲。,,中文名取自描述
+s6_forward_ratio,s1_forward_ratio,quantity,S6 正向电流占比,,ratio,switch,forward,,output,4,S6 正向电流占比，无量纲。,,中文名取自描述
+s7_forward_ratio,s1_forward_ratio,quantity,S7 正向电流占比,,ratio,switch,forward,,output,4,S7 正向电流占比，无量纲。,,中文名取自描述
+s8_forward_ratio,s1_forward_ratio,quantity,S8 正向电流占比,,ratio,switch,forward,,output,4,S8 正向电流占比，无量纲。,,中文名取自描述
+sample_current_dict,,control,,,,,,,input,1,,,中文名需人工（描述未给出可用名称，量纲也未识别）；bundle 参数（整包数据），阶段 2 处理键空间；无任何描述；未能归入标准量（无描述或无词根），待人工
+saturation_checked,saturation_checked,control,是否执行饱和电流校核,,boolean,,saturation,,output,1,是否执行饱和电流校核。,,中文名取自描述
+saturation_current,saturation_current,quantity,电感饱和电流,A,current,inductor,saturation,,input,1,电感饱和电流，单位 A；未知时输入 0。,,中文名取自描述
+saturation_margin,saturation_margin,quantity,饱和电流裕量,A,current,,saturation,margin,output,1,饱和电流裕量，单位 A。,,中文名取自描述
+saturation_margin_factor,saturation_margin_factor,quantity,饱和电流裕量系数,,ratio,,peak,,input,1,饱和电流裕量系数，例如 1.2 表示 Isat 需要大于 1.2 倍峰值电流。,,中文名取自描述
+saturation_required,saturation_required,quantity,计入裕量后的所需饱和电流,A,current,,saturation,,output,1,计入裕量后的所需饱和电流，单位 A。,,中文名取自描述
+selected_capacitance,selected_capacitance,control,按容量规格组织的电容组合明细,,text,capacitor,,,output,1,按容量规格组织的电容组合明细。,,中文名取自描述
+selected_capacitance_value,selected_capacitance_value,quantity,选定组合总电容量,uF,capacitance,capacitor,,,output,1,选定组合总电容量，单位 uF。,,中文名取自描述
+selection_success,selection_success,control,选型是否成功,,boolean,,,,output,1,选型是否成功。,,中文名取自描述
+status,status,control,仿真或器件解析状态,,text,,,,output,1,仿真或器件解析状态。,,中文名取自描述
+steps,steps,control,逻辑工作流步骤清单,,text,,,,input,1,逻辑工作流步骤清单。每项须填 step_id（唯一标识）、agent（必须取自系统消息的【可用子智能体清单】，禁止编造）、task（交给子智能体的任务描述）、depends_on（仅表达真实数据依赖，无依赖的步骤不要串行化）。本轮不要填 tool、不要填 inputs——它们由编译阶段填写。同一类别下按器件重复的计算属于一个步骤内部的多次工具调用，不要为每个器件生成独立步骤。,,中文名取自描述
+success,success,control,工具是否成功,,boolean,,,,output,8,工具是否成功。,,中文名取自描述
+sw_custom_var_name,sw_custom_var_name,control,PLECS 模型中门极电阻结构体的变量名,,text,,,,input,1,"PLECS 模型中门极电阻结构体的变量名，默认 sw1_customvars。注入 {Rgon, Rgoff}（单位 Ω）数值结构；IGBT 为 table_only 模式时注入空字典，即不注入门极电阻。与上面两个的区别：那两个注入文件路径，这个注入数值结构。",,中文名取自描述；量纲订正：是变量名不是阻值（原标 resistance/Ω 是错的）
+sw_xml_var_name,sw_xml_var_name,control,PLECS 模型中开关管器件 XML 的变量名,,,switch,,,input,1,PLECS 模型中开关管器件 XML 的变量名，默认 sw1_xml。注意：名字写错不报错，只会静默使用模型自带器件。,,中文名取自描述；无描述给出该列；降级采用 空
+switch_id,switch_id,control,待校核的开关管位置,,,switch,,,input+output,4,开关管位置或范围标识。 | 开关管位置标识。 | 待校核的开关管位置，例如 S1。 | 待检查的开关管位置，例如 S1。 | 待计算的开关管位置，例如 S1。 | 待选型的开关管位置/范围。单器件选型输入具体编号（如 S1）；多器件统一选型输入范围（如 S1-S8），此时依据该组全部器件的最大阻断电压与最大 RMS 电流统一选型一次（不是逐器件多次调用）。,,中文名取自描述；仅 2/6 条描述表态（model），不足半数；降级采用 空
+tan_delta,tan_delta,quantity,介质损耗角正切（无量纲）,,ratio,capacitor,,,input+output,2,介质损耗角正切（无量纲），PP 聚丙烯薄膜电容典型值 0.001。 | 介质损耗角正切，无量纲。,,中文名取自描述
+target_file,,control,,,,,,,input,1,,,中文名需人工（描述未给出可用名称，量纲也未识别）；无描述给出该列；降级采用 空；无任何描述；未能归入标准量（无描述或无词根），待人工
+target_n,target_n,quantity,目标原副边匝比,,ratio,transformer_secondary,,target,output,1,目标原副边匝比，无量纲。,,中文名取自描述
+temperature_priority,temperature_priority,control,从 XML 温度轴中按优先级挑选的结温点列表,°C,text,,,,input,2,"从 XML 温度轴中按优先级挑选的结温点列表，单位 °C，默认 [125, 150, 175]。取第一个恰好存在于轴上的；都不存在则取离首项最近的。",,中文名取自描述
+title,title,control,预览标题,,,,,,input,1,预览标题，简短概括本次工作流的目标。,,中文名取自描述；无描述给出该列；降级采用 空
+tool_name,tool_name,reference,工具名称,,model,,,,input+output,9,工具名称。 | 按产生结果的工具名子串匹配（大小写敏感），如 dbsrc_plecs 可命中 dbsrc_plecs_loss_tool。留空不筛选。,,中文名取自描述
+topology,topology,reference,拓扑名称,,model,,,,input+output,5,单个拓扑名，当前支持 DAB、DBSRC。与多拓扑对比工具的区别：本工具只优化这一个拓扑。留空则由 design_request 解析。 | 拓扑名称。,,中文名取自描述
+transformer_params_dict,,control,,,,transformer,,,input,1,,,中文名需人工（描述未给出可用名称，量纲也未识别）；bundle 参数（整包数据），阶段 2 处理键空间；无任何描述；未能归入标准量（无描述或无词根），待人工
+use_prepare_cache,use_prepare_cache,control,是否复用前四步（读取/代码生成/注册/校验）的结果,,boolean,,,,input,1,是否复用前四步（读取/代码生成/注册/校验）的结果。仅在 apply_changes=False 时生效。缓存键含 XML 路径+大小+修改时间、温度优先级、校验预设名。,,中文名取自描述
+user_context,user_context,control,对 original_request 的可选结构化摘录,写法都不要求与工具一致,,,,,input,1,对 original_request 的可选结构化摘录。领域 Planner 只读、不得改写；键名与单位写法都不要求与工具一致，可留空。,,中文名取自描述；无描述给出该列；降级采用 空
+v_block,v_block,quantity,该开关管实际阻断电压,V,voltage,switch,,,input,3,该开关管实际阻断电压，单位 V。 | 该开关管的实际阻断电压，单位 V。 | 选型依据的阻断电压：单器件取其最大阻断电压；统一选型取整组最大阻断电压，单位 V。,,中文名取自描述
+v_d1,v_d1,quantity,二极管1截止电压,V,voltage,diode,,,output,2,二极管1截止电压,,中文名取自描述；单位未识别；单位为平台惯例（voltage → V），非描述声明
+v_d2,v_d1,quantity,二极管2截止电压,V,voltage,diode,,,output,2,二极管2截止电压,,中文名取自描述；单位未识别；单位为平台惯例（voltage → V），非描述声明
+v_d3,v_d1,quantity,二极管3截止电压,V,voltage,diode,,,output,2,二极管3截止电压,,中文名取自描述；单位未识别；单位为平台惯例（voltage → V），非描述声明
+v_d4,v_d1,quantity,二极管4截止电压,V,voltage,diode,,,output,2,二极管4截止电压,,中文名取自描述；单位未识别；单位为平台惯例（voltage → V），非描述声明
+v_max,v_max,quantity,谐振电容两端峰值电压,V,voltage,capacitor,max,actual,input+output,1,电容最大工作电压，单位 V。 | 谐振电容两端峰值电压，输入单位为 V。,,中文名取自描述
+v_max_cap,v_max_cap,quantity,谐振电容最大电压,V,voltage,capacitor,max,actual,output,1,谐振电容最大电压，单位 V。,,中文名取自描述
+v_peak,v_peak,quantity,谐振电容峰值电压,V,voltage,capacitor,peak,,input,1,谐振电容峰值电压，单位 V；未知时输入 0。,,中文名取自描述
+v_peak_c1,v_peak_c1,quantity,谐振电容估算峰值电压,V,voltage,capacitor,peak,,output,3,电容1电压峰值 | 谐振电容估算峰值电压，单位 V。,,中文名取自描述
+v_peak_filter_in,v_peak_filter_in,quantity,输入滤波电容估算峰值电压,V,voltage,filter_capacitor,peak,,output,5,输入侧滤波电容电压 | 输入滤波电容估算峰值电压，单位 V。,,中文名取自描述
+v_peak_filter_out,v_peak_filter_out,quantity,输出滤波电容估算峰值电压,V,voltage,filter_capacitor,peak,,output,5,输出侧滤波电容电压 | 输出滤波电容估算峰值电压，单位 V。,,中文名取自描述
+v_rating,v_rating,quantity,器件额定电压,V,voltage,,,rating,output,1,器件额定电压，单位 V。,,中文名取自描述
+v_rms_p,v_rms_p,quantity,变压器原边 RMS 电压,V,voltage,transformer_primary,rms,,input+output,7,变压器原边 RMS 电压，单位 V。 | 变压器原边 RMS 电压，输入单位为 V。 | 变压器原边电压有效值,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+v_rms_s,v_rms_s,quantity,变压器副边 RMS 电压,V,voltage,transformer_secondary,rms,,input+output,8,副边绕组 RMS 电压，单位 V。 | 变压器副边 RMS 电压，单位 V。 | 变压器副边 RMS 电压，输入单位为 V。 | 变压器副边电压有效值,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+v_rms_s_max,v_rms_s_max,quantity,副边最大 RMS 电压,V,voltage,transformer_secondary,max,actual,input,1,副边最大 RMS 电压，用于计算副边匝数，输入单位为 V。,,中文名取自描述
+v_s1,v_block,quantity,S1 阻断电压,V,voltage,switch,,,output,6,S1 阻断电压，单位 V。 | 开关管1截止电压,,中文名取自描述
+v_s2,v_block,quantity,S2 阻断电压,V,voltage,switch,,,output,6,S2 阻断电压，单位 V。 | 开关管2截止电压,,中文名取自描述
+v_s3,v_block,quantity,S3 阻断电压,V,voltage,switch,,,output,6,S3 阻断电压，单位 V。 | 开关管3截止电压,,中文名取自描述
+v_s4,v_block,quantity,S4 阻断电压,V,voltage,switch,,,output,6,S4 阻断电压，单位 V。 | 开关管4截止电压,,中文名取自描述
+v_s5,v_block,quantity,S5 阻断电压,V,voltage,switch,,,output,4,S5 阻断电压，单位 V。,,中文名取自描述
+v_s6,v_block,quantity,S6 阻断电压,V,voltage,switch,,,output,4,S6 阻断电压，单位 V。,,中文名取自描述
+v_s7,v_block,quantity,S7 阻断电压,V,voltage,switch,,,output,4,S7 阻断电压，单位 V。,,中文名取自描述
+v_s8,v_block,quantity,S8 阻断电压,V,voltage,switch,,,output,4,S8 阻断电压，单位 V。,,中文名取自描述
+validation_preset_name,validation_preset_name,control,器件校验环节使用的预置电流字典名,,text,,min,,input,2,器件校验环节使用的预置电流字典名，当前只有 baseline 一个取值，传其它值报错。与工况参数的区别：它只影响最小可运行性校验（仅取 S1 一个器件试算），不参与损耗/仿真工况选择。,,中文名取自描述
+voltage,voltage,quantity,滤波电容工作电压,V,voltage,filter_capacitor,,,input+output,1,滤波电容工作电压，输入单位为 V；当前仅记录，不参与旧内核筛选。 | 记录的工作电压，单位 V。,,中文名取自描述
+voltage_checked,voltage_checked,control,是否执行电压校核,,boolean,,,,output,1,是否执行电压校核。,,中文名取自描述
+voltage_derating,voltage_derating,quantity,电容电压降额系数,,ratio,capacitor,,,input,2,电容电压降额系数，例如 0.8。 | 耐压降额系数，例如 0.8 表示只使用额定值的 80%。,,中文名取自描述
+voltage_limit,voltage_limit,quantity,降额后的电压上限,V,voltage,,,limit,output,2,降额后的电压上限，单位 V。,,中文名取自描述
+voltage_margin,voltage_margin,quantity,电压裕量,V,voltage,,,margin,output,3,电压裕量，单位 V。 | 额定电压裕量，单位 V。,,中文名取自描述
+voltage_rating,voltage_rating,quantity,候选电容额定电压,V,voltage,capacitor,,rating,input,1,候选电容额定电压，单位 V；未知时输入 0。,,中文名取自描述
+voltage_safety_factor,voltage_safety_factor,quantity,电压安全系数,,ratio,,,,input,1,电压安全系数，无量纲，默认 1.2。,,中文名取自描述
+volume,volume,quantity,电容组合体积,mm^3,volume,,,,input+output,3,变压器总体积或等效磁性体积，单位 mm^3。 | 电容组合体积，单位 mm^3。 | 电感总体积或等效磁性体积，单位 mm^3。,,中文名取自描述
+warning,warning,control,未完成校核与风险提示,,text,,,,output,4,未完成校核与风险提示。,,中文名取自描述
+warnings,warning,control,未完成校核与风险提示,,text,,,,input+output,5,未完成校核与风险提示。 | 风险/告警说明列表，用于提示用户注意项（如精度限制、需人工复核的点）。,,中文名取自描述
+wire_L,wire_L,reference,电感绕组线材规格,,model,inductor,,,output,1,电感绕组线材规格。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+wire_area,wire_area,quantity,绕组截面积,mm^2,area,,,,input,1,绕组截面积，单位 mm²。,,中文名取自描述
+wire_area_L,wire_area_L,quantity,电感绕组截面积,mm^2,area,inductor,,,output,1,电感绕组截面积，单位 mm^2。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+wire_area_p,wire_area_p,quantity,原边绕组截面积,mm^2,area,transformer_primary,,,input+output,2,原边绕组截面积，单位 mm^2。 | 原边绕组截面积，单位 mm²。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+wire_area_s,wire_area_s,quantity,副边绕组截面积,mm^2,area,transformer_secondary,,,input+output,2,副边绕组截面积，单位 mm^2。 | 副边绕组截面积，单位 mm²。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+wire_length,wire_length,quantity,绕组总长度,mm,length,,,,input,1,绕组总长度，单位 mm。,,中文名取自描述
+wire_length_L,wire_length_L,quantity,电感绕组长度,mm,length,inductor,,,output,1,电感绕组长度，单位 mm。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+wire_length_p,wire_length_p,quantity,原边绕组长度,mm,length,transformer_primary,,,input+output,2,原边绕组总长度，单位 mm。 | 原边绕组长度，单位 mm。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+wire_length_s,wire_length_s,quantity,副边绕组长度,mm,length,transformer_secondary,,,input+output,2,副边绕组总长度，单位 mm。 | 副边绕组长度，单位 mm。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+wire_p,wire_p,reference,原边绕组线材规格,,model,transformer_primary,,,output,1,原边绕组线材规格。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+wire_s,wire_s,reference,副边绕组线材规格,,model,transformer_secondary,,,output,1,副边绕组线材规格。,,中文名取自描述；后缀疑为绕组/位置标记（p=原边 s=副边 l/t=绕组），非物理量
+wire_width,wire_width,quantity,电感绕组宽度,mm,length,inductor,,,output,2,电感绕组宽度，单位 mm。 | 绕组宽度，单位 mm。,,中文名取自描述
+worst_constraint,worst_constraint,reference,裕量最小的约束名称,,model,,min,,output,3,裕量最小的约束名称。,,中文名取自描述
+worst_margin,worst_margin,control,最差约束裕量,由,,,margin,,output,2,最差约束裕量；单位由 worst_constraint 决定。,,中文名取自描述；无描述给出该列；降级采用 空
+zvs_off,zvs_off,control,关断是否满足零电压开关,,boolean,,off,,output,1,关断是否满足零电压开关。,,中文名取自描述
+zvs_on,zvs_on,control,开通是否满足零电压开关,,boolean,,on,,output,1,开通是否满足零电压开关。,,中文名取自描述
+B_T,B_T,quantity,变压器磁通密度,T,flux_density,transformer,,,output,2,变压器磁芯的磁通密度，单位 T。,,人工补充·词典缺失的真实键（transformer_loss_v1.output_keys）
+V_L_total,V_L_total,quantity,电感总体积,mm^3,volume,inductor,,,output,1,电感（含绕组）的总体积，单位 mm^3。,,同上（inductor_design_v1.output_keys）
+p_cap_total,p_cap_total,quantity,谐振电容组总损耗,W,power,capacitor,loss,,output,1,谐振电容组的总损耗，单位 W。,,同上（resonant_capacitor_loss_v1.output_keys）
+p_cu_L_total,p_cu_L_total,quantity,电感铜损,W,power,inductor,loss,,output,1,电感绕组的铜损（I²R），不含铁损，单位 W。,,同上；原表只有聚合行 p_cu
+p_cu_T,p_cu_T,quantity,变压器铜损,W,power,transformer,loss,,output,2,变压器绕组的铜损（I²R），不含铁损，单位 W。,,同上；原表只有聚合行 p_cu
+p_fe_L_total,p_fe_L_total,quantity,电感铁损,W,power,inductor,loss,,output,1,电感磁芯的铁损，单位 W。,,同上；原表只有聚合行 p_fe
+p_fe_T,p_fe_T,quantity,变压器铁损,W,power,transformer,loss,,output,2,变压器磁芯的铁损，单位 W。,,同上；原表只有聚合行 p_fe
+p_inductor_total,p_inductor_total,quantity,电感总损耗,W,power,inductor,loss,,output,1,电感总损耗（铜损 + 铁损），单位 W。,,同上；原表只有聚合行 p_total
+p_transformer,p_transformer,quantity,变压器总损耗,W,power,transformer,loss,,output,1,变压器总损耗（铜损 + 铁损），单位 W。,,同上；原表只有聚合行 p_total
+v_reverse_d1,v_d1,quantity,二极管1反向电压,V,voltage,diode,,,in,1,二极管1承受的反向电压，单位 V。,,归并到已有的 v_d1；代表元记法同 capacitance1
+i_peak_ind1_max,i_peak_ind_max,quantity,电感峰值电流上限,A,current,inductor,peak,actual,in,1,用于选型的电感峰值电流上限，单位 A。,,归并到已有的 i_peak_ind_max
+i_rms_ind1_max,i_rms_ind_max,quantity,电感 RMS 电流上限,A,current,inductor,rms,actual,in,1,用于选型的电感 RMS 电流上限，单位 A。,,归并到已有的 i_rms_ind_max
+cap5_loss,cap1_loss,quantity,第 5 个谐振电容损耗,W,power,capacitor,loss,,output,1,第 5 个谐振电容组的损耗，单位 W。,,归并到已有的 cap1_loss；代码里电容组到 5 组，原表只到 4

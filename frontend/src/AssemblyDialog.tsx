@@ -1,0 +1,59 @@
+import {useEffect,useState} from 'react';
+import type {Run,Workflow,Port} from './types';
+import ValueForm,{normaliseValues} from './ValueForm';
+import {pretty} from './types';
+type Result={workflow:Workflow;inputs:Record<string,unknown>;revision:number;run:Run;validation:Record<string,unknown>;experience:Record<string,unknown>};
+type Task={id:string;status:string;message:string;batch_call_limit?:number;batch_calls?:number;dispatch_at?:number;updated_at?:string;generation_count:number;repairs_used:number;repair_limit:number;questions?:Record<string,string>;configuration?:Record<string,unknown>;context?:unknown;plan?:unknown;explanation?:string;last_report?:unknown;events?:unknown[];request?:{instruction:string;inputs:Record<string,unknown>;facts:Record<string,string>};result?:Result};
+async function api(path:string,body?:unknown){const r=await fetch('/api'+path,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const data=await r.json();if(!r.ok)throw data;return data;}
+const names:Record<string,string>={dispatch_ready:'等待生成',dispatching:'提交 DSH',awaiting_worker:'DSH 正在提出计划',validating:'平台编译、运行与参考核对',needs_clarification:'需要集中补充',blocked:'任务受阻',paused:'修正已停止',delivery_unknown:'调用状态不明',failed:'平台执行失败',stopped:'用户已停止',completed:'已完成并保存'};
+const active=['dispatch_ready','dispatching','awaiting_worker','validating'];
+export default function AssemblyDialog({onClose,onApplied}:{onClose:()=>void;onApplied:(r:Result)=>void}){
+  const [clock,setClock]=useState(Date.now());
+  useEffect(()=>{const timer=setInterval(()=>setClock(Date.now()),1000);return()=>clearInterval(timer);},[]);
+  const [instruction,setInstruction]=useState(''),[inputs,setInputs]=useState<Record<string,unknown>>({}),[facts,setFacts]=useState<Record<string,string>>({});
+  const [form,setForm]=useState<{input_ports:Record<string,Port>;conditions:{key:string;label:string;value:string;text:string}[]}>({input_ports:{},conditions:[]});
+  const [sources,setSources]=useState<Record<string,string>>({}),[confirmed,setConfirmed]=useState(false);
+  const [proposals,setProposals]=useState<{path:string[];value?:number;unit?:string;evidence:string;status:string;message?:string}[]>([]);
+  useEffect(()=>{void api('/assembly/form').then(setForm).catch(e=>setError(pretty(e)));},[]);
+  const [task,setTask]=useState<Task|null>(null),[recent,setRecent]=useState<Task[]>([]),[answers,setAnswers]=useState<Record<string,string>>({});
+  const [currentConfiguration,setCurrentConfiguration]=useState<Record<string,unknown>|null>(null);
+  const configurationChanged=currentConfiguration!==null&&task!==null&&['prompt_hash','tool_hash','reference_hash'].some(key=>currentConfiguration[key]!==task.configuration?.[key]);
+  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[label,setLabel]=useState('');
+  async function action(fn:()=>Promise<void>){setBusy(true);setError('');try{await fn();}catch(e){setError(e instanceof Error?e.message:(e as {diagnostics?:{message:string;path:string}[]}).diagnostics?.map(d=>d.message+'（'+d.path+'）').join('\n')||pretty(e));}finally{setBusy(false);}}
+  useEffect(()=>{void api('/assembly-configuration').then(setCurrentConfiguration).catch(e=>setError(pretty(e)));},[]);
+  useEffect(()=>{void api('/assembly-tasks').then(d=>setRecent(d.items)).catch(e=>setError(pretty(e)));},[]);
+  useEffect(()=>{if(!task||!active.includes(task.status))return;const timer=setInterval(()=>void api('/assembly-tasks/'+task.id).then(setTask).catch(e=>setError(pretty(e))),2000);return()=>clearInterval(timer);},[task?.id,task?.status]);
+  useEffect(()=>setAnswers({}),[task?.id,JSON.stringify(task?.questions)]);
+  async function example(){await action(async()=>{const r=await api('/examples/assembly-inputs');setInstruction(r.instruction);setInputs(r.inputs);setFacts(r.facts);setLabel(r.label);setSources(Object.fromEntries(Object.keys(r.inputs).map(k=>[k,'用户明确选择的平台示例（待核对）'])));setConfirmed(false);});}
+  async function interpret(){const r=await api('/assembly/interpret',{instruction});setProposals(r.proposals);return r.proposals as typeof proposals;}
+  async function start(){await action(async()=>{const ps=await interpret();if(ps.some(p=>p.status!=='suggestion'))throw Error('原文存在单位缺失或多工况冲突，请先修正目标');if(ps.some(p=>Number((inputs[p.path[0]] as Record<string,unknown>|undefined)?.[p.path[1]])!==p.value))throw Error('目标原文与表单数值不一致，请核对建议或修正原文');if(!confirmed)throw Error('请先确认目标、条件和输入一致');const parsed=normaliseValues(inputs,form.input_ports);setInputs(parsed);setTask(await api('/assembly-tasks',{instruction,inputs:parsed,facts:Object.fromEntries(Object.entries(facts).filter(([,v])=>v.trim())),provenance:sources,timeout_seconds:60}));});}
+  function revise(){if(task?.request){setInstruction(task.request.instruction);setInputs(task.request.inputs);setFacts(task.request.facts);setConfirmed(false);}setTask(null);setError('');}
+  return <div className="modal-backdrop"><div className="change-modal assembly-modal" role="dialog" aria-modal="true" aria-label="自然语言搭建工作流"><header><div><strong>自然语言搭建工作流</strong><small>首轮场景 · DBSRC EPS 单工况候选电流 → 谐振电容介质损耗</small></div><button className="icon-button" aria-label="关闭工作流搭建" onClick={onClose}>×</button></header><div className="change-scroll">
+    {!task?<>
+      <div className="automation-success"><strong>本次支持的范围</strong><p>使用已注册模块，保留全部调制候选的有限遍历。不自动选型、不筛选最优候选、不训练 PPO、不判断整机可行性。</p><small>依据是冻结旧程序；尚无器件实验验证。DSH 提交计划，平台负责检查、运行和保存新工作流。</small></div>
+      {!!recent.length&&<label className="change-label">恢复已有任务<select aria-label="恢复装配任务" defaultValue="" onChange={e=>{if(e.target.value)void action(async()=>setTask(await api('/assembly-tasks/'+e.target.value)));}}><option value="">选择任务</option>{recent.map(t=><option key={t.id} value={t.id}>{t.id.slice(0,8)} · {names[t.status]||t.status}</option>)}</select></label>}
+      <button className="wide-button" disabled={busy} onClick={example}>加载旧程序示例输入（不提供目标工作流）</button>{label&&<p>{label}</p>}
+      <label className="change-label">计算目标<textarea aria-label="自然语言计算目标" value={instruction} onChange={e=>{setInstruction(e.target.value);setConfirmed(false);setProposals([]);}} placeholder="说明拓扑、工况、要得到的计算结果与不包含的步骤"/></label>
+      <div className="assembly-steps"><span>1 描述目标</span><span>2 核对条件</span><span>3 填写输入</span><span>4 生成与验证</span></div>
+      <button className="outline-button" disabled={busy||!instruction.trim()} onClick={()=>void action(async()=>{await interpret();})}>提取明确工况，供我核对</button>
+      {!!proposals.length&&<section className="suggestion-list"><h3>原文数值建议 · 不自动填入</h3>{proposals.map((p,i)=><div key={i}><p>{p.evidence} → {p.path.join(' · ')}：{p.value} {p.unit}</p>{p.message&&<p className="form-error">{p.message}</p>}{p.status==='suggestion'&&<button onClick={()=>{setInputs(old=>({...old,[p.path[0]]:{...(old[p.path[0]] as Record<string,unknown>||{}),[p.path[1]]:p.value}}));setSources(old=>({...old,[p.path.join('.')]: '已核对原文：'+p.evidence}));setConfirmed(false);}}>核对后使用此值</button>}</div>)}</section>}
+      <section><h3>确认本次场景条件</h3><div className="form-grid">{form.conditions.map(c=><label key={c.key}>{c.label}<select aria-label={c.label} value={facts[c.key]||''} onChange={e=>{setFacts({...facts,[c.key]:e.target.value});setConfirmed(false);}}><option value="">尚未确认</option><option value={c.value}>{c.text}</option></select></label>)}</div><p>只显示已支持选项。条件不适用时请修改目标，不用示例替你做决定。</p></section>
+      <section><h3>核对设计、器件与工况</h3><ValueForm ports={form.input_ports} values={inputs} sources={sources} onChange={v=>{setInputs(v);setConfirmed(false);}} onSourceChange={key=>setSources(old=>({...old,[key]:'用户编辑（原有值请一并核对）'}))}/></section>
+      <label className="confirm-row"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>我已核对目标、场景条件、输入值和单位一致；示例值仅在适用时采用。</label>
+      <details><summary>高级：查看任务 JSON</summary><pre>{pretty({instruction,facts,inputs,provenance:sources})}</pre></details>
+      <button className="primary-button" disabled={busy||!instruction.trim()||!confirmed} onClick={start}>{busy?'提交中…':'按以上目标与条件生成、验证并保存新工作流'}</button>
+    </>:<>
+      <div className="automation-status"><strong>{names[task.status]||task.status}</strong><span>任务 {task.id.slice(0,8)} · 历史 DSH 调用 {task.generation_count} 次 · 本批调用 {task.batch_calls||0}/{task.batch_call_limit||4} · 自动修正 {task.repairs_used} 次</span><p>{task.message}</p>{task.dispatch_at&&active.includes(task.status)&&<small>本轮已等待 {Math.max(0,Math.floor(clock/1000-task.dispatch_at))} 秒；最后事件 {task.updated_at?new Date(task.updated_at).toLocaleTimeString():"—"}。超过十分钟将提示核对调用状态，不自动重发。</small>}</div>
+      {!!Object.keys(task.questions||{}).length&&['needs_clarification','blocked'].includes(task.status)&&<div>{Object.entries(task.questions||{}).map(([key,q])=><label className="change-label" key={key}>{q}<textarea aria-label={q} value={answers[key]||''} onChange={e=>setAnswers({...answers,[key]:e.target.value})}/></label>)}<button className="primary-button" disabled={busy||Object.keys(task.questions||{}).some(k=>!answers[k]?.trim())} onClick={()=>void action(async()=>setTask(await api('/assembly-tasks/'+task.id+'/answer',{answers})))}>提交全部补充信息</button></div>}
+      {(active.includes(task.status)||task.status==='delivery_unknown')&&<button className="outline-button" disabled={busy} onClick={()=>void action(async()=>setTask(await api('/assembly-tasks/'+task.id+'/stop',{})))}>停止此任务（晚到结果不会应用）</button>}
+      {['paused','failed','delivery_unknown'].includes(task.status)&&<button className="outline-button" disabled={busy} onClick={()=>void action(async()=>setTask(await api('/assembly-tasks/'+task.id+'/continue',{approved:true,retry_uncertain:task.status==='delivery_unknown',refresh_configuration:configurationChanged&&task.status!=='delivery_unknown'})))}>{task.status==='delivery_unknown'?'同意重新调用，旧调用可能仍在运行':configurationChanged?'批准使用下方新配置并追加最多 3 次调用':'批准追加最多 3 次调用'}</button>}
+      {configurationChanged&&['paused','failed'].includes(task.status)&&<details open><summary>配置已变更 · 追加前核对新旧配置</summary><p>批准后保留旧上下文，冻结下方新配置并追加最多 3 次调用。不会手改候选计划。</p><pre>{pretty({before:task.configuration,after:currentConfiguration})}</pre></details>}
+      {!active.includes(task.status)&&task.status!=='delivery_unknown'&&<button className="outline-button" onClick={revise}>修订目标或输入，创建新任务</button>}
+      {task.result&&<><div className="automation-success"><strong>平台验证结果</strong><p>接口、计算运行及旧模型参考对照通过；工程适用性仍待课题组核对。</p><details><summary>展开规则检查与参考容差</summary><pre>{pretty(task.result.validation)}</pre></details></div><button className="primary-button" onClick={()=>onApplied(task.result!)}>在画布中打开新工作流</button><details><summary>待核对经验卡 · 尚未推广为项目规则</summary><pre>{pretty(task.result.experience)}</pre></details></>}
+      <details><summary>本次生效配置与冻结上下文</summary><p>模型标识未取得时会明确显示未知。凭证不显示。修改目标或输入须创建新任务。</p><pre>{pretty({configuration:task.configuration,context:task.context})}</pre></details>
+      <details><summary>DSH 方案与依据（不替代平台验证）</summary><p>{task.explanation||'尚未收到智能体说明'}</p><pre>{pretty(task.plan||{})}</pre></details>
+      {task.last_report&&task.status!=='completed'&&<details open><summary>平台诊断与停止原因</summary><pre>{pretty(task.last_report)}</pre></details>}
+      <details><summary>实际执行时间线 · 区分用户、智能体与平台</summary><pre>{pretty(task.events||[])}</pre></details>
+    </>}{error&&<pre className="change-error" role="alert">{error}</pre>}
+  </div><footer>原工作流保持可用；新工作流仅在运行与独立参考对照通过后保存。</footer></div></div>;
+}

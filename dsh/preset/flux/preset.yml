@@ -1,0 +1,2 @@
+name: Flux 平台（PE Workflow）
+description: 面向新 Flux 平台（127.0.0.1:8020）的 DSH 工具桥接：flux_* 工具读取模块/词典、准备注册上下文与修改任务、澄清、提交候选、试读与查看运行结果；遵守 contract_version 3.0 扁平字典协议。与旧 pe-agent 并存互不影响。

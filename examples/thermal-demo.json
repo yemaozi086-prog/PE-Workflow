@@ -1,0 +1,1029 @@
+{
+  "workflow": {
+    "schema_version": "1.0",
+    "id": "thermal_demo",
+    "name": "结温与开关损耗",
+    "description": "多工况遍历 → 条件分支 → 裸参数/扁平字典 → 汇总。系数为演示假设。",
+    "inputs": {
+      "workpoints": {
+        "type": "collection",
+        "quantity": "",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": {
+          "type": "flat_dict",
+          "quantity": "",
+          "characteristic": "",
+          "scope": "",
+          "role": "",
+          "index": "",
+          "unit": "",
+          "description": "",
+          "required": true,
+          "default": null,
+          "fields": {
+            "i_rms": {
+              "type": "number",
+              "quantity": "current",
+              "characteristic": "",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "A",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            },
+            "Tj": {
+              "type": "number",
+              "quantity": "temperature",
+              "characteristic": "",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "degC",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            }
+          },
+          "item": null
+        }
+      },
+      "fs": {
+        "type": "number",
+        "quantity": "frequency",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "kHz",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "vce": {
+        "type": "number",
+        "quantity": "voltage",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "V",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "e_sw": {
+        "type": "number",
+        "quantity": "energy",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "mJ",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "mode": {
+        "type": "string",
+        "quantity": "",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      }
+    },
+    "nodes": [
+      {
+        "id": "sweep",
+        "label": "遍历工况",
+        "kind": "foreach",
+        "inputs": {
+          "items": {
+            "source": "input",
+            "node": null,
+            "port": "workpoints",
+            "field": null,
+            "value": null
+          },
+          "fs": {
+            "source": "input",
+            "node": null,
+            "port": "fs",
+            "field": null,
+            "value": null
+          },
+          "vce": {
+            "source": "input",
+            "node": null,
+            "port": "vce",
+            "field": null,
+            "value": null
+          },
+          "e_sw": {
+            "source": "input",
+            "node": null,
+            "port": "e_sw",
+            "field": null,
+            "value": null
+          },
+          "mode": {
+            "source": "input",
+            "node": null,
+            "port": "mode",
+            "field": null,
+            "value": null
+          }
+        },
+        "module_id": null,
+        "module_version": null,
+        "cases": {},
+        "body": {
+          "schema_version": "1.0",
+          "id": "workpoint",
+          "name": "单工况损耗",
+          "description": "",
+          "inputs": {
+            "item": {
+              "type": "flat_dict",
+              "quantity": "",
+              "characteristic": "",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {
+                "i_rms": {
+                  "type": "number",
+                  "quantity": "current",
+                  "characteristic": "",
+                  "scope": "",
+                  "role": "",
+                  "index": "",
+                  "unit": "A",
+                  "description": "",
+                  "required": true,
+                  "default": null,
+                  "fields": {},
+                  "item": null
+                },
+                "Tj": {
+                  "type": "number",
+                  "quantity": "temperature",
+                  "characteristic": "",
+                  "scope": "",
+                  "role": "",
+                  "index": "",
+                  "unit": "degC",
+                  "description": "",
+                  "required": true,
+                  "default": null,
+                  "fields": {},
+                  "item": null
+                }
+              },
+              "item": null
+            },
+            "fs": {
+              "type": "number",
+              "quantity": "frequency",
+              "characteristic": "",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "kHz",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            },
+            "vce": {
+              "type": "number",
+              "quantity": "voltage",
+              "characteristic": "",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "V",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            },
+            "e_sw": {
+              "type": "number",
+              "quantity": "energy",
+              "characteristic": "",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "mJ",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            },
+            "mode": {
+              "type": "string",
+              "quantity": "",
+              "characteristic": "",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            }
+          },
+          "nodes": [
+            {
+              "id": "model",
+              "label": "选择损耗模型",
+              "kind": "switch",
+              "inputs": {
+                "selector": {
+                  "source": "input",
+                  "node": null,
+                  "port": "mode",
+                  "field": null,
+                  "value": null
+                },
+                "i_rms": {
+                  "source": "input",
+                  "node": null,
+                  "port": "item",
+                  "field": "i_rms",
+                  "value": null
+                },
+                "Tj": {
+                  "source": "input",
+                  "node": null,
+                  "port": "item",
+                  "field": "Tj",
+                  "value": null
+                },
+                "fs": {
+                  "source": "input",
+                  "node": null,
+                  "port": "fs",
+                  "field": null,
+                  "value": null
+                },
+                "vce": {
+                  "source": "input",
+                  "node": null,
+                  "port": "vce",
+                  "field": null,
+                  "value": null
+                },
+                "e_sw": {
+                  "source": "input",
+                  "node": null,
+                  "port": "e_sw",
+                  "field": null,
+                  "value": null
+                }
+              },
+              "module_id": null,
+              "module_version": null,
+              "cases": {
+                "baseline": {
+                  "schema_version": "1.0",
+                  "id": "baseline",
+                  "name": "baseline",
+                  "description": "",
+                  "inputs": {
+                    "i_rms": {
+                      "type": "number",
+                      "quantity": "current",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "A",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "fs": {
+                      "type": "number",
+                      "quantity": "frequency",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "Hz",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "vce": {
+                      "type": "number",
+                      "quantity": "voltage",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "V",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "e_sw": {
+                      "type": "number",
+                      "quantity": "energy",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "J",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "Tj": {
+                      "type": "number",
+                      "quantity": "temperature",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "degC",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    }
+                  },
+                  "nodes": [
+                    {
+                      "id": "loss",
+                      "label": "",
+                      "kind": "compute",
+                      "inputs": {
+                        "i_rms": {
+                          "source": "input",
+                          "node": null,
+                          "port": "i_rms",
+                          "field": null,
+                          "value": null
+                        },
+                        "fs": {
+                          "source": "input",
+                          "node": null,
+                          "port": "fs",
+                          "field": null,
+                          "value": null
+                        },
+                        "vce": {
+                          "source": "input",
+                          "node": null,
+                          "port": "vce",
+                          "field": null,
+                          "value": null
+                        },
+                        "e_sw": {
+                          "source": "input",
+                          "node": null,
+                          "port": "e_sw",
+                          "field": null,
+                          "value": null
+                        }
+                      },
+                      "module_id": "switch_loss",
+                      "module_version": 1,
+                      "cases": {},
+                      "body": null,
+                      "operation": null,
+                      "field": null
+                    }
+                  ],
+                  "outputs": {
+                    "p_cond": {
+                      "source": "node",
+                      "node": "loss",
+                      "port": "p_cond",
+                      "field": null,
+                      "value": null
+                    },
+                    "p_sw": {
+                      "source": "node",
+                      "node": "loss",
+                      "port": "p_sw",
+                      "field": null,
+                      "value": null
+                    },
+                    "p_total": {
+                      "source": "node",
+                      "node": "loss",
+                      "port": "p_total",
+                      "field": null,
+                      "value": null
+                    }
+                  },
+                  "output_ports": {
+                    "p_cond": {
+                      "type": "number",
+                      "quantity": "power",
+                      "characteristic": "loss_conduction",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "W",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "p_sw": {
+                      "type": "number",
+                      "quantity": "power",
+                      "characteristic": "loss_switching",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "W",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "p_total": {
+                      "type": "number",
+                      "quantity": "power",
+                      "characteristic": "loss_total",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "W",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    }
+                  },
+                  "layout": {}
+                },
+                "temperature": {
+                  "schema_version": "1.0",
+                  "id": "temperature",
+                  "name": "temperature",
+                  "description": "",
+                  "inputs": {
+                    "i_rms": {
+                      "type": "number",
+                      "quantity": "current",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "A",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "fs": {
+                      "type": "number",
+                      "quantity": "frequency",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "Hz",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "vce": {
+                      "type": "number",
+                      "quantity": "voltage",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "V",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "e_sw": {
+                      "type": "number",
+                      "quantity": "energy",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "J",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "Tj": {
+                      "type": "number",
+                      "quantity": "temperature",
+                      "characteristic": "",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "degC",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    }
+                  },
+                  "nodes": [
+                    {
+                      "id": "loss",
+                      "label": "",
+                      "kind": "compute",
+                      "inputs": {
+                        "i_rms": {
+                          "source": "input",
+                          "node": null,
+                          "port": "i_rms",
+                          "field": null,
+                          "value": null
+                        },
+                        "fs": {
+                          "source": "input",
+                          "node": null,
+                          "port": "fs",
+                          "field": null,
+                          "value": null
+                        },
+                        "vce": {
+                          "source": "input",
+                          "node": null,
+                          "port": "vce",
+                          "field": null,
+                          "value": null
+                        },
+                        "e_sw": {
+                          "source": "input",
+                          "node": null,
+                          "port": "e_sw",
+                          "field": null,
+                          "value": null
+                        },
+                        "Tj": {
+                          "source": "input",
+                          "node": null,
+                          "port": "Tj",
+                          "field": null,
+                          "value": null
+                        }
+                      },
+                      "module_id": "switch_loss",
+                      "module_version": 2,
+                      "cases": {},
+                      "body": null,
+                      "operation": null,
+                      "field": null
+                    }
+                  ],
+                  "outputs": {
+                    "p_cond": {
+                      "source": "node",
+                      "node": "loss",
+                      "port": "p_cond",
+                      "field": null,
+                      "value": null
+                    },
+                    "p_sw": {
+                      "source": "node",
+                      "node": "loss",
+                      "port": "p_sw",
+                      "field": null,
+                      "value": null
+                    },
+                    "p_total": {
+                      "source": "node",
+                      "node": "loss",
+                      "port": "p_total",
+                      "field": null,
+                      "value": null
+                    }
+                  },
+                  "output_ports": {
+                    "p_cond": {
+                      "type": "number",
+                      "quantity": "power",
+                      "characteristic": "loss_conduction",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "W",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "p_sw": {
+                      "type": "number",
+                      "quantity": "power",
+                      "characteristic": "loss_switching",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "W",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    },
+                    "p_total": {
+                      "type": "number",
+                      "quantity": "power",
+                      "characteristic": "loss_total",
+                      "scope": "",
+                      "role": "",
+                      "index": "",
+                      "unit": "W",
+                      "description": "",
+                      "required": true,
+                      "default": null,
+                      "fields": {},
+                      "item": null
+                    }
+                  },
+                  "layout": {}
+                }
+              },
+              "body": null,
+              "operation": null,
+              "field": null
+            },
+            {
+              "id": "pack",
+              "label": "声明式字典输出",
+              "kind": "compute",
+              "inputs": {
+                "p_cond": {
+                  "source": "node",
+                  "node": "model",
+                  "port": "p_cond",
+                  "field": null,
+                  "value": null
+                },
+                "p_sw": {
+                  "source": "node",
+                  "node": "model",
+                  "port": "p_sw",
+                  "field": null,
+                  "value": null
+                },
+                "p_total": {
+                  "source": "node",
+                  "node": "model",
+                  "port": "p_total",
+                  "field": null,
+                  "value": null
+                }
+              },
+              "module_id": "loss_pack",
+              "module_version": 1,
+              "cases": {},
+              "body": null,
+              "operation": null,
+              "field": null
+            }
+          ],
+          "outputs": {
+            "p_cond": {
+              "source": "node",
+              "node": "pack",
+              "port": "loss",
+              "field": "p_cond",
+              "value": null
+            },
+            "p_sw": {
+              "source": "node",
+              "node": "pack",
+              "port": "loss",
+              "field": "p_sw",
+              "value": null
+            },
+            "p_total": {
+              "source": "node",
+              "node": "pack",
+              "port": "loss",
+              "field": "p_total",
+              "value": null
+            }
+          },
+          "output_ports": {
+            "p_cond": {
+              "type": "number",
+              "quantity": "power",
+              "characteristic": "loss_conduction",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "W",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            },
+            "p_sw": {
+              "type": "number",
+              "quantity": "power",
+              "characteristic": "loss_switching",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "W",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            },
+            "p_total": {
+              "type": "number",
+              "quantity": "power",
+              "characteristic": "loss_total",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "W",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            }
+          },
+          "layout": {
+            "model": {
+              "x": 330.0,
+              "y": 100.0
+            },
+            "pack": {
+              "x": 660.0,
+              "y": 100.0
+            }
+          }
+        },
+        "operation": null,
+        "field": null
+      },
+      {
+        "id": "mean_loss",
+        "label": "平均总损耗",
+        "kind": "aggregate",
+        "inputs": {
+          "items": {
+            "source": "node",
+            "node": "sweep",
+            "port": "results",
+            "field": null,
+            "value": null
+          }
+        },
+        "module_id": null,
+        "module_version": null,
+        "cases": {},
+        "body": null,
+        "operation": "mean",
+        "field": "p_total"
+      },
+      {
+        "id": "worst_loss",
+        "label": "最大总损耗",
+        "kind": "aggregate",
+        "inputs": {
+          "items": {
+            "source": "node",
+            "node": "sweep",
+            "port": "results",
+            "field": null,
+            "value": null
+          }
+        },
+        "module_id": null,
+        "module_version": null,
+        "cases": {},
+        "body": null,
+        "operation": "max",
+        "field": "p_total"
+      }
+    ],
+    "outputs": {
+      "mean_loss": {
+        "source": "node",
+        "node": "mean_loss",
+        "port": "value",
+        "field": null,
+        "value": null
+      },
+      "worst_loss": {
+        "source": "node",
+        "node": "worst_loss",
+        "port": "value",
+        "field": null,
+        "value": null
+      },
+      "workpoint_results": {
+        "source": "node",
+        "node": "sweep",
+        "port": "results",
+        "field": null,
+        "value": null
+      }
+    },
+    "output_ports": {
+      "mean_loss": {
+        "type": "number",
+        "quantity": "power",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "W",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "worst_loss": {
+        "type": "number",
+        "quantity": "power",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "W",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": null
+      },
+      "workpoint_results": {
+        "type": "collection",
+        "quantity": "",
+        "characteristic": "",
+        "scope": "",
+        "role": "",
+        "index": "",
+        "unit": "",
+        "description": "",
+        "required": true,
+        "default": null,
+        "fields": {},
+        "item": {
+          "type": "flat_dict",
+          "quantity": "",
+          "characteristic": "",
+          "scope": "",
+          "role": "",
+          "index": "",
+          "unit": "",
+          "description": "",
+          "required": true,
+          "default": null,
+          "fields": {
+            "p_cond": {
+              "type": "number",
+              "quantity": "power",
+              "characteristic": "loss_conduction",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "W",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            },
+            "p_sw": {
+              "type": "number",
+              "quantity": "power",
+              "characteristic": "loss_switching",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "W",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            },
+            "p_total": {
+              "type": "number",
+              "quantity": "power",
+              "characteristic": "loss_total",
+              "scope": "",
+              "role": "",
+              "index": "",
+              "unit": "W",
+              "description": "",
+              "required": true,
+              "default": null,
+              "fields": {},
+              "item": null
+            }
+          },
+          "item": null
+        }
+      }
+    },
+    "layout": {
+      "sweep": {
+        "x": 330.0,
+        "y": 130.0
+      },
+      "mean_loss": {
+        "x": 710.0,
+        "y": 65.0
+      },
+      "worst_loss": {
+        "x": 710.0,
+        "y": 310.0
+      }
+    }
+  },
+  "inputs": {
+    "workpoints": [
+      {
+        "i_rms": 8.0,
+        "Tj": 25.0
+      },
+      {
+        "i_rms": 8.0,
+        "Tj": 75.0
+      },
+      {
+        "i_rms": 8.0,
+        "Tj": 125.0
+      }
+    ],
+    "fs": 100.0,
+    "vce": 1.7,
+    "e_sw": 1.0,
+    "mode": "temperature"
+  }
+}
