@@ -566,3 +566,21 @@ class WorkspaceSnapshotCopy(WorkflowRequest):
 
 class AssemblyInterpretRequest(StrictModel):
     instruction: str = Field(min_length=1,max_length=16000)
+
+class AssemblyInputProfileRequest(StrictModel):
+    name: str = Field(min_length=1, max_length=100)
+    notes: str = Field(min_length=1, max_length=2000)
+    inputs: dict[str, Any] = Field(default_factory=dict, max_length=20)
+    facts: dict[str, str] = Field(default_factory=dict, max_length=12)
+
+    @field_validator('name', 'notes')
+    @classmethod
+    def nonempty_profile_text(cls, value):
+        if not value.strip():raise ValueError('配置名称及适用说明不能为空')
+        return value.strip()
+
+
+class AssemblyInputProfileApply(StrictModel):
+    inputs: dict[str, Any] = Field(default_factory=dict)
+    facts: dict[str, str] = Field(default_factory=dict)
+    provenance: dict[str, str] = Field(default_factory=dict)

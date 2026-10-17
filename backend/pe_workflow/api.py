@@ -317,6 +317,8 @@ from .workspace import install as install_workspace
 install_workspace(app,lambda:store,problem)
 from .assembly_form import install as install_assembly_form
 install_assembly_form(app,module_map)
+from .input_profiles import install as install_input_profiles
+install_input_profiles(app,lambda:store,module_map,problem)
 if DIST.exists():
     app.mount("/assets", StaticFiles(directory=DIST / "assets"), name="assets")
 

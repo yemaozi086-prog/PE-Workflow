@@ -194,3 +194,12 @@
 .creation-routes button[aria-pressed=true] { background:#f0effa; border-color:#8b80c6; box-shadow:0 0 0 1px #8b80c620; }
 .creation-routes button[aria-pressed=true] strong { color:#4d428e; }
 @media(max-width:760px) { .creation-routes { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+.assembly-presets { background:#f8f9fd; }
+.profile-controls { display:flex; align-items:center; gap:10px; margin:12px 0; }
+.profile-controls select { flex:1; min-width:0; }
+.profile-controls button { flex-shrink:0; }
+.assembly-presets details,.assembly-additional { margin:16px 0 0; padding:12px; border:1px solid #e1e6ef; border-radius:9px; background:#fff; }
+.assembly-presets summary,.assembly-additional>summary { font-size:13px; color:#57517f; cursor:pointer; }
+.assembly-additional>.value-form { margin-top:12px; }
+@media(max-width:760px){.profile-controls{align-items:stretch;flex-direction:column;}}
