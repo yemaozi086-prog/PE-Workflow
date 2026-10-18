@@ -33,7 +33,7 @@ def main():
     if not (ROOT/'frontend/dist/index.html').exists():raise RuntimeError('Frontend build is missing; run setup.ps1 or use the portable release')
     with socket.socket() as probe:probe.bind((cfg['host'],cfg['port']))
     url=f"http://{cfg['host']}:{cfg['port']}"
-    print('Flux '+url+' | Ctrl+C stops server',flush=True)
+    print('PE-Workflow '+url+' | Ctrl+C stops server',flush=True)
     if cfg['open_browser'] and not args.no_browser:
         def open_when_ready():
             import time,urllib.request

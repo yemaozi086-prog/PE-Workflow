@@ -2,7 +2,7 @@
 
 Registers the verified baseline, runs it, saves a dedicated workflow and prepares
 a DSH task. Never submits the developer reference answer or edits an existing graph.
-Requires the local Flux server on 8020. No DSH credentials needed.
+Requires the local PE-Workflow server on 8020. No DSH credentials needed.
 """
 import json
 from pathlib import Path

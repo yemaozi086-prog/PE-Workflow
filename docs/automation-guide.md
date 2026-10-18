@@ -4,7 +4,7 @@
 
 ## 使用
 
-1. 确保 DSH 在本机 3080 运行、Flux 在 8020 运行。专用 worker 已安装；重装命令为 `node scripts/install_flux_worker.cjs`，不会改变默认 preset 或旧 pe-agent。模型及 API Key 仍由 DSH 管理。
+1. 确保 DSH 在本机 3080 运行、PE-Workflow 在 8020 运行。专用 worker 已安装；重装命令为 `node scripts/install_flux_worker.cjs`，不会改变默认 preset 或旧 pe-agent。模型及 API Key 仍由 DSH 管理。
 2. 打开工作流，选中 v3 字典计算节点，在属性中点击“上传并自动适配”。
 3. 上传单个 .py 纯计算函数，选择“只适配接口”或“改变模型”，说明意图；可填写已知单位/参数口径。
 4. 点击开始后无需进入 DSH 对话或搬运 JSON。平台创建 worker 会话、发送上下文、接收候选并推进验证。关闭弹窗不会取消任务，重新打开后可恢复持久化任务。

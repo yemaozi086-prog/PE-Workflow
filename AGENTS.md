@@ -1,4 +1,4 @@
-# Flux development
+# PE-Workflow development
 
 - This is a standalone project. Do not modify sibling `aeep-dsh` when developing it.
 - Backend source of truth: `backend/pe_workflow/models.py`; generated JSON Schema is `/api/schema` and `examples/workflow.schema.json`.

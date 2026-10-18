@@ -16,7 +16,7 @@ from .examples import builtins, demo
 from .models import Diagnostic, Module, OptimizeRequest, RevisionRequest, RunRequest, SaveRequest, Workflow, WorkflowRequest
 from .storage import Conflict, ROOT, Store, digest, now
 
-app = FastAPI(title="PE Workflow", version="0.1.0")
+app = FastAPI(title="Power Electronics Workflow", version="0.1.0")
 store = Store()
 for module in builtins():
     store.seed_module(module)

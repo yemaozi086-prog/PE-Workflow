@@ -13,4 +13,4 @@ foreach ($child in $serverChildren) {
     if ($child.CommandLine -like '*pe_workflow.api:app*' -or $child.CommandLine -like '*scripts*launch.py*') { Stop-Process -Id $child.ProcessId -ErrorAction SilentlyContinue }
 }
 Stop-Process -Id $serverPid -ErrorAction SilentlyContinue
-Write-Host "Stopped Flux background service PID $serverPid."
+Write-Host "Stopped PE-Workflow background service PID $serverPid."

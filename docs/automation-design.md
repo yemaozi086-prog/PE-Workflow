@@ -29,7 +29,7 @@
 - `packages/host/apiproxy/src/api/sessions.schema.ts`：session.create 支持 sessionId、agentPreset、cwd/workspaceId；session.prompt 支持 sessionId、queue/steer、文本 content。
 - `apps/web/tests/smoke-real.e2e.ts`：通过 POST `/api/session.create`、`/api/session.prompt`、`/api/session.history` 调用，信封为 `{type:"client-request",rpcId,method,payload}`，结果为 `result.ok/value/error`。
 
-因此设计为平台后台通过本机 3080 RPC 创建专用 worker 会话并提交阶段任务，使用历史读取核对请求及状态，worker 回传候选/澄清到任务专属接口。无需浏览器自动输入，不在 Flux 保存模型 API Key。上述是源码支持，尚未验证自动调度端到端。实现前需核对当前服务鉴权、历史分页/事件游标、完成/中断事件以及 prompt 送达判定；不能把 rpcId 的存在当作服务器保证去重。
+因此设计为平台后台通过本机 3080 RPC 创建专用 worker 会话并提交阶段任务，使用历史读取核对请求及状态，worker 回传候选/澄清到任务专属接口。无需浏览器自动输入，不在 PE-Workflow 保存模型 API Key。上述是源码支持，尚未验证自动调度端到端。实现前需核对当前服务鉴权、历史分页/事件游标、完成/中断事件以及 prompt 送达判定；不能把 rpcId 的存在当作服务器保证去重。
 
 ## 状态与持久化
 

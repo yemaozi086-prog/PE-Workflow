@@ -8,4 +8,4 @@ $launchArgs = @((Join-Path $PSScriptRoot 'launch.py'))
 if ($Port) { $launchArgs += @('--port', "$Port") }
 if ($NoBrowser) { $launchArgs += '--no-browser' }
 & $pythonPath @launchArgs
-if ($LASTEXITCODE) { throw 'Flux did not start successfully; see diagnostics above.' }
+if ($LASTEXITCODE) { throw 'PE-Workflow did not start successfully; see diagnostics above.' }

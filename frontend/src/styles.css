@@ -215,3 +215,6 @@
 .node-overview{border:1px solid #e3e7ef;background:#f8fafc;padding:13px;border-radius:9px;margin:15px 0}.node-overview strong{font-size:13px;color:#4d5b74}.node-overview p{font-size:12px;line-height:1.8;color:#6b7890}.node-overview summary{font-size:12px;cursor:pointer}.node-overview pre{font-size:11px;overflow:auto;max-height:260px;white-space:pre-wrap}.design-history label select{display:block;width:100%;margin-top:8px}.home-shell .topbar{justify-content:flex-start}
 .workflow-purpose summary{font-size:12px;color:#786d96;cursor:pointer}.workflow-purpose p{max-height:180px;overflow:auto;padding:12px;border:1px solid #e3e7ef;background:#fafbfe;border-radius:8px}.project-header{align-items:center}.run-actions{max-width:100%}
 .design-field-row{grid-template-columns:minmax(70px,1fr) 1.5fr 1.5fr 1fr auto auto auto}.design-field-row .field-required{display:flex;align-items:center;white-space:nowrap;font-size:12px;gap:5px}.design-field-row .field-required input{width:auto}@media(max-width:850px){.design-field-row{grid-template-columns:1fr 1fr}}
+
+/* PE-Workflow wordmark fits the existing compact sidebar. */
+.sidebar .brand b{font-size:19px;letter-spacing:-.6px;white-space:nowrap}.sidebar .brand>div{min-width:0}.sidebar .brand div>span{font-size:7px;letter-spacing:.45px;white-space:nowrap}.sidebar .brand-mark{flex-shrink:0}

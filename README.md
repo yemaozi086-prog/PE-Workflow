@@ -1,4 +1,4 @@
-# Flux 电力电子工作流平台
+# Power Electronics Workflow（PE-Workflow）
 
 Windows 本地单机研究原型。支持声明驱动的计算模块、命名扁平字典接口、语义及单位校验、可视化工作流、不可变版本和冻结回放；通过可选 DSH 提出计算方案、补齐公式或上传函数、接线检查并保存工作流。项目自定义声明须补充依据并批准后才启用。
 
@@ -43,7 +43,7 @@ runtime/python.exe scripts/install_dsh_presets.py
 .venv/Scripts/python.exe -m pytest backend/tests -q
 npm --prefix frontend run build
 # 便携包构建输入必须是经过哈希锁安装的新环境
-.venv/Scripts/python.exe scripts/build_portable.py --environment .build/clean-venv --output dist/flux-windows-x64
+.venv/Scripts/python.exe scripts/build_portable.py --environment .build/clean-venv --output dist/PE-Workflow-windows-x64
 # 在复制或解压后的新目录中运行
 runtime/python.exe scripts/verify_portable.py --output verification.json
 ```
