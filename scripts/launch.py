@@ -22,7 +22,7 @@ def main():
     if args.port is not None:
         if not 1<=args.port<=65535:raise ValueError('port must be 1..65535')
         cfg['port']=args.port
-    os.environ.update(PE_WORKFLOW_ROOT=str(ROOT),PE_WORKFLOW_DB=cfg['database'],PE_DSH_URL=cfg['dsh_url'],PE_DSH_ENABLED='1' if cfg['dsh_enabled'] else '0',PYTHONUTF8='1')
+    os.environ.update(PE_WORKFLOW_ROOT=str(ROOT),PE_WORKFLOW_DB=cfg['database'],PE_WORKFLOW_PORT=str(cfg['port']),PE_DSH_URL=cfg['dsh_url'],PE_DSH_ENABLED='1' if cfg['dsh_enabled'] else '0',PYTHONUTF8='1')
     # Child workers use exactly the same relocated source and interpreter.
     sys.path.insert(0,str(ROOT/'backend'));os.environ['PYTHONPATH']=str(ROOT/'backend')
     if args.check:

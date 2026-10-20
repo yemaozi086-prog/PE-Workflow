@@ -1,0 +1,37 @@
+{
+  "operating": {
+    "Vin": 48,
+    "Vout": 96,
+    "Pout": 480
+  },
+  "passive": {
+    "fs": 100000,
+    "L": 0.0001,
+    "C": 0.00047,
+    "ESR": 0.02,
+    "R_L": 0.03
+  },
+  "semiconductor": {
+    "R_on": 0.015,
+    "Vf": 0.7,
+    "r_d": 0.01
+  },
+  "timing": {
+    "tr": 2e-08,
+    "tf": 3e-08
+  },
+  "thermal": {
+    "Ta": 40,
+    "Rth_sw": 4,
+    "Rth_d": 6
+  },
+  "limits": {
+    "Ipk_max": 15,
+    "delta_v_max": 0.3,
+    "Tj_max": 100,
+    "eta_min": 0.95,
+    "Vsw_rated": 150,
+    "Vd_rated": 150,
+    "voltage_margin_min": 1.2
+  }
+}

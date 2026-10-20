@@ -60,7 +60,7 @@ def main():
             unit_run=request(base,'/api/runs',{'workflow':workflow,'inputs':{'values':{'power':2}}})
             assert unit_run['status']=='succeeded' and unit_run['outputs']['loss']['power']==2000,unit_run
             unit_replay=request(base,'/api/runs/'+unit_run['id']+'/replay',{});assert unit_replay['outputs']==unit_run['outputs']
-            config_check=request(base,'/api/design-configuration');assert config_check['preset']=='flux-design-v2'
+            config_check=request(base,'/api/design-configuration');assert config_check['preset']=='flux-design-v3'
             dbsrc=request(base,'/api/examples/dbsrc');db_run=request(base,'/api/runs',{'workflow':dbsrc['workflow'],'inputs':dbsrc['inputs'],'timeout_seconds':60})
             assert db_run['status']=='succeeded',db_run.get('diagnostics')
             db_replay=request(base,'/api/runs/'+db_run['id']+'/replay',{});assert db_replay['outputs']==db_run['outputs']

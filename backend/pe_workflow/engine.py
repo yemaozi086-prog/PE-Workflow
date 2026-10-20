@@ -50,6 +50,15 @@ def validate_value(value, port: Port, path: str):
     elif port.type == "boolean":
         valid = type(value) is bool
     elif port.type == "array":
+        if port.missing_when:
+            from .missing_values import validate_array
+            return validate_array(value,port,path)
+        if port.value_type.dtype=='string':
+            if not isinstance(value,list) or len(value)>1000 or any(not isinstance(v,str) or len(v)>10000 for v in value):
+                fail('TEXT_ARRAY_VALUE','文字数组必须是一维字符串列表，每批最多1000项、每项最多10000字符；不做类型强制转换',path)
+            size=port.value_type.shape[0]
+            if isinstance(size,int) and len(value)!=size:fail('ARRAY_SHAPE','文字数组长度与声明不一致',path)
+            return list(value)
         try:
             if not isinstance(value,(list,numeric.np.ndarray)):
                 fail("ARRAY_TYPE", "数组输入必须是 JSON 数组或数值数组", path)
@@ -88,6 +97,8 @@ def fill_inputs(values: dict, ports: dict[str, Port], path: str) -> dict:
             else:
                 fail("MISSING_INPUT", f"缺少输入：{name}；没有可使用的显式默认值", f"{path}/{name}", port=name)
         result[name] = validate_value(result[name], port, f"{path}/{name}")
+    from .missing_values import validate_masks
+    validate_masks(result,ports,path)
     shape_dimensions(result,ports,path)
     return result
 
@@ -119,6 +130,7 @@ def shape_dimensions(values,ports,path,dimensions=None):
 
 
 def compatible(source: Port, target: Port, path: str):
+    if source.missing_when!=target.missing_when:fail('MISSING_POLICY','缺失值策略不同，不能静默接入普通数值输入',path)
     from .adapters import unit_spec
     if source.unit==target.unit and unit_spec(source)!=unit_spec(target):fail('UNIT_CONFLICT','相同单位名称的定义不一致',path)
     if source.type != target.type:
@@ -203,6 +215,9 @@ def convert(value, source: Port, target: Port):
 
 
 def check_module(module: Module):
+    from .plan_audit import validate_checks
+    try:validate_checks(module.input_checks,module.inputs)
+    except ValueError as e:fail('INPUT_CHECK_INVALID',str(e),'/module/input_checks')
     if module.contract_version=='3.0':
         for side,ports in (('inputs',module.inputs),('outputs',module.outputs)):
             for name,port in ports.items():
@@ -235,7 +250,8 @@ def check_module(module: Module):
             for name, expression in module.expressions.items():
                 tree = parse(expression)
                 used = {n.id for n in ast.walk(tree) if isinstance(n, ast.Name)}
-                unknown = used - module.inputs.keys() - FUNCTIONS.keys() - CONSTANTS.keys() - DEFAULT_ALIASES.keys() - numeric.FUNCTIONS.keys()
+                library_roots={key.split('.')[0] for key in numeric.FUNCTIONS if '.' in key}
+                unknown = used - module.inputs.keys() - FUNCTIONS.keys() - CONSTANTS.keys() - DEFAULT_ALIASES.keys() - numeric.FUNCTIONS.keys() - library_roots
                 if unknown:
                     fail("EXPRESSION_NAME", f"未知变量：{', '.join(sorted(unknown))}", f"/module/expressions/{name}")
                 required=set()
@@ -262,6 +278,8 @@ def check_module(module: Module):
 
 
 def check_port(port: Port, path):
+    from .missing_values import check_policy
+    check_policy(port,path)
     if port.definition_ref and not port.quantity and not port.fields:fail("UNRESOLVED_DEFINITION","参数定义引用尚未解析","/ports")
     if port.unit_definition and port.unit in UNITS:
         known=UNITS[port.unit];declared=port.unit_definition
@@ -281,6 +299,10 @@ def check_port(port: Port, path):
 
 
 def interface(node: Node, modules: dict[str, Module]):
+    if node.kind == 'grid':
+        from .finite_control import grid_interface
+        try:return grid_interface(node.grid_ports,{k:node.grid_axes[k] for k in node.grid_order})
+        except ValueError as error:fail('GRID_DECLARATION',str(error),f'/nodes/{node.id}')
     if node.kind == "compute":
         key = f"{node.module_id}@{node.module_version}"
         if key not in modules:
@@ -300,18 +322,20 @@ def interface(node: Node, modules: dict[str, Module]):
     if node.kind == 'batch':
         if 'item' not in node.body.inputs or 'rows' in node.body.inputs:
             fail('BATCH_ITEM','批量子图必须声明 item，不能声明 rows',f'/nodes/{node.id}')
-        def columns(port):
+        def columns(port, output=False):
+            from .finite_control import BATCH_FIELD_TYPES,BATCH_INPUT_FIELD_TYPES
             from .models import ValueType, Axis
-            if port.type != 'flat_dict' or any(p.type not in ('number','array') for p in port.fields.values()):
-                fail('BATCH_FIELDS','批量字典只允许数值字段或数值数组',f'/nodes/{node.id}')
+            if port.type != 'flat_dict' or any(p.type not in (BATCH_FIELD_TYPES if output else BATCH_INPUT_FIELD_TYPES) for p in port.fields.values()):
+                fail('BATCH_FIELDS','批量工况输入只允许数值，结果允许数值和逐工况文字',f'/nodes/{node.id}')
             fields={}
             for key,p in port.fields.items():
+                if p.type=='array' and p.value_type.dtype=='string':fail('BATCH_TEXT_RANK','批量成员可输出单条文字，不接受嵌套文字列表',f'/nodes/{node.id}')
                 shape=p.value_type.shape if p.type=='array' else []
                 if len(shape)>=4:fail('BATCH_RANK','批量堆叠后数组不能超过四维',f'/nodes/{node.id}')
-                dtype=p.value_type.dtype if p.value_type else 'float64'
+                dtype='string' if p.type=='string' else p.value_type.dtype if p.value_type else 'float64'
                 fields[key]=p.model_copy(update={'type':'array','kind':'bare','value_type':ValueType(dtype=dtype,shape=['batch_rows',*shape]),'axes':[Axis(name='batch_rows'),*p.axes]})
             return Port(type='flat_dict',fields=fields)
-        return {'rows':columns(node.body.inputs['item']),**{k:p for k,p in node.body.inputs.items() if k!='item'}},{k:columns(p) for k,p in node.body.output_ports.items()}
+        return {'rows':columns(node.body.inputs['item']),**{k:p for k,p in node.body.inputs.items() if k!='item'}},{k:columns(p,output=True) for k,p in node.body.output_ports.items()}
     if node.kind == "foreach":
         if "item" not in node.body.inputs:
             fail("LOOP_ITEM", "遍历子图必须声明 item 输入", f"/nodes/{node.id}", node.id)
@@ -362,6 +386,10 @@ def compile_workflow(wf: Workflow, modules, depth=0, connection_plans=None):
     if wf.outputs.keys() != wf.output_ports.keys() or not wf.outputs:
         fail("OUTPUT_CONTRACT", "工作流输出绑定和声明必须完全对应且非空", "/outputs")
     interfaces = {n.id: interface(n, modules) for n in wf.nodes}
+    from .plan_audit import validate_checks
+    for n in wf.nodes:
+        try:validate_checks(n.input_checks,interfaces[n.id][0])
+        except ValueError as e:fail('INPUT_CHECK_INVALID',str(e),f'/nodes/{n.id}/input_checks')
     outputs = {key: pair[1] for key, pair in interfaces.items()}
     remaining = {n.id: {b.node for b in n.inputs.values() if b.source == "node"} for n in wf.nodes}
     for node_id, deps in remaining.items():
@@ -482,6 +510,30 @@ def validate_workflow(wf, modules, inputs=None):
         return {"valid": False, "order": [], "diagnostics": [exc.diagnostic.model_dump()]}
 
 
+def precheck_batch_inputs(body,modules,row_values,path):
+    """Check declared, externally resolvable guards for ALL rows before compute.
+
+    Guards depending on calculated member outputs remain at their original node.
+    No formula is evaluated and no guard is removed from normal execution.
+    """
+    from .plan_audit import run_checks
+    checks=[]
+    for node in body.nodes:
+        if node.kind!='compute':continue
+        ports,_=interface(node,modules)
+        for expression in dict.fromkeys([*modules[f'{node.module_id}@{node.module_version}'].input_checks,*node.input_checks]):
+            tree=parse(expression)
+            names={n.id for n in ast.walk(tree) if isinstance(n,ast.Name) and n.id in node.inputs}
+            if not all(node.inputs[name].source=='input' and node.inputs[name].port in body.inputs and not node.inputs[name].field for name in names):continue
+            checks.append((node,ports,expression,names))
+    if len(checks)*len(row_values)>20000:fail('STEP_LIMIT','批量输入保护检查超过 20000 次预算',path)
+    for index,values in enumerate(row_values):
+        for node,ports,expression,names in checks:
+            local={name:project_dictionary(values[node.inputs[name].port],body.inputs[node.inputs[name].port],ports[name],node.inputs[name].field_map,path+f'/preflight/{index}/{node.id}/inputs/{name}') for name in names}
+            try:run_checks([expression],local)
+            except ValueError as error:fail('INPUT_PRECONDITION',str(error),path+f'/preflight/{index}/{node.id}/input_checks',node.id)
+
+
 def execute(wf: Workflow, modules: dict, inputs: dict, trace=None, prefix="", budget=None, compiled=None):
     trace = trace if trace is not None else []
     budget = budget if budget is not None else [0]
@@ -519,6 +571,10 @@ def execute(wf: Workflow, modules: dict, inputs: dict, trace=None, prefix="", bu
             projection=node.kind=='compute' and modules[f'{node.module_id}@{node.module_version}'].contract_version=='3.0'
             args = fill_inputs({k: resolve(b, ins[k],projection) for k, b in node.inputs.items()}, ins, f"/nodes/{node_id}/inputs")
             entry["inputs"] = dict(args)
+            from .plan_audit import run_checks
+            guards=[*modules[f'{node.module_id}@{node.module_version}'].input_checks,*node.input_checks] if node.kind=='compute' else node.input_checks
+            try:run_checks(list(dict.fromkeys(guards)),args)
+            except ValueError as e:fail('INPUT_PRECONDITION',str(e),f'/nodes/{node_id}/input_checks',node_id)
             if projection:
                 # Repeated batch rows share one compiled mapping. Keep its full
                 # evidence once; reference that trace path in subsequent rows.
@@ -538,10 +594,15 @@ def execute(wf: Workflow, modules: dict, inputs: dict, trace=None, prefix="", bu
                     fail("BRANCH_NOT_FOUND", f"没有分支：{selector}；可用：{list(node.cases)}", f"/nodes/{node_id}", node_id)
                 entry["selected_case"] = selector
                 value = execute(node.cases[selector], modules, {k:v for k,v in args.items() if k!="selector"}, trace, prefix + node_id + "/" + selector + "/", budget,compiled)
+            elif node.kind == 'grid':
+                from .finite_control import evaluate_grid
+                value=evaluate_grid(args,{k:node.grid_axes[k] for k in node.grid_order})
             elif node.kind == 'batch':
                 rows=args['rows']; count=len(next(iter(rows.values())))
                 if count>1000:fail('BATCH_LIMIT','单个批次最多 1000 行',f'/nodes/{node_id}',node_id)
-                evaluations=[execute(node.body,modules,{**{k:v for k,v in args.items() if k!='rows'},'item':{k:v[i] for k,v in rows.items()}},trace,f'{prefix}{node_id}/{i}/',budget,compiled) for i in range(count)]
+                row_values=[{**{k:v for k,v in args.items() if k!='rows'},'item':{k:v[i] for k,v in rows.items()}} for i in range(count)]
+                precheck_batch_inputs(node.body,modules,row_values,f'/nodes/{node_id}')
+                evaluations=[execute(node.body,modules,value,trace,f'{prefix}{node_id}/{i}/',budget,compiled) for i,value in enumerate(row_values)]
                 if not evaluations:fail('EMPTY_BATCH','批量计算需要至少一个显式候选；无解需走不可行分支',f'/nodes/{node_id}',node_id)
                 value={name:{key:[v[name][key] for v in evaluations] for key in port.fields} for name,port in outs.items()}
             elif node.kind == "foreach":

@@ -1,0 +1,367 @@
+{
+  "candidate": {
+    "blueprint": {
+      "external_inputs": {
+        "device": {
+          "ref": "device_bag"
+        },
+        "scan": {
+          "ref": "scan_bag"
+        }
+      },
+      "grids": [
+        {
+          "axes": {
+            "i_rms": "scan.currents"
+          },
+          "axis_order": [
+            "i_rms"
+          ],
+          "id": "current_grid",
+          "input_sources": {
+            "scan": {
+              "port": "scan",
+              "source": "input"
+            }
+          },
+          "title": "电流扫描原生网格"
+        }
+      ],
+      "limitations": [
+        "仅适用固定电阻、无温度依赖的焦耳损耗模型",
+        "运行时为单轴有限扫描（最大 1000 行），不包含嵌套或收敛循环",
+        "本阶段只规划结构与绑定，所有数值（电流序列与电阻值）均在运行时由外部输入提供，无默认值"
+      ],
+      "loops": [
+        {
+          "captures": {
+            "device": {
+              "port": "device",
+              "source": "input"
+            }
+          },
+          "id": "scan_batch",
+          "kind": "batch",
+          "outputs": {
+            "loss_p_w": {
+              "field": "p_w",
+              "node": "joule_loss",
+              "port": "loss",
+              "source": "node"
+            }
+          },
+          "rows": {
+            "node": "current_grid",
+            "port": "rows",
+            "source": "node"
+          },
+          "step_ids": [
+            "joule_loss"
+          ],
+          "title": "逐行焦耳损耗 batch 子图"
+        }
+      ],
+      "port_defs": {
+        "device_bag": {
+          "description": "运行时外部输入：固定电阻 bag（不随温度变化）",
+          "entry_type": "quantity",
+          "fields": {
+            "R": {
+              "entry_type": "quantity",
+              "quantity": "electrical resistance",
+              "required": true,
+              "type": "number",
+              "unit": "ohm"
+            }
+          },
+          "type": "flat_dict"
+        },
+        "scan_bag": {
+          "description": "运行时外部输入：RMS 电流扫描数组 bag",
+          "entry_type": "quantity",
+          "fields": {
+            "currents": {
+              "axis_names": [
+                "scan_currents"
+              ],
+              "dtype": "float64",
+              "entry_type": "quantity",
+              "quantity": "electric current",
+              "required": true,
+              "shape": [
+                "scan_current_count"
+              ],
+              "statistic": "rms",
+              "type": "array",
+              "unit": "A"
+            }
+          },
+          "type": "flat_dict"
+        }
+      },
+      "steps": [
+        {
+          "assumptions": [
+            "电阻 R 固定，不随温度或工作点变化",
+            "每个扫描点独立计算，逐点结果全部保留且保持扫描原顺序"
+          ],
+          "dependencies": [],
+          "evidence": [
+            "已注册模块 ohmic_loss@1 provenance: Independent acceptance fixture: P=I_rms^2 R; fixed resistance, no temperature dependence",
+            "用户请求: 已知公式 P=I_rms²R，固定电阻、不考虑温度变化；扫描行 i_rms 接到 electrical.i_rms；device 必须作为显式 capture"
+          ],
+          "formula_latex": "P = I_{rms}^{2} R",
+          "id": "joule_loss",
+          "input_sources": {
+            "device": {
+              "port": "device",
+              "source": "input"
+            },
+            "electrical": {
+              "port": "item",
+              "source": "input"
+            }
+          },
+          "module_ref": "ohmic_loss@1",
+          "purpose": "在 batch 子图内对单行 i_rms 与被 capture 的固定电阻 R 调用已注册工具 ohmic_loss@1，计算该扫描点的损耗功率 loss.p_w；不做筛选、汇总或排序。",
+          "selection_reason": "用户明确要求只复用已注册 ohmic_loss@1，其冻结接口 electrical.i_rms[A] × device.R[ohm] -> loss.p_w[W] 与 P=I_rms^2 R 逐字匹配；网格列直接命名为 i_rms，故 item 整袋绑定即可满足 electrical 契约，无需 field_map。",
+          "title": "逐点焦耳损耗 P = I_rms^2 R"
+        }
+      ],
+      "summary": "运行时外部输入 scan.currents（一维 RMS 电流数组，单位 A，统计量 rms）与 device.R（固定电阻，单位 ohm）。原生网格 current_grid 以 scan.currents 作为唯一轴生成一列 i_rms（flat_dict，shape=[batch_rows]，保持输入原始顺序，不排序不过滤），得到 rows 端口。一层有限 batch 子图 scan_batch 以该 rows 作为行输入，把 device 作为显式 capture 传入循环体；循环体只包含唯一的已注册工具步骤 joule_loss（module_ref=ohmic_loss@1），逐行把 item 绑定到 electrical（其 i_rms 字段正好来自网格列），把 capture 的 device 绑定到 device bag，输出 loss.p_w。循环输出别名 loss_p_w 保留全部逐点 P=I_rms^2 R 结果，运行时在字段前加 batch_rows 轴，行序与扫描原顺序一致。不新增工具、不新增汇总或筛选节点、不设默认数值。",
+      "title": "固定电阻焦耳损耗有限电流扫描"
+    },
+    "kind": "plan_blueprint"
+  },
+  "modules": [
+    {
+      "adapter": null,
+      "applies_to": {},
+      "builtin_hash": null,
+      "builtin_id": null,
+      "capabilities": [],
+      "contract_version": "3.0",
+      "description": "",
+      "domains": {},
+      "entrypoint": null,
+      "expressions": {
+        "loss": "{'p_w': electrical['i_rms'] ** 2 * device['R']}"
+      },
+      "id": "ohmic_loss",
+      "implementation": "expressions",
+      "input_checks": [],
+      "inputs": {
+        "device": {
+          "aggregation": "",
+          "axes": [],
+          "catalog_ref": null,
+          "characteristic": "",
+          "chinese_name": "",
+          "default": null,
+          "definition_ref": null,
+          "description": "",
+          "device": "",
+          "direction": "",
+          "entry_type": "quantity",
+          "event": "",
+          "family_id": "",
+          "fields": {
+            "R": {
+              "aggregation": "",
+              "axes": [],
+              "catalog_ref": null,
+              "characteristic": "",
+              "chinese_name": "",
+              "default": null,
+              "definition_ref": null,
+              "description": "",
+              "device": "",
+              "direction": "",
+              "entry_type": "quantity",
+              "event": "",
+              "family_id": "",
+              "fields": {},
+              "index": "",
+              "instance_id": "",
+              "item": null,
+              "kind": "bare",
+              "loss_component": "",
+              "nature": "",
+              "quantity": "electrical resistance",
+              "required": true,
+              "role": "",
+              "scope": "",
+              "semantic_evidence": "",
+              "semantic_id": "",
+              "statistic": "",
+              "type": "number",
+              "unit": "ohm",
+              "unit_definition": null,
+              "value_type": null
+            }
+          },
+          "index": "",
+          "instance_id": "",
+          "item": null,
+          "kind": "flat_dict",
+          "loss_component": "",
+          "nature": "",
+          "quantity": "",
+          "required": true,
+          "role": "",
+          "scope": "",
+          "semantic_evidence": "",
+          "semantic_id": "",
+          "statistic": "",
+          "type": "flat_dict",
+          "unit": "",
+          "unit_definition": null,
+          "value_type": null
+        },
+        "electrical": {
+          "aggregation": "",
+          "axes": [],
+          "catalog_ref": null,
+          "characteristic": "",
+          "chinese_name": "",
+          "default": null,
+          "definition_ref": null,
+          "description": "",
+          "device": "",
+          "direction": "",
+          "entry_type": "quantity",
+          "event": "",
+          "family_id": "",
+          "fields": {
+            "i_rms": {
+              "aggregation": "",
+              "axes": [],
+              "catalog_ref": null,
+              "characteristic": "",
+              "chinese_name": "",
+              "default": null,
+              "definition_ref": null,
+              "description": "",
+              "device": "",
+              "direction": "",
+              "entry_type": "quantity",
+              "event": "",
+              "family_id": "",
+              "fields": {},
+              "index": "",
+              "instance_id": "",
+              "item": null,
+              "kind": "bare",
+              "loss_component": "",
+              "nature": "",
+              "quantity": "electric current",
+              "required": true,
+              "role": "",
+              "scope": "",
+              "semantic_evidence": "",
+              "semantic_id": "",
+              "statistic": "",
+              "type": "number",
+              "unit": "A",
+              "unit_definition": null,
+              "value_type": null
+            }
+          },
+          "index": "",
+          "instance_id": "",
+          "item": null,
+          "kind": "flat_dict",
+          "loss_component": "",
+          "nature": "",
+          "quantity": "",
+          "required": true,
+          "role": "",
+          "scope": "",
+          "semantic_evidence": "",
+          "semantic_id": "",
+          "statistic": "",
+          "type": "flat_dict",
+          "unit": "",
+          "unit_definition": null,
+          "value_type": null
+        }
+      },
+      "name": "固定电阻焦耳损耗",
+      "naming_rules": [],
+      "outputs": {
+        "loss": {
+          "aggregation": "",
+          "axes": [],
+          "catalog_ref": null,
+          "characteristic": "",
+          "chinese_name": "",
+          "default": null,
+          "definition_ref": null,
+          "description": "",
+          "device": "",
+          "direction": "",
+          "entry_type": "quantity",
+          "event": "",
+          "family_id": "",
+          "fields": {
+            "p_w": {
+              "aggregation": "",
+              "axes": [],
+              "catalog_ref": null,
+              "characteristic": "",
+              "chinese_name": "",
+              "default": null,
+              "definition_ref": null,
+              "description": "",
+              "device": "",
+              "direction": "",
+              "entry_type": "quantity",
+              "event": "",
+              "family_id": "",
+              "fields": {},
+              "index": "",
+              "instance_id": "",
+              "item": null,
+              "kind": "bare",
+              "loss_component": "",
+              "nature": "",
+              "quantity": "power",
+              "required": true,
+              "role": "",
+              "scope": "",
+              "semantic_evidence": "",
+              "semantic_id": "",
+              "statistic": "",
+              "type": "number",
+              "unit": "W",
+              "unit_definition": null,
+              "value_type": null
+            }
+          },
+          "index": "",
+          "instance_id": "",
+          "item": null,
+          "kind": "flat_dict",
+          "loss_component": "",
+          "nature": "",
+          "quantity": "",
+          "required": true,
+          "role": "",
+          "scope": "",
+          "semantic_evidence": "",
+          "semantic_id": "",
+          "statistic": "",
+          "type": "flat_dict",
+          "unit": "",
+          "unit_definition": null,
+          "value_type": null
+        }
+      },
+      "project_id": "",
+      "provenance": "Independent acceptance fixture: P=I_rms^2 R; fixed resistance, no temperature dependence",
+      "source": "",
+      "transforms": [],
+      "version": 1
+    }
+  ]
+}

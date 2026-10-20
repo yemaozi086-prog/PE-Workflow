@@ -8,7 +8,7 @@
     "root": "<relocated-release>",
     "configuration": {
       "host": "127.0.0.1",
-      "port": 51368,
+      "port": 56515,
       "database": "<fresh-temp-directory>/fresh.sqlite",
       "dsh_url": "http://127.0.0.1:3080",
       "dsh_enabled": false,
@@ -16,7 +16,7 @@
     },
     "scientific_hash": "61a37756279b87041cf8d9a7e8e7c0927c31b96dc41adfcb11a0cc61af8ac185"
   },
-  "checked_files": 4978,
+  "checked_files": 5062,
   "dictionary_loss": {
     "loss": {
       "cap1_loss": 1.1368210220849666,
@@ -30,7 +30,7 @@
     "custom_unit_watts": 2000.0,
     "frozen_replay_equal": true
   },
-  "design_preset": "flux-design-v2",
+  "design_preset": "flux-design-v3",
   "dbsrc_result": {
     "valid": 1.0,
     "reward": 0.704378924970644,
@@ -40,20 +40,7 @@
   },
   "dbsrc_replay_equal": true,
   "scope": "Same Windows host, not a pristine OS VM; real DSH calls excluded.",
-  "validated_at": "2026-10-18T02:02:47.069254+08:00",
-  "source_validation": {
-    "python_lock_install": "fresh venv; offline wheelhouse; --require-hashes; pip check passed",
-    "frontend_lock_install": "fresh node_modules; npm ci --offline; lock integrity verified",
-    "backend_tests": 281,
-    "backend_failed": 0,
-    "frontend_input_cases": 5,
-    "frontend_build": "passed",
-    "toolchain": {
-      "platform": "windows-x86_64",
-      "python": "3.14.3",
-      "node": "24.14.0",
-      "npm": "11.9.0"
-    },
-    "scope": "Same Windows x64 host; no pristine OS VM or real DSH model calls"
-  }
+  "verified_at": "2026-10-21",
+  "release_archive": "PE-Workflow-windows-x64-20261021.zip",
+  "archive_sha256": "f44e7c4f0b46a287b95b2898cb0e95f6eb4c20d009937ff86f082a4f782e9dfa"
 }

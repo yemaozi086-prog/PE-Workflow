@@ -22,6 +22,11 @@ function put(value:unknown,path:number[],next:unknown):unknown {if(!path.length)
 function dimensions(value:unknown):number[]{return Array.isArray(value)?[value.length,...dimensions(value[0])]:[];}
 function build(shape:number[],old:unknown):unknown {return shape.length?Array.from({length:shape[0]},(_,i)=>build(shape.slice(1),Array.isArray(old)?old[i]:undefined)):old??'';}
 
+function TextArrayEditor({value,onChange,label}:{value:unknown;onChange:(v:unknown)=>void;label:string}){
+ const [text,setText]=useState(()=>JSON.stringify(value??[],null,2)),[error,setError]=useState('');
+ useEffect(()=>setText(JSON.stringify(value??[],null,2)),[JSON.stringify(value)]);
+ return <div><small>逐工况文字列表；顺序和数量须与工况一致，空字符串也保留。</small><textarea aria-label={label+' 文字列表'} value={text} onChange={e=>setText(e.target.value)} onBlur={()=>{try{const v=JSON.parse(text);if(!Array.isArray(v)||v.length>1000||v.some(x=>typeof x!=='string'||x.length>10000))throw Error('请输入一维字符串 JSON 列表，最多1000项');onChange(v);setError('');}catch(e){setError(String(e));}}}/>{error&&<small role="alert">{error}</small>}</div>;
+}
 function ArrayEditor({port,value,onChange,label}:{port:Port;value:unknown;onChange:(v:unknown)=>void;label:string}){
   const rank=port.value_type?.shape.length||1;const actual=dimensions(value);
   const [sizes,setSizes]=useState(()=>Array.from({length:rank},(_,i)=>String(actual[i]|| (typeof port.value_type?.shape[i]==='number'?port.value_type.shape[i]:1))));
@@ -55,6 +60,7 @@ function ArrayEditor({port,value,onChange,label}:{port:Port;value:unknown;onChan
 
 export function ValueEditor({port,value,onChange,label}:{port:Port;value:unknown;onChange:(v:unknown)=>void;label:string}){
   if(port.type==='flat_dict'){const bag=value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{};return <ValueForm ports={port.fields||{}} values={bag} onChange={onChange} prefix={label}/>;}
+  if(port.type==='array'&&port.value_type?.dtype==='string')return <TextArrayEditor value={value} onChange={onChange} label={label}/>;
   if(port.type==='array')return <ArrayEditor port={port} value={value} onChange={onChange} label={label}/>;
   if(port.type==='boolean')return <select aria-label={label} value={value===true?'true':value===false?'false':''} onChange={e=>onChange(e.target.value===''?'':e.target.value==='true')}><option value="">未填写</option><option value="true">是</option><option value="false">否</option></select>;
   if(port.type==='collection'){const list=Array.isArray(value)?value:[];return <div>{list.map((v,i)=><details key={i}><summary>第 {i+1} 项 <button onClick={()=>onChange(list.filter((_,j)=>j!==i))}>移除</button></summary><ValueEditor port={port.item||{type:'number'}} value={v} onChange={next=>onChange(list.map((old,j)=>j===i?next:old))} label={`${label}.${i}`}/></details>)}<button onClick={()=>onChange([...list,port.item?.type==='flat_dict'?{}:''])}>添加一项</button></div>;}

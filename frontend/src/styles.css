@@ -218,3 +218,67 @@
 
 /* PE-Workflow wordmark fits the existing compact sidebar. */
 .sidebar .brand b{font-size:19px;letter-spacing:-.6px;white-space:nowrap}.sidebar .brand>div{min-width:0}.sidebar .brand div>span{font-size:7px;letter-spacing:.45px;white-space:nowrap}.sidebar .brand-mark{flex-shrink:0}
+
+.completion-list{max-height:440px;overflow-y:auto;overscroll-behavior:contain;margin:14px 0;padding:0 8px 0 0}.completion-list .design-step{margin:10px 0;padding:14px!important;box-shadow:none}.completion-list details{margin:10px 0}.completion-list summary{cursor:pointer;color:#61548c}.completion-list label{font-weight:600}.completion-list input[type=checkbox]{width:auto;margin-right:8px}
+/* One navigation, quiet resource lists, and readable graph interactions. */
+.workspace-caption{font-size:11px;color:#8992a5;padding:0 8px 17px;flex-shrink:0}
+.workspace-nav{display:flex;flex-direction:column;gap:4px;padding:0 0 15px;margin-bottom:14px;border-bottom:1px solid #e5e9f1;flex-shrink:0}
+.workspace-nav button{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-height:40px;padding:10px 12px;border-radius:9px;text-align:left;font-size:13px;color:#667187}
+.workspace-nav button:hover{background:#f1f3f9;color:#4d5670}
+.workspace-nav button[aria-current=page]{background:#eeeaf8;color:#6653a8;font-weight:600}
+.workspace-nav button>span{margin-left:auto;font-size:10px;font-weight:500;background:#e7eaf2;color:#798397;padding:2px 6px;border-radius:5px}
+.sidebar .sidebar-section-heading{gap:7px;font-size:11px;color:#8791a4}
+.sidebar-section-heading>span{flex:1}
+.sidebar .sidebar-section-heading .new-workflow-button{display:flex;gap:4px;width:auto;white-space:nowrap;padding:5px 7px;font-size:11px;background:#f1eef9;color:#6a5a9c;border-radius:6px}
+.sidebar .catalog-heading{color:#8791a4}
+.sidebar .module-upload{border-style:solid;border-color:#ded8ef;background:#f5f2fb;color:#6c5b9f;min-height:39px}
+.sidebar .module-family{box-shadow:none;border-color:#e4e8f0;border-radius:10px;margin-bottom:8px}
+.sidebar .module-family>summary{padding:12px 10px;color:#6c6294;gap:10px}
+.sidebar .module-family>summary>svg{margin-top:3px;flex-shrink:0}
+.module-family .family-purpose{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.65;margin-top:4px;color:#8791a4;font-size:11px}
+.module-family .family-review-label{display:inline-block;color:#8c7a5d;background:#f6f2e9;border-radius:4px;padding:1px 5px;font-size:9px;margin-top:6px}
+.module-family .module-versions{background:#f8f9fc}
+.module-family em{font-size:10px;color:#8a83a1}
+.version-contract{margin-top:8px}.version-contract>summary{font-size:10px;color:#7b6aa7;cursor:pointer}
+.version-contract pre{max-height:210px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:10px;background:#f6f7fb;padding:7px;border-radius:6px}
+.sidebar .advanced-module-register{display:flex;align-items:center;gap:6px;margin:9px 3px 0;padding:8px;font-size:11px;width:calc(100% - 6px);text-align:left;border-radius:6px;color:#7d8399}
+.sidebar .advanced-module-register:hover{background:#eeedf6}
+.canvas-meta .layout-action{display:flex;align-items:center;gap:6px;font-size:11px;color:#69589b;background:#f0ecf9;padding:7px 10px;border:1px solid #e3dcef;border-radius:7px;white-space:nowrap}
+.canvas-meta .layout-action:hover{background:#e7dff5}.canvas-meta button:disabled{opacity:.35;cursor:default}
+.workflow-edge-label{position:absolute;padding:3px 6px;border:1px solid #ddd7ef;background:#fffffff2;color:#6c5b9d;border-radius:5px;font-size:10px;pointer-events:none;white-space:nowrap;box-shadow:0 2px 6px #49336b0b}
+.react-flow__edge-path{transition:opacity .14s,stroke .14s}
+.react-flow__edge-path{stroke-linejoin:round;stroke-linecap:round}
+
+.module-formula{margin:12px 0;padding:12px;border:1px solid #e3def0;border-radius:8px;background:#faf8ff}.module-formula>strong{font-size:12px}.module-formula small,.formula-note{display:block;color:#7d8296;font-size:11px;line-height:1.7}.module-formula details{margin-top:8px}.module-formula summary{cursor:pointer;font-size:11px;color:#79669f}.module-math{max-width:100%;overflow-x:auto;overflow-y:hidden;padding:5px 0;font-size:12px}.module-formula pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}.module-formula .katex-display{margin:8px 0;text-align:left}
+
+.completion-concurrency{padding:12px;margin:12px 0;background:#f6f3fc;border:1px solid #e3dcef;border-radius:8px}.completion-concurrency label{display:flex;align-items:center;gap:10px}.completion-concurrency select{width:110px}.completion-concurrency button{margin-top:10px;border:1px solid #dfd9ed;padding:8px;border-radius:6px;background:white}.module-math .katex-display>.katex{text-align:left}
+
+.continue-task-card {padding:24px;border:1px solid #d8d1f4;border-radius:16px;background:linear-gradient(120deg,#f7f5ff,#fff);margin:16px 0 22px;box-shadow:0 4px 18px #39306308;}
+.continue-task-badge {display:inline-block;padding:5px 10px;border-radius:20px;background:#eee9fc;color:#58458c;font-size:13px;font-weight:600;}
+.continue-task-card h2 {font-size:23px;margin:16px 0 10px;color:#28243a;}
+.continue-task-card p {line-height:1.7;color:#55546a;max-width:850px;}
+.continue-task-card .primary-button {margin:12px 0 4px;min-height:48px;padding:12px 24px;font-size:16px;}
+.continue-task-budget {padding:10px 14px;background:#fff;border-radius:9px;width:fit-content;}
+.continue-task-note {font-size:13px;}
+.design-secondary {margin:12px 0;border:1px solid #e6e6ef;border-radius:10px;padding:12px 16px;}
+.design-secondary>summary {cursor:pointer;color:#686079;font-size:14px;}
+
+.plan-readiness{padding:20px;border:1px solid #cbd5e1;border-radius:14px;background:#f8fafc;margin:16px 0}.plan-readiness h3{margin-top:0}.readiness-stages{display:flex;gap:12px;list-style:none;padding:0;flex-wrap:wrap}.readiness-stages li{flex:1;min-width:160px;background:white;border:1px solid #e2e8f0;padding:12px;border-radius:10px}.readiness-stages span,.plan-readiness small{display:block;color:#475569;margin-top:6px}.plan-readiness details li{margin:12px 0;overflow-wrap:anywhere}
+
+.step-summary{cursor:pointer;font-weight:650;padding:6px 0}.step-summary small{display:block;font-weight:400;color:#64748b;margin-top:6px}.design-step[open]>.step-summary{border-bottom:1px solid #e2e8f0;margin-bottom:16px;padding-bottom:12px}
+
+/* Requirement-first workflow: one visible next step and local action groups. */
+.design-modal .change-scroll{scroll-padding-top:160px}
+.design-next-step{position:sticky;top:-20px;z-index:8;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 20px;margin:0 0 10px;background:#f3f5ff;border:1px solid #d5daf0;border-radius:12px;box-shadow:0 5px 18px #26355212}
+.design-next-step h2{font-size:19px;margin:5px 0;color:#24324c}.design-next-step small{font-weight:600;color:#5a63a0}.design-next-step p{margin:5px 0 0!important;color:#51617b!important;max-width:650px}.design-next-step>button{flex-shrink:0;padding:12px 18px!important;white-space:normal;max-width:230px}
+.design-next-step.warning{background:#fffbf0;border-color:#ecd69c}.design-next-step.warning small{color:#92651b}.design-next-step.success{background:#effaf6;border-color:#b8ddcf}
+.design-shortcuts{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.design-shortcuts button{background:white;border:1px solid #dce2ed;padding:8px 12px;border-radius:8px;color:#51617b;font-size:12px}
+.design-modal [id^=design-]{scroll-margin-top:160px}.design-modal [id^=design-]:focus{outline:2px solid #9584c9;outline-offset:5px}
+.design-action-panel{border:1px solid #d8dced;border-radius:12px;padding:18px;margin:18px 0;background:#fafaff}.design-action-panel h3{margin-top:0}.design-action-panel button{margin:6px 8px 0 0}.design-action-panel .confirm-row{background:white!important;border:1px solid #e3e6ef}
+.design-overview{margin:20px 0}.design-overview h3{margin-bottom:6px}.design-overview ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;list-style:none;padding:0}.design-overview li{display:flex;align-items:center;gap:8px;border:1px solid #e3e7ef;padding:10px 12px;border-radius:9px;font-size:12px;color:#3c4b65}.design-overview li>span{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;flex-shrink:0;border-radius:50%;background:#eeedf8;color:#65558f}.design-overview li>small{margin-left:auto;font-size:11px;white-space:nowrap;color:#79859a}
+.design-modal .completion-list{max-height:none;overflow:visible;padding-right:0}.completion-filters{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 12px}.completion-filters button{border:1px solid #dce2ec;border-radius:20px;padding:7px 12px;background:white;color:#53617a;font-size:12px}.completion-filters button[aria-pressed=true]{background:#ece9fa;color:#5c4c8a;border-color:#bdafd9}.completion-filters span{margin-left:4px;font-weight:600}
+.completion-concurrency{border:1px solid #e1e5ed;padding:12px;border-radius:9px;margin-bottom:14px}.completion-concurrency summary{cursor:pointer;font-size:13px;color:#5c6480}.completion-concurrency[open]>summary{margin-bottom:14px}.completion-item-message{font-size:12px;line-height:1.7;color:#65738a;margin:10px 0;overflow-wrap:anywhere}.completion-register-bar{border-top:1px solid #dce2ee;padding:16px 0;margin-top:20px;display:grid;gap:12px}.completion-register-bar>label{font-size:12px;color:#5d6980}.completion-register-bar>button{justify-self:start}.completion-empty{padding:24px;border:1px dashed #d8deea;border-radius:9px;text-align:center}.completion-list .design-step>button{display:block;margin-top:12px;border:1px solid #cdd5e5;background:#f7f9fe;color:#4d5a78;padding:9px 14px;border-radius:8px}
+@media(max-width:650px){.design-next-step{top:-16px;padding:14px;gap:10px;align-items:stretch;flex-direction:column}.design-next-step>button{max-width:none;align-self:flex-start}.design-next-step h2{font-size:17px}.design-overview ol{grid-template-columns:1fr}.design-modal [id^=design-]{scroll-margin-top:220px}.design-modal .change-scroll{scroll-padding-top:220px}}
+
+.design-modal .change-scroll{overflow-x:hidden}.design-next-step>div{min-width:0}.design-modal .design-progress span{min-width:0;overflow-wrap:anywhere}.design-overview li{min-width:0;overflow-wrap:anywhere}.completion-advanced{padding:10px 0;color:#64718a;font-size:12px}.completion-advanced>summary{cursor:pointer}.design-modal pre{max-width:100%;overflow:auto}.design-modal section{min-width:0}
+@media(max-width:650px){.design-next-step{position:static}.design-modal [id^=design-]{scroll-margin-top:20px}.design-modal .change-scroll{scroll-padding-top:20px}.design-next-step>button{width:100%;align-self:stretch}.design-next-step p{font-size:12px}.design-shortcuts{gap:6px}.design-shortcuts button{padding:7px 9px}}

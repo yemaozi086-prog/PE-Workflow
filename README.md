@@ -35,7 +35,7 @@ Python 使用 `backend/requirements-win-py314.lock` 精确版本与轮子 SHA256
 runtime/python.exe scripts/install_dsh_presets.py
 ```
 
-源码环境改用 `.venv/Scripts/python.exe`。安装专用 flux、flux-worker、flux-assembly 和 flux-design-v2 preset，写入当前路径并备份已有专用配置，不改默认 agent。重复安装相同配置不会重复备份；移动目录后需重新安装 preset。启用前可查看 `GET /api/health`，该接口只报告配置，不证明模型服务在线。真实 AI 验收需要用户自己的服务及调用预算。
+源码环境改用 `.venv/Scripts/python.exe`。安装专用 flux、flux-worker、flux-assembly 和 flux-design-v3 preset，写入当前路径并备份已有专用配置，不改默认 agent。重复安装相同配置不会重复备份；移动目录后需重新安装 preset。启用前可查看 `GET /api/health`，该接口只报告配置，不证明模型服务在线。真实 AI 验收需要用户自己的服务及调用预算。
 
 ## 复现与交付
 
@@ -52,7 +52,7 @@ runtime/python.exe scripts/verify_portable.py --output verification.json
 
 ## 能力边界
 
-上传只支持受控单函数及指定数学功能；复杂内置模型经过审计后接入。已迁移 DBSRC EPS 独立单步链并与冻结旧程序对照，保留旧模型已知限制，不代表器件实测准确。AI 建图仅验证候选电流到电容损耗两个职责，尚未实现任意拓扑规划。已有单标量 DE；PPO、完整 Pareto 和通用收敛迭代尚未打通。
+上传只支持受控单函数及指定数学功能；复杂内置模型经过审计后接入。已迁移 DBSRC EPS 独立单步链并与冻结旧程序对照，保留旧模型已知限制，不代表器件实测准确。AI 建图支持显式来源的多节点计算链、有限笛卡尔网格与单层 batch 子图，可排队补齐工具、查看诊断并局部修正；尚不支持任意嵌套或收敛循环，也不保证任意任务一次生成成功。已有单标量 DE；PPO、完整 Pareto 和通用收敛迭代尚未打通。
 
 历史本机验收结果不作为便携包用户数据发布。第三方组件保留原有许可；科学模型源码的权利归属需由课题组按实际来源管理，本项目没有擅自为其添加开源许可证。
 
@@ -63,3 +63,13 @@ runtime/python.exe scripts/verify_portable.py --output verification.json
 前端任务入口与无指导使用验收见 [易用性决策记录](docs/decisions-ui-usability.md)。
 
 项目自定义表的申请、审批与版本规则见 [项目扩展说明](docs/project-extensions.md)。Windows 自动回归入口为 GitHub Actions 的 Windows reproducibility；便携包的独立验证脚本覆盖新表审批、单位转换和冻结回放，真实 DSH 仍需另行配置。
+
+
+## 当前交付与环境验证
+
+本次交付日期：2026-10-21。源码、锁定依赖、自包含 Windows x64 运行包分别交付；运行数据、API 密钥、本机配置和测试数据库不上传。运行包及校验文件见仓库 Releases。
+
+- 计算链中的接口、单位、来源、字段依赖与控制结构分别检查。检查通过不等于工程模型正确，独立样例和实测依据仍需提供。
+- 已注册循环成员可省略重复接口声明；平台先读取冻结接口，再生成循环输出和下游声明。
+- 候选原始提交、局部修正、剩余额度与恢复记录可追溯；平台错误重验不会消耗模型调用。
+- 验证范围与操作说明见 [本次交付记录](docs/release-20261021.md)。

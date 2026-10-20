@@ -1,0 +1,28 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path'),ts=require('typescript');
+const code=ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/designJourney.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const exportsObject={};vm.runInNewContext(code,{exports:exportsObject});
+const {designJourney:j}=exportsObject;
+const plan={steps:[{module_ref:null}]},t={status:'awaiting_confirmation',phase:'plan',plan};
+assert.equal(j(null).target,'design-request');
+assert.equal(j({...t,plan:undefined,status:'awaiting_worker'}).stage,0);
+assert.equal(j(t).target,'design-plan-actions');
+assert.equal(j({...t,status:'missing_tools'}).target,'design-tools');
+assert.equal(j({...t,questions:{q:'unit?'}}).target,'design-questions');
+assert.equal(j({...t,plan_preflight:{valid:false}}).target,'design-interface');
+assert.equal(j({...t,failure_routing:{route:'platform_fault'}}).target,'design-diagnostics');
+assert.equal(j({...t,status:'paused',phase:'formula'}).target,'design-recovery');
+assert.equal(j({...t,status:'formula_candidate',phase:'formula'}).target,'design-candidate');
+assert.equal(j({...t,status:'formula_registered',phase:'formula'}).target,'design-history');
+assert.equal(j({...t,status:'formula_registered',phase:'formula',queue_id:'q'}).target,'design-back-to-tools');
+const queue={active:0,pending:0,ready:5,blocked:1,registered:5,total:11};
+assert.match(j(t,queue).title,/5.*候选/);
+assert.match(j(t,{...queue,ready:0}).title,/1.*处理/);
+assert.equal(j(t,queue,true).target,'design-wiring');
+assert.equal(j({...t,status:'ready_to_save'}).target,'design-save');
+assert.equal(j({...t,status:'saved'}).stage,3);
+assert.equal(j({...t,superseded_by:'new'}).target,'design-successor');
+assert.equal(j({...t,status:'waiting_extension'}).target,'design-extension');
+console.log('18 workflow journey state and action destination checks passed');
+
+assert.equal(j({...t,status:'awaiting_worker',candidate_processing:{status:'validating'}}).title,'候选已收到，平台正在校验');
+assert.equal(j({...t,status:'paused',last_report:{code:'CANDIDATE_PROCESSING_INTERRUPTED'},failure_routing:{route:'platform_fault'}}).target,'design-recovery');

@@ -14,6 +14,26 @@ BINARY={ast.Add:operator.add,ast.Sub:operator.sub,ast.Mult:operator.mul,ast.Div:
 COMPARE={ast.Eq:operator.eq,ast.NotEq:operator.ne,ast.Lt:operator.lt,ast.LtE:operator.le,ast.Gt:operator.gt,ast.GtE:operator.ge}
 ALLOWED=(ast.Expression,ast.BinOp,ast.UnaryOp,ast.BoolOp,ast.Compare,ast.IfExp,ast.Call,ast.Name,ast.Load,ast.Constant,ast.Dict,ast.List,ast.Tuple,ast.Subscript,ast.Slice,ast.Attribute,ast.keyword,ast.Add,ast.Sub,ast.Mult,ast.Div,ast.Mod,ast.Pow,ast.MatMult,ast.UAdd,ast.USub,ast.Not,ast.And,ast.Or,ast.Eq,ast.NotEq,ast.Lt,ast.LtE,ast.Gt,ast.GtE)
 DEFAULT_ALIASES={"math":"math","np":"numpy","numpy":"numpy","scipy":"scipy"}
+MAX_SOURCE_CHARS=16000
+MAX_EXPRESSION_CHARS=4000
+MAX_AST_NODES=500
+MAX_CALL_ARGS=20
+MAX_CONSTANT_CHARS=1000
+PERMITTED_IMPORTS={"math","numpy","scipy","scipy.integrate","scipy.linalg"}
+STATEMENT_NODES=(ast.Assign,ast.AnnAssign,ast.Return,ast.If,ast.Expr)
+
+
+def syntax_manifest():
+    """Generated from the same registries and budgets used by this interpreter."""
+    return {'version':'controlled_python_v1','expression_nodes':sorted(n.__name__ for n in ALLOWED),
+            'binary_operators':sorted(n.__name__ for n in BINARY),
+            'comparison_operators':sorted(n.__name__ for n in COMPARE),
+            'statement_nodes':sorted(n.__name__ for n in STATEMENT_NODES),
+            'imports':sorted(PERMITTED_IMPORTS),'aliases':DEFAULT_ALIASES.copy(),
+            'budgets':{'source_chars':MAX_SOURCE_CHARS,'expression_chars':MAX_EXPRESSION_CHARS,'expression_ast_nodes':MAX_AST_NODES,'call_positional_arguments':MAX_CALL_ARGS,'constant_chars':MAX_CONSTANT_CHARS},
+            'function_rules':['exactly one function; no decorators, *args or **kwargs','assign only one local variable; no field assignment or unpacking','Expr statements only allow string documentation','python_subset signature: def compute(inputs); return complete named output dictionaries','Python if/and/or/not require scalar truth values; use the supplied array mask identities for arrays','No loops, comprehensions, helper definitions, bitwise operators or dynamic function calls'],
+            'numeric_catalog_ref':'controlled_syntax.numeric_catalog'}
+
 
 
 class ExpressionError(ValueError): pass
@@ -28,7 +48,7 @@ def qualified(node,aliases):
 def check_tree(tree,aliases=None):
     aliases=aliases or DEFAULT_ALIASES
     nodes=list(ast.walk(tree))
-    if len(nodes)>500: raise ExpressionError("表达式太复杂（最多 500 个语法节点）")
+    if len(nodes)>MAX_AST_NODES: raise ExpressionError("表达式太复杂（最多 500 个语法节点）")
     for node in nodes:
         if not isinstance(node,ALLOWED): raise ExpressionError(f"不支持的语法：{type(node).__name__}")
         if isinstance(node,ast.Name) and node.id.startswith("_"): raise ExpressionError("不能访问私有名称")
@@ -38,14 +58,14 @@ def check_tree(tree,aliases=None):
         if isinstance(node,ast.Call):
             name=qualified(node.func,aliases)
             canonical="math."+name if name in FUNCTIONS and name not in numeric.FUNCTIONS else name
-            if canonical not in numeric.FUNCTIONS or len(node.args)>20 or any(k.arg is None for k in node.keywords): raise ExpressionError(f"未登记的函数：{name}")
+            if canonical not in numeric.FUNCTIONS or len(node.args)>MAX_CALL_ARGS or any(k.arg is None for k in node.keywords): raise ExpressionError(f"未登记的函数：{name}")
             if {k.arg for k in node.keywords}-numeric.FUNCTIONS[canonical][1]: raise ExpressionError(f"{name} 使用未登记关键字")
-        if isinstance(node,ast.Constant) and (not isinstance(node.value,(int,float,bool,str,type(None))) or len(str(node.value))>1000): raise ExpressionError("不支持的常量")
+        if isinstance(node,ast.Constant) and (not isinstance(node.value,(int,float,bool,str,type(None))) or len(str(node.value))>MAX_CONSTANT_CHARS): raise ExpressionError("不支持的常量")
         if isinstance(node,ast.Dict) and any(k is None for k in node.keys): raise ExpressionError("不支持字典展开")
 
 
 def parse(expression):
-    if len(expression)>4000: raise ExpressionError("表达式长度超过 4000")
+    if len(expression)>MAX_EXPRESSION_CHARS: raise ExpressionError("表达式长度超过 4000")
     tree=ast.parse(expression,mode="eval");check_tree(tree)
     return tree.body
 
@@ -110,9 +130,9 @@ def evaluate(node,values:dict[str,Any],aliases=None):
 
 
 def program(source,entrypoint=None,legacy=False):
-    if len(source)>16000:raise ExpressionError("源码超过 16000 字符")
+    if len(source)>MAX_SOURCE_CHARS:raise ExpressionError("源码超过 16000 字符")
     tree=ast.parse(source);aliases={"math":"math"};definitions=[]
-    permitted={"math","numpy","scipy","scipy.integrate","scipy.linalg"}
+    permitted=PERMITTED_IMPORTS
     for stmt in tree.body:
         if isinstance(stmt,ast.Expr) and isinstance(stmt.value,ast.Constant) and isinstance(stmt.value.value,str):continue
         if isinstance(stmt,ast.Import):
@@ -145,6 +165,7 @@ def program(source,entrypoint=None,legacy=False):
             if isinstance(n,ast.Subscript) and not (isinstance(n.slice,ast.Constant) and isinstance(n.slice.value,str)):transforms.add("slice")
     def validate(stmts):
         for stmt in stmts:
+            if not isinstance(stmt,STATEMENT_NODES):raise ExpressionError(f"Python 子集不支持：{type(stmt).__name__}")
             if isinstance(stmt,(ast.Assign,ast.AnnAssign)):
                 targets=stmt.targets if isinstance(stmt,ast.Assign) else [stmt.target]
                 if len(targets)!=1 or not isinstance(targets[0],ast.Name):raise ExpressionError(f"第 {stmt.lineno} 行仅允许给单个局部变量赋值，不支持解包或字段赋值")
@@ -174,6 +195,7 @@ def run_function(source,entrypoint,arguments,legacy=False):
     if missing:raise ExpressionError(f"原函数缺少参数：{sorted(missing)}")
     def run(stmts):
         for stmt in stmts:
+            if not isinstance(stmt,STATEMENT_NODES):raise ExpressionError(f"Python 子集不支持：{type(stmt).__name__}")
             if isinstance(stmt,(ast.Assign,ast.AnnAssign)):
                 target=stmt.targets[0] if isinstance(stmt,ast.Assign) else stmt.target
                 values[target.id]=evaluate(stmt.value,values,aliases)
@@ -188,6 +210,8 @@ def run_function(source,entrypoint,arguments,legacy=False):
 
 
 def execute_module(module,inputs):
+    from .plan_audit import run_checks
+    run_checks(module.input_checks,inputs)
     def coerce(value,port):
         if port.type=="array":return numeric.array(value,port.value_type.dtype)
         if port.type=="flat_dict":return {k:coerce(value[k],p) for k,p in port.fields.items() if k in value}

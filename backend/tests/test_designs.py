@@ -36,8 +36,10 @@ def fixture(tmp_path):
 def create(c):return c.post('/api/workflow-designs',json={'instruction':'请根据工具计算倍增结果'}).json()
 
 def callback(c,s,t,**payload):
-    current=s.get(t['id']);current.update(status='awaiting_worker',call_id='a'*32,token='secret',calls=current.get('calls',0)+1);s.save(current,'test_agent_dispatched')
-    r=c.post('/api/workflow-designs/'+t['id']+'/result',json={'call_id':'a'*32,'token':'secret',**payload});assert r.status_code==200,r.text
+    import uuid
+    call_id=uuid.uuid4().hex
+    current=s.get(t['id']);current.update(status='awaiting_worker',call_id=call_id,token='secret',calls=current.get('calls',0)+1);s.save(current,'test_agent_dispatched')
+    r=c.post('/api/workflow-designs/'+t['id']+'/result',json={'call_id':call_id,'token':'secret',**payload});assert r.status_code==200,r.text
     return r.json()
 
 def confirm(c,t):return c.post('/api/workflow-designs/'+t['id']+'/confirm',json={'revision':t['revision'],'allow_unverified':True}).json()
@@ -67,7 +69,8 @@ def test_wrong_formula_output_is_rejected(fixture):
     c,s,_=fixture;t=callback(c,s,create(c),kind='plan',plan=plan(False))
     t=c.post('/api/workflow-designs/'+t['id']+'/formula',json={'revision':t['revision'],'step_id':'calculate','formula':'y=2x','declarations':'W','evidence':'手算','examples':[{'inputs':{'data':{'value':3}},'outputs':{'result':{'value':7}}}]}).json()
     m=tool().model_dump();m['id']='wrong';t=callback(c,s,t,kind='module',module=m)
-    assert t['status']=='dispatch_ready' and '独立数值样例不通过' in t['last_report']['message']
+    assert t['status']=='needs_clarification' and '独立数值样例不通过' in t['last_report']['message']
+    assert t['failure_routing']['route']=='uncertain'
 
 def test_revision_derives_and_preserves_old_plan(fixture):
     c,s,_=fixture;t=callback(c,s,create(c),kind='plan',plan=plan());old=copy.deepcopy(t['plan']);p=plan();p['title']='新方案'
@@ -109,16 +112,79 @@ def test_formula_expected_answers_not_given_to_agent(fixture):
 def test_late_callback_after_stop_does_not_publish(fixture):
     c,s,store=fixture;t=create(c);t=s.get(t['id']);t.update(status='awaiting_worker',call_id='b'*32,token='secret');t=s.save(t,'test_dispatched')
     c.post('/api/workflow-designs/'+t['id']+'/stop',json={'revision':t['revision']})
-    with pytest.raises(Conflict):c.post('/api/workflow-designs/'+t['id']+'/result',json={'call_id':'b'*32,'token':'secret','kind':'plan','plan':plan()})
+    result=c.post('/api/workflow-designs/'+t['id']+'/result',json={'call_id':'b'*32,'token':'secret','kind':'plan','plan':plan()}).json()
+    assert result['status']=='recorded_late_result' and result['applied'] is False
+    assert s.get(t['id'])['status']=='paused'
     assert not store.workflows()
 
 def test_two_step_dependency_chain_and_wrong_rewiring(fixture):
     c,s,store=fixture;p=plan();second=copy.deepcopy(p['steps'][0]);second.update(id='second',title='第二步',dependencies=['calculate']);p['steps'].append(second)
+    p['external_inputs']=copy.deepcopy(p['steps'][0]['inputs'])
+    p['steps'][0]['input_sources']={'data':{'source':'input','port':'data'}}
+    second['input_sources']={'data':{'source':'node','node':'calculate','port':'result'}}
     t=callback(c,s,create(c),kind='plan',plan=p);t=confirm(c,t);wf=workflow();n=copy.deepcopy(wf['nodes'][0]);n.update(id='second',inputs={'data':{'source':'node','node':'calculate','port':'result'}});wf['nodes'].append(n);wf['outputs']['result']['node']='second'
     t=callback(c,s,t,kind='workflow',workflow=wf);assert t['status']=='ready_to_save',t
     assert execute(Workflow.model_validate(t['workflow']),{'double@1':tool()},{'data':{'value':3}})['result']['value']==12
     other=callback(c,s,create(c),kind='plan',plan=p);other=confirm(c,other);wf['nodes'][1]['inputs']['data']={'source':'input','port':'data'}
     bad=callback(c,s,other,kind='workflow',workflow=wf);assert bad['status']=='dispatch_ready' and '依赖' in bad['last_report']['message']
+
+def test_old_unbound_chain_is_read_only_and_replan_preserves_it(fixture):
+    c,s,store=fixture;t=callback(c,s,create(c),kind='plan',plan=plan())
+    raw=s.get(t['id']);second=copy.deepcopy(raw['plan']['steps'][0]);second.update(id='second',dependencies=['calculate']);raw['plan']['steps'].append(second)
+    old=s.save(raw,'legacy_fixture');before=copy.deepcopy(old)
+    public=c.get('/api/workflow-designs/'+old['id']).json()
+    assert not public['plan_preflight']['valid'] and s.get(old['id'])==before
+    with pytest.raises(WorkflowError) as e:confirm(c,public)
+    assert e.value.diagnostic.code=='PLAN_PREFLIGHT'
+    new=c.post('/api/workflow-designs/'+old['id']+'/replan',json={'revision':old['revision'],'instruction':'请保持公式，为每个字典明确来源，并添加已声明的计算前提'}).json()
+    assert new['parent_id']==old['id'] and new['status']=='dispatch_ready'
+    assert s.get(old['id'])==before and not store.runs()
+    ctx=s.context(s.get(new['id']))
+    assert ctx['previous_plan']==old['plan'] and not ctx['replan_diagnostics']['valid']
+
+def test_plan_preflight_feedback_and_guard_cannot_be_removed(fixture):
+    c,s,_=fixture;p=plan();p['external_inputs']=copy.deepcopy(p['steps'][0]['inputs'])
+    t=callback(c,s,create(c),kind='plan',plan=p)
+    assert t['status']=='dispatch_ready' and t['last_report']['code']=='PLAN_PREFLIGHT'
+    p['steps'][0]['input_sources']={'data':{'source':'input','port':'data'}}
+    p['steps'][0]['input_checks']=["data['value'] > 0"]
+    t=callback(c,s,t,kind='plan',plan=p);t=confirm(c,t)
+    wf=workflow();t=callback(c,s,t,kind='workflow',workflow=wf)
+    assert '输入保护' in t['last_report']['message']
+    wf['nodes'][0]['input_checks']=["data['value'] > 0"]
+    t=callback(c,s,t,kind='workflow',workflow=wf)
+    assert t['status']=='ready_to_save'
+
+def test_different_preflight_errors_are_not_counted_as_same_failure(fixture):
+    c,s,_=fixture;p=plan();p['external_inputs']=copy.deepcopy(p['steps'][0]['inputs'])
+    t=callback(c,s,create(c),kind='plan',plan=p)
+    assert t['repeat_count']==1
+    p['steps'][0]['input_sources']={'data':{'source':'input','port':'data'}}
+    p['steps'][0]['input_checks']=["unknown['value'] > 0"]
+    t=callback(c,s,t,kind='plan',plan=p)
+    assert t['status']=='dispatch_ready' and t['repeat_count']==1
+    assert t['last_report']['plan_preflight']['repairs'][0]['strategy']=='repair_input_checks'
+    ctx=s.context(s.get(t['id']));assert ctx['plan_repair']['repairs']
+    t=callback(c,s,t,kind='plan',plan=p,explanation='再次提交仍未修正同一保护路径')
+    assert t['status']=='paused' and t['repeat_count']==2
+
+def test_repair_accepts_patch_only_and_preserves_frozen_plan(fixture):
+    c,s,store=fixture;p=plan(False);p['external_inputs']={'upstream':copy.deepcopy(p['steps'][0]['inputs']['data'])}
+    step=p['steps'][0];step['input_sources']={'data':{'source':'input','port':'upstream'}};step['input_checks']=["upstream['value'] > 0"]
+    t=callback(c,s,create(c),kind='plan',plan=p)
+    raw=s.get(t['id']);raw['status']='paused';old=s.save(raw,'test_stopped')
+    repaired=c.post('/api/workflow-designs/'+old['id']+'/repair',json={'revision':old['revision'],'max_calls':2}).json()
+    assert repaired['status']=='awaiting_confirmation' and repaired['calls']==0 and repaired['patch_origin']=='platform'
+    ctx=s.context(s.get(repaired['id']))
+    assert ctx['required_result_kind']=='plan_patch' and ctx['schemas']['patch']
+    assert ctx['schemas']['patch']['$defs']['PlanStepEdit']['properties']['step_id']['enum']==['calculate']
+    bad=callback(c,s,repaired,kind='plan',plan=plan(False))
+    assert bad['last_report']['code']=='PATCH_REQUIRED'
+    fixed=callback(c,s,bad,kind='plan_patch',patch={'base_hash':ctx['patch_base']['hash'],'edits':[]})
+    assert fixed['status']=='awaiting_confirmation' and fixed['plan_preflight']['valid']
+    assert fixed['plan']['steps'][0]['input_checks']==["data['value'] > 0"]
+    assert fixed['patch_audit']['frozen'] and s.get(old['id'])==old
+    assert len(store.modules())==1 and not store.runs()
 
 def test_formula_change_derives_existing_module_version(fixture):
     c,s,store=fixture;t=callback(c,s,create(c),kind='plan',plan=plan())
@@ -131,10 +197,26 @@ def test_formula_change_derives_existing_module_version(fixture):
     assert len(store.modules())==2
     with store.connect() as con:assert con.execute('select count(*) from module_relations where id=? and version=2',('double',)).fetchone()[0]==1
 
+def test_new_interface_derives_version_without_overwriting_original(fixture):
+    c,s,store=fixture;p=plan(False);p['steps'][0]['derives_from']='double@1'
+    data=p['steps'][0]['inputs'].pop('data');p['steps'][0]['inputs']['measurement']=data
+    p['external_inputs']={'measurement':copy.deepcopy(data)}
+    p['steps'][0]['input_sources']={'measurement':{'source':'input','port':'measurement'}}
+    t=callback(c,s,create(c),kind='plan',plan=p)
+    t=c.post('/api/workflow-designs/'+t['id']+'/formula',json={'revision':t['revision'],'step_id':'calculate','formula':'y=2x，接口改名为 measurement','declarations':'保持 W 与原公式','evidence':'原工具公式','examples':[{'inputs':{'measurement':{'value':3}},'outputs':{'result':{'value':6}}}]}).json()
+    assert s.context(s.get(t['id']))['registration_target']=={'id':'double','version':2,'parent_version':1}
+    m=tool().model_dump();m.update(version=2,inputs={'measurement':data},expressions={'result':"{'value': measurement['value']*2}"})
+    t=callback(c,s,t,kind='module',module=m);assert t['status']=='formula_candidate'
+    child=c.post('/api/workflow-designs/'+t['id']+'/register-formula',json={'revision':t['revision'],'allow_unverified':True}).json()
+    assert child['plan']['steps'][0]['module_ref']=='double@2'
+    original=next(m for m in store.modules() if m['version']==1)
+    assert Module.model_validate(original)==tool()
+
 def test_approved_continuation_keeps_configuration_history_and_three_call_limit(fixture):
     c,s,_=fixture;t=create(c);t=s.get(t['id']);old=copy.deepcopy(t['configuration']);t.update(status='paused',calls=3);t=s.save(t,'test_paused')
     t=c.post('/api/workflow-designs/'+t['id']+'/continue',json={'revision':t['revision']}).json()
-    assert t['call_limit']==3 and t['calls']==0 and t['configuration']['max_calls']==3
+    assert t['call_limit']==7 and t['calls']==3 and t['remaining_calls']==4 and t['configuration']['max_calls']==3
+    assert t['budget_history'][0]['used']==3
     assert t['configuration_history'][0]['configuration']==old
     assert c.get('/api/design-configuration').json()['provider_hash']==t['configuration']['provider_hash']
 
@@ -148,7 +230,7 @@ def test_protocol_diagnostic_is_concrete_and_does_not_edit_candidate():
 def test_continuation_can_be_limited_to_one_approved_call(fixture):
     c,s,_=fixture;t=create(c);t=s.get(t['id']);t.update(status='paused');t=s.save(t,'test_paused')
     t=c.post('/api/workflow-designs/'+t['id']+'/continue',json={'revision':t['revision'],'max_calls':1}).json()
-    assert t['call_limit']==1 and t['configuration']['max_calls']==1
+    assert t['call_limit']==5 and t['calls']==0 and t['configuration']['max_calls']==1
 
 def test_module_repair_guidance_does_not_leak_into_binding_stage(fixture):
     c,s,_=fixture;t=callback(c,s,create(c),kind='plan',plan=plan());t=confirm(c,t)
@@ -223,10 +305,11 @@ def test_dependency_gate_blocks_bad_candidates_without_extra_calls(fixture,case)
     t=callback(c,s,create(c),kind='plan',plan=p)
     t=c.post('/api/workflow-designs/'+t['id']+'/formula',json={'revision':t['revision'],'step_id':'calculate','formula':'y=2x','declarations':'W','evidence':'手算','examples':[{'inputs':values,'outputs':{'result':{'value':6}}}]}).json()
     t=callback(c,s,t,kind='module',module=m)
-    assert t['status']==('needs_clarification' if case=='dynamic' else 'paused'),t.get('last_report')
+    assert t['status']==('needs_clarification' if case=='dynamic' else 'paused' if case in ('change_required','extra_required') else 'dispatch_ready'),t.get('last_report')
     if case=='dynamic':assert t['questions']
     assert t['calls']==1
-    assert t['last_report']['code'].startswith('DEPENDENCY_') or t['last_report']['code']=='CONTRACT_CHANGE_REQUIRES_CONFIRM'
+    assert t['last_report']['code'].startswith('DEPENDENCY_') or t['last_report']['code'] in ('CONTRACT_CHANGE_REQUIRES_CONFIRM','INPUT_USAGE_REVIEW_REQUIRED')
+    if case=='extra_required':assert t['failure_routing']['route']=='needs_confirmation'
     assert t['previous_candidate']['module']['id']=='dependency_candidate'
     assert not any(x['id']=='dependency_candidate' for x in store.modules())
     with pytest.raises(Conflict):c.post('/api/workflow-designs/'+t['id']+'/register-formula',json={'revision':t['revision'],'allow_unverified':True})
@@ -306,3 +389,86 @@ def test_unknown_unit_is_rejected_before_formula_generation(fixture):
     assert t['calls']==before['calls']
     assert t['extension_request']['status']=='needs_information'
     assert t['extension_request']['proposal']['name']=='unregistered-unit'
+
+
+def test_clarification_does_not_renew_budget(fixture):
+    c,s,_=fixture
+    t=create(c);t=s.get(t['id']);t.update(status='needs_clarification',calls=4,call_limit=4,questions={'unit':'请提供依据'})
+    t=s.save(t,'test_clarification')
+    t=c.post('/api/workflow-designs/'+t['id']+'/answer',json={'revision':t['revision'],'answers':{'unit':'暂时没有资料'}}).json()
+    assert t['status']=='paused' and t['calls']==4 and t['remaining_calls']==0
+    assert not t['questions']
+
+
+def test_platform_fault_cannot_be_retried_as_candidate(fixture):
+    c,s,_=fixture;t=s.get(create(c)['id'])
+    t=s.retry(t,RuntimeError('database failure'))
+    assert t['failure_routing']['route']=='platform_fault' and t['status']=='paused'
+    with pytest.raises(Conflict):
+        c.post('/api/workflow-designs/'+t['id']+'/continue',json={'revision':t['revision']})
+
+
+def test_same_candidate_error_stops_after_two(fixture):
+    c,s,_=fixture;t=s.get(create(c)['id'])
+    t.update(calls=1)
+    t=s.retry(t,ValueError('步骤 ID 重复'))
+    assert t['status']=='dispatch_ready'
+    t.update(calls=2)
+    t=s.retry(t,ValueError('步骤 ID 重复'))
+    assert t['status']=='paused' and t['failure_routing']['stop_reason']=='repeated_error'
+    assert t['calls']==2
+
+
+def test_derived_revision_keeps_step_budget_and_exposes_impact(fixture):
+    c,s,_=fixture;t=callback(c,s,create(c),kind='plan',plan=plan(False))
+    t=c.post('/api/workflow-designs/'+t['id']+'/formula',json={'revision':t['revision'],'step_id':'calculate','formula':'y=2x','declarations':'W','evidence':'user formula','examples':[]}).json()
+    old=s.get(t['id']);old.update(calls=4,call_limit=4,status='paused');old=s.save(old,'test_exhausted')
+    revised=copy.deepcopy(old['plan']);revised['steps'][0]['formula_latex']='y=3x'
+    child=c.post('/api/workflow-designs/'+old['id']+'/revise',json={'revision':old['revision'],'plan':revised}).json()
+    assert '/plan/steps/0/formula_latex' in child['revision_changes']
+    child=c.post('/api/workflow-designs/'+child['id']+'/formula',json={'revision':child['revision'],'step_id':'calculate','formula':'y=3x','declarations':'W','evidence':'changed formula','examples':[]}).json()
+    assert child['calls']==4 and child['remaining_calls']==0 and child['status']=='paused'
+    assert s.get(old['id'])['plan']!=child['plan']
+
+
+def test_evidence_review_keeps_basis_and_remaining_budget(fixture):
+    c,s,_=fixture;t=s.get(create(c)['id'])
+    t.update(status='needs_clarification',phase='formula',calls=2,call_limit=4,repeat_count=1,formula_request={'step_id':'calculate'},last_report={'code':'EXAMPLE_RESULT_MISMATCH'},verification_feedback={'example':1,'execution_status':'succeeded'},failure_routing={'route':'uncertain'},questions={'failure_evidence':'provide evidence'})
+    t=s.save(t,'test_mismatch')
+    t=c.post('/api/workflow-designs/'+t['id']+'/review-evidence',json={'revision':t['revision'],'evidence':'Verified against independent derivation; keep basis','keep_confirmed_basis':True}).json()
+    assert t['status']=='dispatch_ready' and t['calls']==2 and t['remaining_calls']==2
+    assert t['repeat_count']==1 and t['evidence_reviews'][0]['keep_confirmed_basis']
+
+
+def test_syntax_error_routes_to_candidate_repair_before_semantic_questions(fixture):
+    c,s,_=fixture;t=callback(c,s,create(c),kind='plan',plan=plan(False))
+    t=c.post('/api/workflow-designs/'+t['id']+'/formula',json={'revision':t['revision'],'step_id':'calculate','formula':'y=2x','declarations':'W','evidence':'user formula','examples':[]}).json()
+    m=tool().model_dump();m.update(id='syntax_candidate',implementation='python_subset',source='def compute(inputs):\n    return {',expressions={})
+    t=callback(c,s,t,kind='module',module=m)
+    assert t['last_report']['code']=='MODULE_SYNTAX'
+    assert t['failure_routing']['route']=='candidate_repair' and t['status']=='dispatch_ready'
+    assert not t['questions']
+
+
+def test_defer_preserves_questions_and_budget(fixture):
+    c,s,_=fixture;t=s.get(create(c)['id']);t.update(status='needs_clarification',calls=2,questions={'units':'please provide unit evidence'})
+    t=s.save(t,'test_questions');before=copy.deepcopy(t)
+    t=c.post('/api/workflow-designs/'+t['id']+'/defer',json={'revision':t['revision']}).json()
+    assert t['status']=='blocked' and t['calls']==2 and t['questions']==before['questions']
+    assert t['call_limit']==before['call_limit']
+
+
+def test_agent_questions_cannot_be_bypassed_with_extra_calls(fixture):
+    c,s,_=fixture;t=callback(c,s,create(c),kind='questions',questions={'unit':'please clarify unit'},explanation='unit is unknown')
+    assert t['failure_routing']['route']=='needs_information'
+    t=s.get(t['id']);t.update(status='blocked');t=s.save(t,'test_blocked')
+    with pytest.raises(Conflict):c.post('/api/workflow-designs/'+t['id']+'/continue',json={'revision':t['revision']})
+    t=c.post('/api/workflow-designs/'+t['id']+'/answer',json={'revision':t['revision'],'answers':{'unit':'use the existing W declaration'}}).json()
+    assert t['calls']==1 and t['status']=='dispatch_ready' and t['failure_routing'] is None
+
+
+def test_answers_do_not_bypass_repeat_stop(fixture):
+    c,s,_=fixture;t=s.get(create(c)['id']);t.update(status='needs_clarification',calls=2,call_limit=4,repeat_count=2,questions={'scope':'clarify fields'})
+    t=s.save(t,'test_repeat_stop')
+    t=c.post('/api/workflow-designs/'+t['id']+'/answer',json={'revision':t['revision'],'answers':{'scope':'keep the original fields'}}).json()
+    assert t['status']=='paused' and t['repeat_count']==2 and t['remaining_calls']==2

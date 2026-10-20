@@ -1,4 +1,4 @@
-import sys,json
+import sys,json,subprocess
 from pathlib import Path
 import pytest
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'bridge'))
@@ -20,3 +20,15 @@ def test_invalid_json_is_cleaned(tmp_path,monkeypatch):
     monkeypatch.setattr(bridge,'_config_root',tmp_path);inbox=tmp_path/'data/dsh-inbox';inbox.mkdir(parents=True);path=inbox/('b'*32+'.json');path.write_text('{')
     with pytest.raises(ValueError):bridge.load_payload(['client','design-result','--file',str(path)])
     assert not path.exists()
+
+
+@pytest.mark.parametrize('data,code',[("malformed raw tool text",'TOOL_ARGUMENT_OBJECT'),({'_tool_runtime_hash':'stale'},'TOOL_RUNTIME_MISMATCH')])
+def test_bridge_rejects_bad_root_or_stale_runtime_before_http(data,code):
+    import uuid
+    root=Path(__file__).resolve().parents[2]
+    inbox=root/'data/dsh-inbox';inbox.mkdir(exist_ok=True,parents=True)
+    path=inbox/(uuid.uuid4().hex+'.json');path.write_text(json.dumps(data),encoding='utf-8')
+    result=subprocess.run([sys.executable,str(root/'bridge/flux_worker_client.py'),'design-result','--file',str(path)],capture_output=True,text=True,encoding='utf-8',check=True)
+    value=json.loads(result.stdout)
+    assert value['code']==code and value['submitted'] is False and value['stop_required']
+    assert not path.exists() and '.pop' not in result.stdout

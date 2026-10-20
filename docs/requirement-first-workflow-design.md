@@ -22,7 +22,7 @@
 - 状态机：`backend/pe_workflow/designs.py`。
 - 方案存储：本机 SQLite 的 workflow_designs；带乐观版本检查和事件时间线。
 - 工具目录快照按内容指纹保存到 contexts，避免每次状态变更重复写入整个库。
-- DSH 配置：`dsh/preset/flux-design/`（安装名 flux-design-v2）。工具只有 design_context、design_module、design_result；不能直接发布。
+- DSH 配置：`dsh/preset/flux-design/`（安装名 flux-design-v3）。工具只有 design_context、design_module、design_result；不能直接发布。
 - 桥接：`bridge/flux_worker_client.py`，限定任务与调用凭证。
 - 已注册模块的完整接口由平台物化，禁止模型修改已声明的类型、单位和语义。
 - 候选公式的独立预期答案不发送给智能体；仅平台使用用户提供的答案进行比较。
@@ -54,7 +54,7 @@
 .venv/Scripts/python.exe scripts/install_dsh_presets.py --only flux-design
 ```
 
-安装名为 `flux-design-v2`，项目内源码仍在 `dsh/preset/flux-design`。平台会核对预设和上下文提供程序指纹；修改后需核对新配置再继续，旧配置会保留。桥接使用项目 data/dsh-inbox 中的短期 JSON 文件，解决 Windows 命令行长参数限制；文件读后清理，不进入版本库。
+安装名为 `flux-design-v3`，项目内源码仍在 `dsh/preset/flux-design`。平台会核对预设和上下文提供程序指纹；修改后需核对新配置再继续，旧配置会保留。桥接使用项目 data/dsh-inbox 中的短期 JSON 文件，解决 Windows 命令行长参数限制；文件读后清理，不进入版本库。
 
 ## 字段依赖门禁
 

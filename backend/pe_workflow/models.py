@@ -9,7 +9,7 @@ class StrictModel(BaseModel):
 
 
 class ValueType(StrictModel):
-    dtype: Literal["float64", "float32", "int64"] = "float64"
+    dtype: Literal["float64", "float32", "int64", "string"] = "float64"
     shape: list[int | str] = Field(default_factory=list, max_length=4)
 
     @model_validator(mode="after")
@@ -51,9 +51,11 @@ class ExtensionRef(StrictModel):
     fingerprint: str
 
 class Port(StrictModel):
+    missing_when: str | None = None  # sibling 0/1 validity column; null encodes missing NaN
     @model_serializer(mode='wrap')
     def serialize_extensions(self,handler):
         result=handler(self)
+        if self.missing_when is None:result.pop('missing_when',None)
         if not self.extension_refs:result.pop('extension_refs',None)
         return result
     type: Literal["number", "string", "boolean", "array", "flat_dict", "collection"] = "number"
@@ -118,6 +120,8 @@ class Port(StrictModel):
         if self.type == "array":
             if self.value_type is None or not self.value_type.shape:
                 raise ValueError("数值数组必须声明 value_type.shape")
+            if self.value_type.dtype == "string" and len(self.value_type.shape)!=1:
+                raise ValueError("文字数组只支持一维工况列表")
             if len(self.axes) != len(self.value_type.shape):
                 raise ValueError("数组的每个维度必须声明轴")
         elif self.axes or (self.value_type is not None and self.value_type.shape):
@@ -243,6 +247,7 @@ class CatalogImport(StrictModel):
 
 
 class Module(StrictModel):
+    input_checks: list[str] = Field(default_factory=list, max_length=40)
     id: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_-]{0,79}$")
     version: int = Field(ge=1)
     name: str
@@ -267,9 +272,13 @@ class Module(StrictModel):
 
 
 class Node(StrictModel):
+    input_checks: list[str] = Field(default_factory=list, max_length=40)
     id: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_-]{0,79}$")
     label: str = ""
-    kind: Literal["compute", "switch", "foreach", "aggregate", "batch"] = "compute"
+    kind: Literal["compute", "switch", "foreach", "aggregate", "batch", "grid"] = "compute"
+    grid_ports: dict[str, Port] = Field(default_factory=dict)
+    grid_axes: dict[str, str] = Field(default_factory=dict)
+    grid_order: list[str] = Field(default_factory=list)
     inputs: dict[str, Binding] = Field(default_factory=dict)
     module_id: str | None = None
     module_version: int | None = Field(default=None, ge=1)
@@ -280,6 +289,9 @@ class Node(StrictModel):
 
     @model_validator(mode="after")
     def configuration(self):
+        if self.kind == 'grid':
+            if not self.grid_ports or not self.grid_axes or len(self.grid_order)!=len(self.grid_axes) or set(self.grid_order)!=set(self.grid_axes):raise ValueError('grid 必须声明输入接口、轴映射及无重复的遍历轴顺序')
+        elif self.grid_ports or self.grid_axes or self.grid_order:raise ValueError('只有 grid 可以声明轴映射')
         if self.kind == "compute":
             if not self.module_id or not self.module_version:
                 raise ValueError("compute 必须固定 module_id 和 module_version")
@@ -613,6 +625,9 @@ class AssemblyInputConfig(AssemblyInputProfileRequest):
 
 # Design plans intentionally contain no operating-point values.
 class DesignStep(StrictModel):
+    derives_from: str | None = None
+    input_sources: dict[str, Binding] = Field(default_factory=dict)
+    input_checks: list[str] = Field(default_factory=list, max_length=40)
     id: str = Field(pattern=r'^[A-Za-z][A-Za-z0-9_-]{0,59}$')
     title: str = Field(min_length=1,max_length=160)
     purpose: str = Field(min_length=1,max_length=2000)
@@ -625,11 +640,46 @@ class DesignStep(StrictModel):
     module_ref: str | None = None
     selection_reason: str = Field(default='',max_length=2000)
 
+class PlanGrid(StrictModel):
+    id: str = Field(pattern=r'^[A-Za-z][A-Za-z0-9_-]{0,59}$')
+    title: str
+    input_sources: dict[str, Binding]
+    axes: dict[str, str]  # output field -> explicit local bag.field; order is significant
+    axis_order: list[str]
+
+class PlanLoop(StrictModel):
+    id: str = Field(pattern=r'^[A-Za-z][A-Za-z0-9_-]{0,59}$')
+    title: str
+    kind: Literal['batch'] = 'batch'
+    step_ids: list[str] = Field(min_length=1,max_length=60)
+    rows: Binding
+    captures: dict[str, Binding] = Field(default_factory=dict)
+    outputs: dict[str, Binding] = Field(min_length=1)
+
 class DesignPlan(StrictModel):
+    external_inputs: dict[str, Port] = Field(default_factory=dict)
     title: str = Field(min_length=1,max_length=160)
     summary: str = Field(min_length=1,max_length=4000)
     steps: list[DesignStep] = Field(min_length=1,max_length=60)
     limitations: list[str] = Field(default_factory=list,max_length=40)
+    grids: list[PlanGrid] = Field(default_factory=list,max_length=4)
+    loops: list[PlanLoop] = Field(default_factory=list,max_length=4)
+
+class PlanStepEdit(StrictModel):
+    step_id: str
+    inputs: dict[str, Port]
+    input_sources: dict[str, Binding]
+    derive_interface: bool = False
+    repair_shapes: bool = False
+    guard_field_map: dict[str, str] = Field(default_factory=dict, max_length=80)
+
+class PlanPatch(StrictModel):
+    base_hash: str = Field(pattern=r'^[0-9a-f]{64}$')
+    edits: list[PlanStepEdit] = Field(default_factory=list, max_length=60)
+
+class ShapeRepairConfirm(StrictModel):
+    revision: int = Field(ge=1)
+    patch_hash: str = Field(pattern=r'^[0-9a-f]{64}$')
 
 class DesignRequest(StrictModel):
     project_id: str = Field(default='local',pattern=r'^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$')
@@ -640,6 +690,11 @@ class DesignRequest(StrictModel):
 class DesignRevision(StrictModel):
     revision: int = Field(ge=1)
     plan: DesignPlan
+
+class DesignReplan(StrictModel):
+    revision: int = Field(ge=1)
+    instruction: str = Field(min_length=3, max_length=20000)
+    max_calls: int = Field(default=4, ge=1, le=4)
 
 class DesignConfirm(StrictModel):
     revision: int = Field(ge=1)
@@ -666,7 +721,8 @@ class ExtensionDecision(StrictModel):
 class DesignWorkerResult(StrictModel):
     call_id: str
     token: str
-    kind: Literal['plan','workflow','questions','blocked','module','extension_request']
+    kind: Literal['plan','plan_patch','workflow','questions','blocked','module','extension_request']
+    patch: PlanPatch | None = None
     extension_request: ExtensionProposal | None = None
     plan: DesignPlan | None = None
     workflow: Workflow | None = None
@@ -686,15 +742,76 @@ class FormulaRequest(StrictModel):
     evidence: str = Field(min_length=1,max_length=4000)
     examples: list[FormulaExample] = Field(default_factory=list,max_length=30)
 
+class ToolCompletionItem(StrictModel):
+    step_id: str
+    formula: str = Field(default='',max_length=10000)
+    evidence: str = Field(default='',max_length=4000)
+    examples: list[FormulaExample] = Field(default_factory=list,max_length=30)
+    max_calls: int = Field(default=4,ge=1,le=4)
+
+class ToolCompletionRequest(StrictModel):
+    revision: int = Field(ge=1)
+    confirm_plan: Literal[True]
+    concurrency: int = Field(default=2,ge=1,le=10)
+    items: list[ToolCompletionItem] = Field(min_length=1,max_length=60)
+
+class ToolCompletionConcurrency(StrictModel):
+    revision: int = Field(ge=1)
+    concurrency: int = Field(ge=1,le=10)
+
+class ToolCompletionRegister(StrictModel):
+    revision: int = Field(ge=1)
+    task_ids: list[str] = Field(min_length=1,max_length=60)
+    allow_unverified: bool = False
+
 class DesignAnswer(StrictModel):
     revision: int = Field(ge=1)
     answers: dict[str,str]
+
+class DesignArchive(StrictModel):
+    revision: int = Field(ge=1)
+    archived: bool = True
+
+class BindingAssemblyConfirm(StrictModel):
+    revision: int = Field(ge=1)
+    preview_hash: str
+    allow_unverified: Literal[True]
+
+class CompletionRecovery(StrictModel):
+    revision: int = Field(ge=1)
+    preview_hash: str
+    confirm: Literal[True]
+
+class MissingOutputRevision(StrictModel):
+    revision: int = Field(ge=1)
+    port: str
+    mask: str
+    fields: list[str] = Field(min_length=1,max_length=40)
+    evidence: str = Field(min_length=3,max_length=2000)
+    confirm_missing_nan: Literal[True]
+
+class DeclarationRecovery(CompletionRecovery):
+    quantities: dict[str,str] = Field(default_factory=dict)
+
+class DesignEvidenceReview(StrictModel):
+    revision: int = Field(ge=1)
+    evidence: str = Field(min_length=3,max_length=4000)
+    keep_confirmed_basis: Literal[True]
+
+class FormulaRecovery(StrictModel):
+    revision: int = Field(ge=1)
+    examples: list[FormulaExample] = Field(min_length=2,max_length=30)
+    evidence: str = Field(min_length=3,max_length=4000)
+    confirm: Literal[True]
+    max_calls: Literal[1]
 
 class DesignContinue(DesignConfirm):
     max_calls: int = Field(default=3,ge=1,le=3)
 
 
 class DependencyAudit(StrictModel):
+    check_fields: list[str] = Field(default_factory=list)
+    carried_fields: list[str] = Field(default_factory=list)
     status: Literal['passed','failed','uncertain']
     required_fields: list[str]
     optional_fields: list[str]

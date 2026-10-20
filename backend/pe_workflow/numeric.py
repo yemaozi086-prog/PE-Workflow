@@ -68,7 +68,10 @@ def solve(a, b, assume_a=None):
     return linalg.solve(a,b,assume_a=assume_a,check_finite=True)
 
 
+from .missing_values import masked_values
+
 FUNCTIONS = {
+    "pe.masked_values":(masked_values,set()),
     **{f"math.{n}": (getattr(math,n),set()) for n in ("sqrt","sin","cos","tan","exp","log","log10","fabs","floor","ceil")},
     "abs":(abs,set()),"min":(min,set()),"max":(max,set()),"float":(float,set()),"int":(int,set()),"len":(len,set()),
     "numpy.array":(array,{"dtype"}),"numpy.asarray":(array,{"dtype"}),"numpy.zeros":(zeros,{"dtype"}),"numpy.linspace":(linspace,{"num","endpoint"}),

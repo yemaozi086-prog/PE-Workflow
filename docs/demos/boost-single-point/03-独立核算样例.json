@@ -1,0 +1,416 @@
+[
+  {
+    "name": "A_baseline_pass",
+    "inputs": {
+      "operating": {
+        "Vin": 48,
+        "Vout": 96,
+        "Pout": 480
+      },
+      "passive": {
+        "fs": 100000,
+        "L": 0.0001,
+        "C": 0.00047,
+        "ESR": 0.02,
+        "R_L": 0.03
+      },
+      "semiconductor": {
+        "R_on": 0.015,
+        "Vf": 0.7,
+        "r_d": 0.01
+      },
+      "timing": {
+        "tr": 2e-08,
+        "tf": 3e-08
+      },
+      "thermal": {
+        "Ta": 40,
+        "Rth_sw": 4,
+        "Rth_d": 6
+      },
+      "limits": {
+        "Ipk_max": 15,
+        "delta_v_max": 0.3,
+        "Tj_max": 100,
+        "eta_min": 0.95,
+        "Vsw_rated": 150,
+        "Vd_rated": 150,
+        "voltage_margin_min": 1.2
+      }
+    },
+    "expected_by_step": {
+      "operating_point": {
+        "D": 0.5,
+        "Iout": 5.0,
+        "IL_avg": 10.0
+      },
+      "inductor_current": {
+        "delta_i": 2.4,
+        "Ipk": 11.2,
+        "Imin": 8.8
+      },
+      "currents": {
+        "IL_rms": 10.023971268913334,
+        "Isw_rms": 7.08801805866774,
+        "Id_rms": 7.08801805866774,
+        "Ic_rms": 5.023942674832188,
+        "Id_avg": 5.0
+      },
+      "mosfet_conduction": {
+        "P_sw_cond": 0.7536
+      },
+      "diode_conduction": {
+        "P_diode": 4.0024
+      },
+      "inductor_copper": {
+        "P_L_cu": 3.0144
+      },
+      "capacitor_esr": {
+        "P_C_esr": 0.5048
+      },
+      "mosfet_switching": {
+        "P_sw_switch": 2.4576
+      },
+      "ripple": {
+        "delta_v_cap": 0.05319148936170213,
+        "delta_v_esr": 0.22399999999999998,
+        "delta_v_bound": 0.2771914893617021
+      },
+      "loss_summary": {
+        "P_total": 10.7328,
+        "eta": 0.9781290347822685
+      },
+      "mosfet_temperature": {
+        "Tj_sw": 52.8448
+      },
+      "diode_temperature": {
+        "Tj_d": 64.0144
+      },
+      "voltage_stress": {
+        "Vsw_block": 96,
+        "Vd_reverse": 96,
+        "margin_sw": 1.5625,
+        "margin_d": 1.5625
+      },
+      "evaluation": {
+        "peak_current_pass": 1,
+        "ripple_pass": 1,
+        "switch_temperature_pass": 1,
+        "diode_temperature_pass": 1,
+        "efficiency_pass": 1,
+        "switch_voltage_pass": 1,
+        "diode_voltage_pass": 1,
+        "overall_pass": 1,
+        "failed_reasons": ""
+      }
+    },
+    "numeric_comparison": {
+      "relative_tolerance": 1e-08,
+      "absolute_tolerance": 1e-10
+    }
+  },
+  {
+    "name": "B_independent_point_pass",
+    "inputs": {
+      "operating": {
+        "Vin": 60,
+        "Vout": 120,
+        "Pout": 600
+      },
+      "passive": {
+        "fs": 80000,
+        "L": 0.00015,
+        "C": 0.00033,
+        "ESR": 0.015,
+        "R_L": 0.04
+      },
+      "semiconductor": {
+        "R_on": 0.02,
+        "Vf": 0.8,
+        "r_d": 0.008
+      },
+      "timing": {
+        "tr": 2.5e-08,
+        "tf": 3.5e-08
+      },
+      "thermal": {
+        "Ta": 35,
+        "Rth_sw": 3,
+        "Rth_d": 4
+      },
+      "limits": {
+        "Ipk_max": 15,
+        "delta_v_max": 0.3,
+        "Tj_max": 100,
+        "eta_min": 0.95,
+        "Vsw_rated": 200,
+        "Vd_rated": 200,
+        "voltage_margin_min": 1.2
+      }
+    },
+    "expected_by_step": {
+      "operating_point": {
+        "D": 0.5,
+        "Iout": 5.0,
+        "IL_avg": 10.0
+      },
+      "inductor_current": {
+        "delta_i": 2.5000000000000004,
+        "Ipk": 11.25,
+        "Imin": 8.75
+      },
+      "currents": {
+        "IL_rms": 10.026007846263303,
+        "Isw_rms": 7.089458136322315,
+        "Id_rms": 7.089458136322315,
+        "Ic_rms": 5.025974200756174,
+        "Id_avg": 5.0
+      },
+      "mosfet_conduction": {
+        "P_sw_cond": 1.0052083333333333
+      },
+      "diode_conduction": {
+        "P_diode": 4.402083333333334
+      },
+      "inductor_copper": {
+        "P_L_cu": 4.020833333333333
+      },
+      "capacitor_esr": {
+        "P_C_esr": 0.37890624999999994
+      },
+      "mosfet_switching": {
+        "P_sw_switch": 2.9400000000000004
+      },
+      "ripple": {
+        "delta_v_cap": 0.0946969696969697,
+        "delta_v_esr": 0.16874999999999998,
+        "delta_v_bound": 0.2634469696969697
+      },
+      "loss_summary": {
+        "P_total": 12.74703125,
+        "eta": 0.979196910633747
+      },
+      "mosfet_temperature": {
+        "Tj_sw": 46.835625
+      },
+      "diode_temperature": {
+        "Tj_d": 52.608333333333334
+      },
+      "voltage_stress": {
+        "Vsw_block": 120,
+        "Vd_reverse": 120,
+        "margin_sw": 1.6666666666666667,
+        "margin_d": 1.6666666666666667
+      },
+      "evaluation": {
+        "peak_current_pass": 1,
+        "ripple_pass": 1,
+        "switch_temperature_pass": 1,
+        "diode_temperature_pass": 1,
+        "efficiency_pass": 1,
+        "switch_voltage_pass": 1,
+        "diode_voltage_pass": 1,
+        "overall_pass": 1,
+        "failed_reasons": ""
+      }
+    },
+    "numeric_comparison": {
+      "relative_tolerance": 1e-08,
+      "absolute_tolerance": 1e-10
+    }
+  },
+  {
+    "name": "C_ESR_double_constraint_fail",
+    "inputs": {
+      "operating": {
+        "Vin": 48,
+        "Vout": 96,
+        "Pout": 480
+      },
+      "passive": {
+        "fs": 100000,
+        "L": 0.0001,
+        "C": 0.00047,
+        "ESR": 0.04,
+        "R_L": 0.03
+      },
+      "semiconductor": {
+        "R_on": 0.015,
+        "Vf": 0.7,
+        "r_d": 0.01
+      },
+      "timing": {
+        "tr": 2e-08,
+        "tf": 3e-08
+      },
+      "thermal": {
+        "Ta": 40,
+        "Rth_sw": 4,
+        "Rth_d": 6
+      },
+      "limits": {
+        "Ipk_max": 15,
+        "delta_v_max": 0.3,
+        "Tj_max": 100,
+        "eta_min": 0.95,
+        "Vsw_rated": 150,
+        "Vd_rated": 150,
+        "voltage_margin_min": 1.2
+      }
+    },
+    "expected_by_step": {
+      "operating_point": {
+        "D": 0.5,
+        "Iout": 5.0,
+        "IL_avg": 10.0
+      },
+      "inductor_current": {
+        "delta_i": 2.4,
+        "Ipk": 11.2,
+        "Imin": 8.8
+      },
+      "currents": {
+        "IL_rms": 10.023971268913334,
+        "Isw_rms": 7.08801805866774,
+        "Id_rms": 7.08801805866774,
+        "Ic_rms": 5.023942674832188,
+        "Id_avg": 5.0
+      },
+      "mosfet_conduction": {
+        "P_sw_cond": 0.7536
+      },
+      "diode_conduction": {
+        "P_diode": 4.0024
+      },
+      "inductor_copper": {
+        "P_L_cu": 3.0144
+      },
+      "capacitor_esr": {
+        "P_C_esr": 1.0096
+      },
+      "mosfet_switching": {
+        "P_sw_switch": 2.4576
+      },
+      "ripple": {
+        "delta_v_cap": 0.05319148936170213,
+        "delta_v_esr": 0.44799999999999995,
+        "delta_v_bound": 0.5011914893617021
+      },
+      "loss_summary": {
+        "P_total": 11.2376,
+        "eta": 0.977123900939179
+      },
+      "mosfet_temperature": {
+        "Tj_sw": 52.8448
+      },
+      "diode_temperature": {
+        "Tj_d": 64.0144
+      },
+      "voltage_stress": {
+        "Vsw_block": 96,
+        "Vd_reverse": 96,
+        "margin_sw": 1.5625,
+        "margin_d": 1.5625
+      },
+      "evaluation": {
+        "peak_current_pass": 1,
+        "ripple_pass": 0,
+        "switch_temperature_pass": 1,
+        "diode_temperature_pass": 1,
+        "efficiency_pass": 1,
+        "switch_voltage_pass": 1,
+        "diode_voltage_pass": 1,
+        "overall_pass": 0,
+        "failed_reasons": "ripple_pass"
+      }
+    },
+    "numeric_comparison": {
+      "relative_tolerance": 1e-08,
+      "absolute_tolerance": 1e-10
+    }
+  },
+  {
+    "name": "D_non_CCM",
+    "inputs": {
+      "operating": {
+        "Vin": 48,
+        "Vout": 96,
+        "Pout": 20
+      },
+      "passive": {
+        "fs": 100000,
+        "L": 0.0001,
+        "C": 0.00047,
+        "ESR": 0.02,
+        "R_L": 0.03
+      },
+      "semiconductor": {
+        "R_on": 0.015,
+        "Vf": 0.7,
+        "r_d": 0.01
+      },
+      "timing": {
+        "tr": 2e-08,
+        "tf": 3e-08
+      },
+      "thermal": {
+        "Ta": 40,
+        "Rth_sw": 4,
+        "Rth_d": 6
+      },
+      "limits": {
+        "Ipk_max": 15,
+        "delta_v_max": 0.3,
+        "Tj_max": 100,
+        "eta_min": 0.95,
+        "Vsw_rated": 150,
+        "Vd_rated": 150,
+        "voltage_margin_min": 1.2
+      }
+    },
+    "expected_behavior": "stop_with_clear_error",
+    "reason": "model not applicable: non-CCM"
+  },
+  {
+    "name": "E_invalid_voltage",
+    "inputs": {
+      "operating": {
+        "Vin": 96,
+        "Vout": 96,
+        "Pout": 480
+      },
+      "passive": {
+        "fs": 100000,
+        "L": 0.0001,
+        "C": 0.00047,
+        "ESR": 0.02,
+        "R_L": 0.03
+      },
+      "semiconductor": {
+        "R_on": 0.015,
+        "Vf": 0.7,
+        "r_d": 0.01
+      },
+      "timing": {
+        "tr": 2e-08,
+        "tf": 3e-08
+      },
+      "thermal": {
+        "Ta": 40,
+        "Rth_sw": 4,
+        "Rth_d": 6
+      },
+      "limits": {
+        "Ipk_max": 15,
+        "delta_v_max": 0.3,
+        "Tj_max": 100,
+        "eta_min": 0.95,
+        "Vsw_rated": 150,
+        "Vd_rated": 150,
+        "voltage_margin_min": 1.2
+      }
+    },
+    "expected_behavior": "stop_with_clear_error",
+    "reason": "invalid operating point"
+  }
+]

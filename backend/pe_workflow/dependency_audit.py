@@ -133,10 +133,23 @@ def audit_dependencies(module):
     except (SyntaxError,ValueError,TypeError):unknown.append('源码无法静态解析')
     # Scalar adapter mappings are evaluated before the function, even if guarded inside it.
     unsafe|={key for key in eager if key in declared and key not in required and not has_explicit_default(key)}
-    undeclared=reads-declared.keys();unused=required-reads
+    from .plan_audit import validate_checks
+    check_fields=set()
+    try:
+        validate_checks(module.input_checks,module.inputs)
+        for expression in module.input_checks:
+            for n in ast.walk(ast.parse(expression,mode='eval')):
+                if isinstance(n,ast.Subscript) and isinstance(n.value,ast.Name) and isinstance(n.slice,ast.Constant):
+                    check_fields.add(n.value.id+'.'+str(n.slice.value))
+    except (ValueError,SyntaxError) as e:unknown.append('保护条件无法解析：'+str(e))
+    unsafe|={key for key in check_fields if key in declared and key not in required and not has_explicit_default(key)}
+    for key in module.domains:
+        if key in declared:check_fields.add(key)
+    undeclared=(reads|check_fields)-declared.keys();unused=required-reads-check_fields
     optional=set(declared)-required
     failed=bool(undeclared or unused or unsafe)
     return DependencyAudit(status='uncertain' if unknown else 'failed' if failed else 'passed',
         required_fields=sorted(required),optional_fields=sorted(optional),read_fields=sorted(reads),
+        check_fields=sorted(check_fields),carried_fields=sorted(set(declared)-reads-check_fields),
         guarded_fields=sorted(guarded),unused_required_fields=sorted(unused),undeclared_fields=sorted(undeclared),
         unsafe_optional_fields=sorted(unsafe),uncertainties=sorted(set(unknown))).model_dump()

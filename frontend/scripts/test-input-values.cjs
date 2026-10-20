@@ -13,3 +13,7 @@ assert.deepEqual(normalize({design:{C:'0.0001',L:'0'},flag:false}),{design:{C:0.
 assert.deepEqual(normalize({design:{C:'',L:'bad'}}),{design:{C:'',L:'bad'}});
 assert.deepEqual(normalize({design:{C:'0.0001'}}),{design:{C:0.0001}});
 console.log('5 optional input normalization cases passed');
+
+const textPorts={reasons:{type:'array',value_type:{dtype:'string',shape:['batch_rows']}}};
+assert.deepEqual(JSON.parse(JSON.stringify(normaliseValues({reasons:['','001','0','中文']},textPorts))),{reasons:['','001','0','中文']});
+console.log('Text array normalization preserves empty and numeric-looking strings');

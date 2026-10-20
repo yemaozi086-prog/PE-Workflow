@@ -185,6 +185,14 @@
     "Node": {
       "additionalProperties": false,
       "properties": {
+        "input_checks": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 40,
+          "title": "Input Checks",
+          "type": "array"
+        },
         "id": {
           "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$",
           "title": "Id",
@@ -202,10 +210,32 @@
             "switch",
             "foreach",
             "aggregate",
-            "batch"
+            "batch",
+            "grid"
           ],
           "title": "Kind",
           "type": "string"
+        },
+        "grid_ports": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Port"
+          },
+          "title": "Grid Ports",
+          "type": "object"
+        },
+        "grid_axes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Grid Axes",
+          "type": "object"
+        },
+        "grid_order": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Grid Order",
+          "type": "array"
         },
         "inputs": {
           "additionalProperties": {
@@ -297,6 +327,18 @@
     "Port": {
       "additionalProperties": false,
       "properties": {
+        "missing_when": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Missing When"
+        },
         "type": {
           "default": "number",
           "enum": [
@@ -554,7 +596,8 @@
           "enum": [
             "float64",
             "float32",
-            "int64"
+            "int64",
+            "string"
           ],
           "title": "Dtype",
           "type": "string"
