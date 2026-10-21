@@ -305,6 +305,11 @@ def test_dependency_gate_blocks_bad_candidates_without_extra_calls(fixture,case)
     t=callback(c,s,create(c),kind='plan',plan=p)
     t=c.post('/api/workflow-designs/'+t['id']+'/formula',json={'revision':t['revision'],'step_id':'calculate','formula':'y=2x','declarations':'W','evidence':'手算','examples':[{'inputs':values,'outputs':{'result':{'value':6}}}]}).json()
     t=callback(c,s,t,kind='module',module=m)
+    if case=='extra_required':
+        assert t['status']=='formula_candidate' and t['calls']==1
+        assert t['formula_validation']['dependency_audit']['warnings']
+        assert not any(x['id']=='dependency_candidate' for x in store.modules())
+        return
     assert t['status']==('needs_clarification' if case=='dynamic' else 'paused' if case in ('change_required','extra_required') else 'dispatch_ready'),t.get('last_report')
     if case=='dynamic':assert t['questions']
     assert t['calls']==1

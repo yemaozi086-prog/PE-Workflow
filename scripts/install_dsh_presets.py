@@ -15,8 +15,8 @@ def copy_tree(source,target,**kwargs):
         return value
     return shutil.copytree(native(source),native(target),**kwargs)
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--dsh-home',type=Path,default=Path.home()/'.dsh');ap.add_argument('--only',choices=('flux','flux-worker','flux-assembly','flux-design'));args=ap.parse_args()
-    for name in ('flux','flux-worker','flux-assembly','flux-design'):
+    ap=argparse.ArgumentParser();ap.add_argument('--dsh-home',type=Path,default=Path.home()/'.dsh');ap.add_argument('--only',choices=('flux','flux-worker','flux-assembly','flux-design','pe-quick'));args=ap.parse_args()
+    for name in ('flux','flux-worker','flux-assembly','flux-design','pe-quick'):
         if args.only and name!=args.only:continue
         source=ROOT/'dsh/preset'/name;target=args.dsh_home/'.agent-presets'/('flux-design-v3' if name=='flux-design' else name)
         if not source.exists():continue
@@ -25,6 +25,11 @@ def main():
             code=expected[Path('flux-design-tools.js')]
             expected[Path(tool_filename(code))]=code
             expected[Path('agent.cordis.yml')]=render_prompt(expected[Path('agent.cordis.yml')].decode('utf-8'),code).encode('utf-8')
+        if name=='pe-quick':
+            import hashlib
+            code=expected[Path('quick-tools.js')];filename='quick-tools-'+hashlib.sha256(code).hexdigest()[:20]+'.js'
+            expected[Path(filename)]=code
+            expected[Path('agent.cordis.yml')]=expected[Path('agent.cordis.yml')].decode('utf-8').replace('./quick-tools.js','./'+filename).encode('utf-8')
         if target.exists():
             if all((target/p).is_file() and (target/p).read_bytes()==data for p,data in expected.items()) and (target/'flux-root.txt').is_file() and (target/'flux-root.txt').read_text(encoding='utf-8')==ROOT.as_posix():
                 print('Already current: '+target.name);continue

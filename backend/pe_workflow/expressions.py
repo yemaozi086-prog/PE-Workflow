@@ -19,6 +19,7 @@ MAX_EXPRESSION_CHARS=4000
 MAX_AST_NODES=500
 MAX_CALL_ARGS=20
 MAX_CONSTANT_CHARS=1000
+MAX_TEXT_CHARS=16000
 PERMITTED_IMPORTS={"math","numpy","scipy","scipy.integrate","scipy.linalg"}
 STATEMENT_NODES=(ast.Assign,ast.AnnAssign,ast.Return,ast.If,ast.Expr)
 
@@ -32,6 +33,9 @@ def syntax_manifest():
             'imports':sorted(PERMITTED_IMPORTS),'aliases':DEFAULT_ALIASES.copy(),
             'budgets':{'source_chars':MAX_SOURCE_CHARS,'expression_chars':MAX_EXPRESSION_CHARS,'expression_ast_nodes':MAX_AST_NODES,'call_positional_arguments':MAX_CALL_ARGS,'constant_chars':MAX_CONSTANT_CHARS},
             'function_rules':['exactly one function; no decorators, *args or **kwargs','assign only one local variable; no field assignment or unpacking','Expr statements only allow string documentation','python_subset signature: def compute(inputs); return complete named output dictionaries','Python if/and/or/not require scalar truth values; use the supplied array mask identities for arrays','No loops, comprehensions, helper definitions, bitwise operators or dynamic function calls'],
+            'text_rules':{'addition':'str + str concatenates unchanged text, including empty strings; no implicit number conversion',
+                          'arrays':'Text arrays are collected by batch; arithmetic and implicit concatenation are not supported',
+                          'maximum_result_chars':MAX_TEXT_CHARS,'unsupported':'string repetition, formatting, dynamic methods and mixed str/number addition'},
             'numeric_catalog_ref':'controlled_syntax.numeric_catalog'}
 
 
@@ -93,6 +97,13 @@ def evaluate(node,values:dict[str,Any],aliases=None):
         return result.item() if isinstance(result,np.generic) else result
     if isinstance(node,ast.BinOp):
         a,b=ev(node.left),ev(node.right)
+        if isinstance(a,str) or isinstance(b,str):
+            if isinstance(node.op,ast.Add) and type(a) is str and type(b) is str:
+                if len(a)+len(b)>MAX_TEXT_CHARS:raise ExpressionError(f"第 {node.lineno} 行文本拼接结果超过 {MAX_TEXT_CHARS} 字符预算")
+                return a+b
+            raise ExpressionError(f"第 {node.lineno} 行 {type(node.op).__name__} 类型不匹配：左侧 {type(a).__name__}，右侧 {type(b).__name__}；文本仅支持字符串＋字符串，不进行隐式数值转换")
+        if any(isinstance(v,np.ndarray) and v.dtype.kind in ('U','S','O') for v in (a,b)):
+            raise ExpressionError(f"第 {node.lineno} 行 {type(node.op).__name__} 不支持文本或对象数组；逐点文本由 batch 原样收集，不参与算术或隐式拼接")
         if not all(type(v) in (int,float) or isinstance(v,np.ndarray) for v in (a,b)):raise ExpressionError("算术运算仅接受数字或数值数组")
         if isinstance(node.op,ast.Pow) and np.any(np.abs(b)>32):raise ExpressionError("幂指数绝对值不能超过 32")
         if isinstance(a,np.ndarray) or isinstance(b,np.ndarray):

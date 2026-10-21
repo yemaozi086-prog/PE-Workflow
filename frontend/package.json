@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node scripts/test-input-values.cjs && node scripts/test-graph-layout.cjs && node scripts/test-design-journey.cjs && node scripts/test-control-contracts.cjs"
+    "test": "node scripts/test-input-values.cjs && node scripts/test-graph-layout.cjs && node scripts/test-design-journey.cjs && node scripts/test-control-contracts.cjs && node scripts/test-completion-view.cjs"
   },
   "dependencies": {
     "@xyflow/react": "12.12.0",

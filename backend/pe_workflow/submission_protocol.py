@@ -2,8 +2,8 @@
 import copy
 from .models import Diagnostic
 
-PAYLOADS = ('plan','blueprint','delta','patch','workflow','module','questions','extension_request')
-EXPECTED = {'plan':'plan','plan_blueprint':'blueprint','plan_delta':'delta','plan_patch':'patch','workflow':'workflow','module':'module','questions':'questions','extension_request':'extension_request'}
+PAYLOADS = ('plan','blueprint','delta','patch','workflow','module','questions','extension_request','implementation')
+EXPECTED = {'plan':'plan','plan_blueprint':'blueprint','plan_delta':'delta','plan_patch':'patch','workflow':'workflow','module':'module','module_code':'implementation','questions':'questions','extension_request':'extension_request'}
 
 class EnvelopeError(ValueError):
     def __init__(self, path, message):
@@ -21,6 +21,9 @@ def normalize_submission(req, blueprint_mode=False):
     if blueprint_mode and value.get('kind')=='plan_blueprint' and value.get('blueprint') is None and isinstance(value.get('plan'),dict) and {'title','summary','steps','port_defs'} <= set(value['plan']):
         value['blueprint']=value.pop('plan')
         audit.append({'path':'/plan','target':'/blueprint','basis':'explicit_blueprint_kind_complete_compact_payload','notice':'kind 已明确为蓝图；完整紧凑蓝图仅移动到对应顶层字段，内容未改变。'})
+    if value.get('kind')=='module_code' and isinstance(plan,dict) and set(plan)=={'implementation'} and isinstance(plan['implementation'],dict) and not any(value.get(k) is not None for k in PAYLOADS if k!='plan'):
+        value['implementation']=value.pop('plan')['implementation']
+        audit.append({'path':'/plan/implementation','target':'/implementation','basis':'exact_single_implementation_wrapper','notice':'Only the envelope moved; code and contracts unchanged.'})
     kind=value.get('kind');field=EXPECTED.get(kind)
     present=[k for k in PAYLOADS if value.get(k) is not None]
     if kind=='blocked':

@@ -86,7 +86,9 @@ def compile_plan(plan, workflow_id, project_id='local', registry=None):
 
 def preflight_controls(plan):
     try:
-        from .control_contracts import reference_issues,batch_output_issues,connection_issues
+        from .control_contracts import reference_issues,batch_output_issues,connection_issues,scope_issues
+        scope=scope_issues(plan)
+        if scope:return {'valid':False,'issues':scope,'repairs':[],'scope':'finite_subgraphs','notice':'先修正全部作用域来源，再检查字段与依赖；已有公式和保护条件保留，来源变更须确认。'}
         issues=reference_issues(plan)+batch_output_issues(plan)+connection_issues(plan)
         if issues:return {'valid':False,'issues':issues,'repairs':[],'scope':'finite_subgraphs','notice':'按正式控制契约定位无效端口；仅预览，不自动修改。'}
         compile_plan(plan,'control_preview')

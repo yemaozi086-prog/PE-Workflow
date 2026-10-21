@@ -50,7 +50,7 @@ def configuration(limit=4):
     return {'prompt':prompt,'preset':'flux-design-v3',
             'prompt_hash':digest(prompt),
             'tool_hash':digest((PRESET/'flux-design-tools.js').read_text(encoding='utf-8')),
-            'provider_hash':digest({'syntax_manifest':syntax_manifest(),'interpreter':(Path(__file__).parent/'expressions.py').read_text(encoding='utf-8'),'numeric':(Path(__file__).parent/'numeric.py').read_text(encoding='utf-8'),'control_contracts':(Path(__file__).parent/'control_contracts.py').read_text(encoding='utf-8'),'control_repair':(Path(__file__).parent/'control_repair.py').read_text(encoding='utf-8'),'submission_protocol':(Path(__file__).parent/'submission_protocol.py').read_text(encoding='utf-8'),'candidate_receipts':(Path(__file__).parent/'candidate_receipts.py').read_text(encoding='utf-8'),'planning_protocol':(Path(__file__).parent/'planning_protocol.py').read_text(encoding='utf-8'),'plan_controls':(Path(__file__).parent/'plan_controls.py').read_text(encoding='utf-8'),'finite_control':(Path(__file__).parent/'finite_control.py').read_text(encoding='utf-8'),'binding_assembly':(Path(__file__).parent/'binding_assembly.py').read_text(encoding='utf-8'),'context_pages':(Path(__file__).parent/'design_context_pages.py').read_text(encoding='utf-8'),'progress':(Path(__file__).parent/'design_progress.py').read_text(encoding='utf-8'),'recovery':(Path(__file__).parent/'completion_recovery.py').read_text(encoding='utf-8'),'completion':(Path(__file__).parent/'tool_completion.py').read_text(encoding='utf-8'),'routing':(Path(__file__).parent/'repair_routing.py').read_text(encoding='utf-8'),'provider':Path(__file__).read_text(encoding='utf-8'),'guidance':(Path(__file__).parent/'design_guidance.py').read_text(encoding='utf-8'),'missing_values':(Path(__file__).parent/'missing_values.py').read_text(encoding='utf-8'),'missing_revision':(Path(__file__).parent/'missing_revision.py').read_text(encoding='utf-8'),'input_usage':(Path(__file__).parent/'input_usage.py').read_text(encoding='utf-8'),'dependency_audit':(Path(__file__).parent/'dependency_audit.py').read_text(encoding='utf-8'),'plan_audit':(Path(__file__).parent/'plan_audit.py').read_text(encoding='utf-8'),'plan_patch':(Path(__file__).parent/'plan_patch.py').read_text(encoding='utf-8'),'shape_repair':(Path(__file__).parent/'shape_repair.py').read_text(encoding='utf-8'),'models':(Path(__file__).parent/'models.py').read_text(encoding='utf-8')}),
+            'provider_hash':digest({'syntax_manifest':syntax_manifest(),'interpreter':(Path(__file__).parent/'expressions.py').read_text(encoding='utf-8'),'numeric':(Path(__file__).parent/'numeric.py').read_text(encoding='utf-8'),'control_contracts':(Path(__file__).parent/'control_contracts.py').read_text(encoding='utf-8'),'control_repair':(Path(__file__).parent/'control_repair.py').read_text(encoding='utf-8'),'submission_protocol':(Path(__file__).parent/'submission_protocol.py').read_text(encoding='utf-8'),'candidate_receipts':(Path(__file__).parent/'candidate_receipts.py').read_text(encoding='utf-8'),'planning_protocol':(Path(__file__).parent/'planning_protocol.py').read_text(encoding='utf-8'),'plan_controls':(Path(__file__).parent/'plan_controls.py').read_text(encoding='utf-8'),'finite_control':(Path(__file__).parent/'finite_control.py').read_text(encoding='utf-8'),'binding_assembly':(Path(__file__).parent/'binding_assembly.py').read_text(encoding='utf-8'),'context_pages':(Path(__file__).parent/'design_context_pages.py').read_text(encoding='utf-8'),'progress':(Path(__file__).parent/'design_progress.py').read_text(encoding='utf-8'),'recovery':(Path(__file__).parent/'completion_recovery.py').read_text(encoding='utf-8'),'completion':(Path(__file__).parent/'tool_completion.py').read_text(encoding='utf-8'),'routing':(Path(__file__).parent/'repair_routing.py').read_text(encoding='utf-8'),'provider':Path(__file__).read_text(encoding='utf-8'),'guidance':(Path(__file__).parent/'design_guidance.py').read_text(encoding='utf-8'),'missing_values':(Path(__file__).parent/'missing_values.py').read_text(encoding='utf-8'),'missing_revision':(Path(__file__).parent/'missing_revision.py').read_text(encoding='utf-8'),'input_usage':(Path(__file__).parent/'input_usage.py').read_text(encoding='utf-8'),'formula_authoring':(Path(__file__).parent/'formula_authoring.py').read_text(encoding='utf-8'),'dependency_audit':(Path(__file__).parent/'dependency_audit.py').read_text(encoding='utf-8'),'plan_audit':(Path(__file__).parent/'plan_audit.py').read_text(encoding='utf-8'),'plan_patch':(Path(__file__).parent/'plan_patch.py').read_text(encoding='utf-8'),'shape_repair':(Path(__file__).parent/'shape_repair.py').read_text(encoding='utf-8'),'models':(Path(__file__).parent/'models.py').read_text(encoding='utf-8')}),
             'engine_hash':digest((Path(__file__).parent/'engine.py').read_text(encoding='utf-8')),
             'max_calls':limit,'model':'DSH configured model; unknown to platform'}
 
@@ -121,6 +121,7 @@ class Designs:
         result['continuation_action']=continuation_action(t)
         from .design_lifecycle import actions
         result['recovery_actions']=actions(t)
+        if hasattr(self,'authoring') and t['phase']=='formula':result['formula_precheck']=self.authoring.summary(t)
         if hasattr(self,'receipts'):
             result['candidate_processing']=self.receipts.state(t)
             if (t.get('last_report') or {}).get('code')=='CANDIDATE_PROCESSING_INTERRUPTED':
@@ -184,7 +185,7 @@ class Designs:
                 'No environment package is installed. Every physical dependency needs cited user or module evidence; uncertain assumptions must be visible.',
                 'If external suggestions are disabled, use only user-provided facts and registered module declarations; ask questions when insufficient.',
                 'Plans may contain missing tools (module_ref=null). No invented physical model. Module refs are id@version.',
-                'After code generation, the platform audits literal field reads against required flags. Dynamic dictionary accesses block automatic registration. All repairs must preserve confirmed required/optional flags and units; interface changes require a user-derived plan. Return python_subset outputs nested under declared output port names.',
+                'Required means present at call time, not compulsory reading. Unused declared fields are advisory only: preserve the contract, do not add dummy reads or force interface edits. Missing declarations and unsafe optional reads still block. After code generation, the platform audits literal field reads against required flags. Dynamic dictionary accesses block automatic registration. All repairs must preserve confirmed required/optional flags and units; interface changes require a user-derived plan. Return python_subset outputs nested under declared output port names.',
                 'PLAN: new tools declare only calculation and input-check dependencies; upstream extra fields do not make them required. FORMULA: preserve confirmed inputs/outputs and required flags exactly. Implement the actual formula without dummy reads. If confirmed inputs overdeclare requirements, platform offers input-usage revision review; never silently omit fields or change required flags. Node checks are copied into module.input_checks by the platform and are executed independently of formula reads. Never change registered modules.',
                 'Registered module interfaces are copied deterministically by the platform before user confirmation; do not invent or retype units.',
                 'Return each step purpose, dependencies, named flat-dictionary inputs/outputs, assumptions, evidence, formula_latex and selection_reason.',
@@ -210,6 +211,19 @@ class Designs:
             result['schemas']={'delta':delta_schema(t['format_repair'].get('allowed_paths',[]))} if t.get('format_repair') else {'blueprint':blueprint_schema()}
             # These legacy flat-only instructions do not apply to explicit numeric control data.
             result['rules']=[r for r in result['rules'] if 'MUST be named flat_dict' not in r]
+        if t['phase']=='formula' and t.get('formula_authoring')=='formula_code_v1':
+            from .formula_authoring import context as authoring_context
+            result['formula_authoring']=authoring_context(self,t)
+            result['required_result_kind']='module_code'
+            from .models import FormulaSubmission
+            result['schemas']={'implementation':FormulaSubmission.model_json_schema()}
+            result['stage_instruction']=result['formula_authoring']['instruction']
+            result['rules']=['Implement only the user-confirmed formula. No invented physics, hidden transforms or reference answers.',
+                'Platform assembles frozen input/output contracts, checks, identity and version. Changes require reviewed plan revision.',
+                'Read controlled_syntax before coding. Use design_precheck; only candidate_repair permits local code changes.',
+                'Same error twice, 3 prechecks or time budget exhaustion stops this call. Model-call quota is unchanged.',
+                'No independent examples means no numerical verification. Never change expected answers to fit code.',
+                'A passed precheck is not registration, workflow execution or engineering approval. User confirmation is required.']
         return result
     def begin(self,t,phase,limit=4):
         retained_failure={k:t[k] for k in ('repeat_count','failure_signature') if k in t} if t.get('declaration_recovery_key') else {}
@@ -241,6 +255,7 @@ class Designs:
                 t.update(status='paused',message='DSH 设计预设未安装或配置已变更；未发起调用');return self.save(t,'preset_mismatch')
         from .design_lifecycle import close_call
         close_call(self,t,'new_call_started')
+        if t['phase']=='formula':t['formula_authoring']='formula_code_v1'
         t.update(status='dispatching',session_id='flux-design-'+uuid.uuid4().hex,worker_result_closed=False,call_id=uuid.uuid4().hex,token=secrets.token_urlsafe(32),calls=t['calls']+1,total_calls=t.get('total_calls',t['calls'])+1,dispatched_at=time.time())
         t=self.save(t,'dispatch_intent')
         try:
@@ -358,6 +373,81 @@ class Designs:
             if connection_questions:
                 t['questions']={'connection_'+str(i+1):q['question']+' 位置：'+q['path']+'；当前声明：'+canonical(q['selected_binding'])+'；该节点已声明输出：'+', '.join(q['available_ports']) for i,q in enumerate(connection_questions)}
         return self.save(t,'validation_failed')
+    async def check_formula_candidate(self,t,m):
+        """One validation pipeline for drafts and formal submission; never saves."""
+        f=t['formula_request'];plan=DesignPlan.model_validate(t['plan']);step=next(s for s in plan.steps if s.id==f['step_id'])
+        if m.implementation not in ('expressions','python_subset','python_function') or m.contract_version!='3.0':raise ValueError('仅允许受控纯计算和 flat_dict 契约')
+        target=t.get('registration_target',{'id':None,'version':1})
+        if target['id'] is not None and (m.id!=target['id'] or m.version!=target['version']):raise ValueError('必须按指定基准派生新版本：'+canonical(target))
+        if target['id'] is None and (m.version!=1 or any(x.id==m.id for x in self.modules().values())):raise ValueError('新工具必须使用新 ID 和版本 1；修改已有工具应从其方案派生')
+        if f'{m.id}@{m.version}' in self.modules():raise ValueError('不可覆盖已有模块')
+        for side in ('inputs','outputs'):
+            generated=getattr(m,side);declared=getattr(step,side)
+            if set(generated)!=set(declared):fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','输入输出字典发生变化；请派生方案并由用户确认，不允许代码修正改变已确认接口','/module/'+side)
+            for bag,port in generated.items():
+                if set(port.fields)!=set(declared[bag].fields):fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','字段增删必须先派生方案确认：'+bag+'；新增 '+', '.join(sorted(set(port.fields)-set(declared[bag].fields)))+'；移除 '+', '.join(sorted(set(declared[bag].fields)-set(port.fields))),'/module/'+side+'/'+bag+'/fields')
+                for attr in ('type','required','default','unit'):
+                    if attr in port.model_fields_set and getattr(port,attr)!=getattr(declared[bag],attr):fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','字典声明变化：'+bag+'/'+attr+'；原值 '+canonical(declared[bag].model_dump()[attr])+'；候选 '+canonical(port.model_dump()[attr]),'/module/'+side+'/'+bag+'/'+attr)
+                for key,field in port.fields.items():
+                    target=declared[bag].fields[key]
+                    if target.extension_refs and field.unit_definition is None:field.unit_definition=copy.deepcopy(target.unit_definition)
+                    for attr in ('type','unit','quantity','semantic_id','statistic','event','value_type','axes','unit_definition','required','default','missing_when'):
+                        if attr in field.model_fields_set and getattr(field,attr)!=getattr(target,attr):fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','字段声明变化须用户确认：'+bag+'.'+key+'/'+attr+'；原值 '+canonical(target.model_dump()[attr])+'；候选 '+canonical(field.model_dump()[attr]),'/module/'+side+'/'+bag+'/fields/'+key+'/'+attr)
+            setattr(m,side,copy.deepcopy(declared))
+        check_examples(f['examples'],step.inputs,step.outputs)
+        if m.input_checks and not same_checks(m.input_checks,step.input_checks):
+            fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','工具保护条件必须与已确认步骤一致','/module/input_checks')
+        m.input_checks=copy.deepcopy(step.input_checks)
+        module_check_error=None
+        try:check_module(m)
+        except WorkflowError as error:
+            if error.diagnostic.code=='MODULE_SYNTAX':raise
+            module_check_error=error
+        dependency=audit_dependencies(m);t['dependency_audit']=dependency
+        if dependency['status']=='uncertain':fail('DEPENDENCY_UNCERTAIN','无法可靠确定字段依赖：'+'；'.join(dependency['uncertainties'])+'。请提供显式字段访问或集中补充后再提交','/module/source')
+        if dependency['status']!='passed':
+            reasons=[]
+            for key,label in [('undeclared_fields','读取未声明字段'),('unsafe_optional_fields','无保护读取可选字段')]:
+                if dependency[key]:reasons.append(label+'：'+', '.join(dependency[key]))
+            fail('DEPENDENCY_CONFLICT','；'.join(reasons)+'。保持接口时请修改代码；确需改变接口则派生方案并由用户确认','/module/inputs')
+        if module_check_error:raise module_check_error
+        if m.transforms and len(f['examples'])<2:fail('TRANSFORM_EXAMPLES_REQUIRED','显式变换必须提供至少两个独立验证样例，请补充独立样例及变换前提','/examples')
+        from .engine import fill_inputs,validate_value
+        for ex in f['examples']:
+            fill_inputs(ex['inputs'],m.inputs,'/examples/inputs')
+            if set(ex['outputs'])!=set(m.outputs):raise ValueError('独立样例必须覆盖全部输出')
+            for k,v in ex['outputs'].items():validate_value(v,m.outputs[k],'/examples/outputs/'+k)
+        wf=Workflow(schema_version='3.0',id='formula_check',name=m.name,inputs=m.inputs,nodes=[Node(id='calculate',module_id=m.id,module_version=m.version,inputs={k:Binding(source='input',port=k) for k in m.inputs})],outputs={k:Binding(source='node',node='calculate',port=k) for k in m.outputs},output_ports=m.outputs)
+        reports=[]
+        for index,ex in enumerate(f['examples']):
+            actual=await asyncio.to_thread(self.worker,{'workflow':wf.model_dump(),'inputs':ex['inputs'],'modules':[m.model_dump()]},30)
+            if actual.get('status')!='succeeded':
+                from .formula_authoring import execution_failure
+                execution_failure(actual,'/examples/'+str(index)+'/execution')
+            if not equivalent(actual['outputs'],ex['outputs']):
+                # Human-only feedback: expected answers must never enter the worker context.
+                t['verification_feedback']={'example':index+1,'inputs':ex['inputs'],'expected':ex['outputs'],'actual':actual.get('outputs',{}),'execution_status':actual.get('status')}
+                fail('EXAMPLE_RESULT_MISMATCH','第 '+str(index+1)+' 组独立数值样例不通过；实际输出：'+canonical(actual.get('outputs',{}))+'；预期答案仅在用户核对区显示','/examples/'+str(index)+'/outputs')
+            reports.append({'status':'passed','input_hash':digest(ex['inputs'])})
+        probe_reports=[]
+        for index,ex in enumerate(f['examples']):
+            def minimum(values,ports):
+                return {k:minimum(values[k],p.fields) if p.type=='flat_dict' else values[k] for k,p in ports.items() if p.required and k in values}
+            minimal=minimum(ex['inputs'],m.inputs)
+            base=await asyncio.to_thread(self.worker,{'workflow':wf.model_dump(),'inputs':minimal,'modules':[m.model_dump()]},30)
+            if base.get('status')!='succeeded':fail('DEPENDENCY_MINIMUM_FAILED','第 '+str(index+1)+' 组最小必需输入测试失败；可选字段不能成为隐式依赖','/examples/'+str(index)+'/inputs')
+            enlarged=copy.deepcopy(minimal);probe=wf.model_copy(deep=True)
+            from .models import Port
+            for name,port in probe.inputs.items():
+                if port.type!='flat_dict' or name not in enlarged:continue
+                key='audit_unused'
+                while key in port.fields:key+='x'
+                port.fields[key]=Port(type='number',quantity='scalar',unit='1')
+                enlarged[name][key]=137
+            extra=await asyncio.to_thread(self.worker,{'workflow':probe.model_dump(),'inputs':enlarged,'modules':[m.model_dump()]},30)
+            if extra.get('status')!='succeeded' or not equivalent(extra['outputs'],base['outputs']):fail('DEPENDENCY_EXTRA_FAILED','额外携带字段改变了输出或阻止计算','/examples/'+str(index)+'/inputs')
+            probe_reports.append({'example':index+1,'minimum_inputs':'passed','extra_fields':'passed'})
+        return m,{'interface':'passed','implementation_checks':'passed','dependency_audit':dependency,'input_probes':probe_reports,'probe_status':'passed' if reports else 'not_run_no_independent_examples','independent_examples':reports,'scientific_applicability':'user_review_required'}
     async def receive(self,t,req,revalidate=False):
         if not revalidate and t.get('callback_hash')==digest(req.model_dump()):return self.public(t)
         if not revalidate and t['status'] not in ('dispatching','awaiting_worker','delivery_unknown'):raise Conflict('当前调用已结束')
@@ -420,78 +510,8 @@ class Designs:
                 wf.id='design_'+t['id'];wf.name=plan.title
                 t.update(status='ready_to_save',workflow=wf.model_dump(),validation={**report,'execution':'not_run','scientific_correctness':'not_established'},message='结构检查通过，尚未运行；可保存新工作流')
             elif t['phase']=='formula' and req.kind=='module' and req.module:
-                m=req.module;f=t['formula_request'];plan=DesignPlan.model_validate(t['plan']);step=next(s for s in plan.steps if s.id==f['step_id'])
-                if m.implementation not in ('expressions','python_subset','python_function') or m.contract_version!='3.0':raise ValueError('仅允许受控纯计算和 flat_dict 契约')
-                target=t.get('registration_target',{'id':None,'version':1})
-                if target['id'] is not None and (m.id!=target['id'] or m.version!=target['version']):raise ValueError('必须按指定基准派生新版本：'+canonical(target))
-                if target['id'] is None and (m.version!=1 or any(x.id==m.id for x in self.modules().values())):raise ValueError('新工具必须使用新 ID 和版本 1；修改已有工具应从其方案派生')
-                if f'{m.id}@{m.version}' in self.modules():raise ValueError('不可覆盖已有模块')
-                for side in ('inputs','outputs'):
-                    generated=getattr(m,side);declared=getattr(step,side)
-                    if set(generated)!=set(declared):fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','输入输出字典发生变化；请派生方案并由用户确认，不允许代码修正改变已确认接口','/module/'+side)
-                    for bag,port in generated.items():
-                        if set(port.fields)!=set(declared[bag].fields):fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','字段增删必须先派生方案确认：'+bag+'；新增 '+', '.join(sorted(set(port.fields)-set(declared[bag].fields)))+'；移除 '+', '.join(sorted(set(declared[bag].fields)-set(port.fields))),'/module/'+side+'/'+bag+'/fields')
-                        for attr in ('type','required','default','unit'):
-                            if attr in port.model_fields_set and getattr(port,attr)!=getattr(declared[bag],attr):fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','字典声明变化：'+bag+'/'+attr+'；原值 '+canonical(declared[bag].model_dump()[attr])+'；候选 '+canonical(port.model_dump()[attr]),'/module/'+side+'/'+bag+'/'+attr)
-                        for key,field in port.fields.items():
-                            target=declared[bag].fields[key]
-                            if target.extension_refs and field.unit_definition is None:field.unit_definition=copy.deepcopy(target.unit_definition)
-                            for attr in ('type','unit','quantity','semantic_id','statistic','event','value_type','axes','unit_definition','required','default','missing_when'):
-                                if attr in field.model_fields_set and getattr(field,attr)!=getattr(target,attr):fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','字段声明变化须用户确认：'+bag+'.'+key+'/'+attr+'；原值 '+canonical(target.model_dump()[attr])+'；候选 '+canonical(field.model_dump()[attr]),'/module/'+side+'/'+bag+'/fields/'+key+'/'+attr)
-                    setattr(m,side,copy.deepcopy(declared))
-                check_examples(f['examples'],step.inputs,step.outputs)
-                if m.input_checks and not same_checks(m.input_checks,step.input_checks):
-                    fail('CONTRACT_CHANGE_REQUIRES_CONFIRM','工具保护条件必须与已确认步骤一致','/module/input_checks')
-                m.input_checks=copy.deepcopy(step.input_checks)
-                module_check_error=None
-                try:check_module(m)
-                except WorkflowError as error:
-                    if error.diagnostic.code=='MODULE_SYNTAX':raise
-                    module_check_error=error
-                dependency=audit_dependencies(m);t['dependency_audit']=dependency
-                if dependency['status']=='uncertain':fail('DEPENDENCY_UNCERTAIN','无法可靠确定字段依赖：'+'；'.join(dependency['uncertainties'])+'。请提供显式字段访问或集中补充后再提交','/module/source')
-                if dependency['status']!='passed':
-                    if dependency['unused_required_fields'] and not dependency['undeclared_fields'] and not dependency['unsafe_optional_fields']:
-                        fail('INPUT_USAGE_REVIEW_REQUIRED','声明含本工具未使用的必填字段；请查看输入依赖修订预览并确认。不能为通过检查而添加无效读取，也不能在候选中擅自改必填性。','/module/inputs')
-                    reasons=[]
-                    for key,label in [('unused_required_fields','声明必填但未读取'),('undeclared_fields','读取未声明字段'),('unsafe_optional_fields','无保护读取可选字段')]:
-                        if dependency[key]:reasons.append(label+'：'+', '.join(dependency[key]))
-                    fail('DEPENDENCY_CONFLICT','；'.join(reasons)+'。保持接口时请修改代码；确需改变接口则派生方案并由用户确认','/module/inputs')
-                if module_check_error:raise module_check_error
-                if m.transforms and len(f['examples'])<2:fail('TRANSFORM_EXAMPLES_REQUIRED','显式变换必须提供至少两个独立验证样例，请补充独立样例及变换前提','/examples')
-                from .engine import fill_inputs,validate_value
-                for ex in f['examples']:
-                    fill_inputs(ex['inputs'],m.inputs,'/examples/inputs')
-                    if set(ex['outputs'])!=set(m.outputs):raise ValueError('独立样例必须覆盖全部输出')
-                    for k,v in ex['outputs'].items():validate_value(v,m.outputs[k],'/examples/outputs/'+k)
-                wf=Workflow(schema_version='3.0',id='formula_check',name=m.name,inputs=m.inputs,nodes=[Node(id='calculate',module_id=m.id,module_version=m.version,inputs={k:Binding(source='input',port=k) for k in m.inputs})],outputs={k:Binding(source='node',node='calculate',port=k) for k in m.outputs},output_ports=m.outputs)
-                reports=[]
-                for index,ex in enumerate(f['examples']):
-                    actual=await asyncio.to_thread(self.worker,{'workflow':wf.model_dump(),'inputs':ex['inputs'],'modules':[m.model_dump()]},30)
-                    if actual.get('status')!='succeeded' or not equivalent(actual['outputs'],ex['outputs']):
-                        # Human-only feedback: expected answers must never enter the worker context.
-                        t['verification_feedback']={'example':index+1,'inputs':ex['inputs'],'expected':ex['outputs'],'actual':actual.get('outputs',{}),'execution_status':actual.get('status')}
-                        fail('EXAMPLE_RESULT_MISMATCH','第 '+str(index+1)+' 组独立数值样例不通过；实际输出：'+canonical(actual.get('outputs',{}))+'；预期答案仅在用户核对区显示','/examples/'+str(index)+'/outputs')
-                    reports.append({'status':'passed','input_hash':digest(ex['inputs'])})
-                probe_reports=[]
-                for index,ex in enumerate(f['examples']):
-                    def minimum(values,ports):
-                        return {k:minimum(values[k],p.fields) if p.type=='flat_dict' else values[k] for k,p in ports.items() if p.required and k in values}
-                    minimal=minimum(ex['inputs'],m.inputs)
-                    base=await asyncio.to_thread(self.worker,{'workflow':wf.model_dump(),'inputs':minimal,'modules':[m.model_dump()]},30)
-                    if base.get('status')!='succeeded':fail('DEPENDENCY_MINIMUM_FAILED','第 '+str(index+1)+' 组最小必需输入测试失败；可选字段不能成为隐式依赖','/examples/'+str(index)+'/inputs')
-                    enlarged=copy.deepcopy(minimal);probe=wf.model_copy(deep=True)
-                    from .models import Port
-                    for name,port in probe.inputs.items():
-                        if port.type!='flat_dict' or name not in enlarged:continue
-                        key='audit_unused'
-                        while key in port.fields:key+='x'
-                        port.fields[key]=Port(type='number',quantity='scalar',unit='1')
-                        enlarged[name][key]=137
-                    extra=await asyncio.to_thread(self.worker,{'workflow':probe.model_dump(),'inputs':enlarged,'modules':[m.model_dump()]},30)
-                    if extra.get('status')!='succeeded' or not equivalent(extra['outputs'],base['outputs']):fail('DEPENDENCY_EXTRA_FAILED','额外携带字段改变了输出或阻止计算','/examples/'+str(index)+'/inputs')
-                    probe_reports.append({'example':index+1,'minimum_inputs':'passed','extra_fields':'passed'})
-                t.update(status='formula_candidate',candidate=m.model_dump(),formula_validation={'interface':'passed','implementation_checks':'passed','dependency_audit':dependency,'input_probes':probe_reports,'probe_status':'passed' if reports else 'not_run_no_independent_examples','independent_examples':reports,'scientific_applicability':'user_review_required'},message='候选已检查；确认注册后才可用于方案')
+                m,validation=await self.check_formula_candidate(t,req.module)
+                t.update(status='formula_candidate',candidate=m.model_dump(),formula_validation=validation,message='候选已检查；确认注册后才可用于方案')
             else:raise ValueError('当前阶段 '+t['phase']+' 必须提交 kind='+{'plan':'plan','bind':'workflow','formula':'module'}[t['phase']]+'；不要重新提交其他阶段产物')
         except Exception as e:
             t['previous_candidate']=req.model_dump(exclude={'token'})
@@ -550,8 +570,12 @@ def install(app,get_store,module_map,worker,problem):
     service.planning_migration=install_planning_migration(app,service)
     from .control_repair import install as install_control_repair
     service.control_repair=install_control_repair(app,service)
+    from .plan_structure_repair import install as install_plan_structure_repair
+    service.structure_repair=install_plan_structure_repair(app,service)
     from .candidate_receipts import install as install_receipts
     service.receipts=install_receipts(app,service)
+    from .formula_authoring import install as install_authoring
+    service.authoring=install_authoring(app,service)
     previous=app.router.lifespan_context
     @asynccontextmanager
     async def lifespan(app):
@@ -811,6 +835,7 @@ def install(app,get_store,module_map,worker,problem):
         t=service.get(key);service.check_revision(t,req.revision)
         if t['phase']!='formula' or t['status'] not in ('paused','blocked'):raise Conflict('只有已暂停或受阻的公式候选可以重新验证')
         candidate=(t.get('previous_candidate') or {}).get('module')
+        if not candidate and (t.get('previous_candidate') or {}).get('kind')=='module_code':candidate=service.authoring.recover(t).model_dump()
         if not candidate:fail('CANDIDATE_MISSING','没有保留的模块候选，不能重新验证','/candidate')
         # No code generation, registration, publication or retry budget is consumed.
         t['dependency_audit']=None;t['verification_feedback']=None
@@ -904,7 +929,26 @@ def install(app,get_store,module_map,worker,problem):
                 for item in envelope_audit:item.update(candidate_receipt_hash=receipt['payload_hash'],call_id=t['call_id'])
                 t.setdefault('envelope_repair_audit',[]).extend(envelope_audit)
             req=normalized
+            # Move only unambiguously misplaced known blueprint members before
+            # compiling the preserved original candidate. This is a packaging
+            # correction, never a formula, port, unit or dependency edit.
+            if req.get('kind')=='plan_blueprint':
+                from .plan_structure_repair import relocate_blueprint_structure
+                corrected,moves,move_issues=relocate_blueprint_structure(req)
+                if move_issues:
+                    from .planning_protocol import ProtocolError
+                    raise ProtocolError(move_issues)
+                if moves:
+                    for move in moves:
+                        move.update(candidate_receipt_hash=receipt['payload_hash'],call_id=t['call_id'])
+                    t.setdefault('structure_repair_audit',[]).extend(moves)
+                    req=corrected
             repair_input=req
+            if req.get('kind')=='module_code':
+                module=service.authoring.submission(t,req.get('implementation'))
+                normalized.pop('implementation',None);normalized['kind']='module';normalized['module']=module.model_dump()
+            elif req.get('kind')=='module' and t.get('formula_authoring')=='formula_code_v1':
+                fail('PRECHECK_REQUIRED','此调用只接受紧凑实现及最新预检回执；请先调用 design_precheck','/implementation')
             if t.get('format_repair') and req.get('kind') not in ('plan_delta','questions','blocked','extension_request'):
                 fail('PLAN_DELTA_SCOPE','本轮只接受诊断限定的局部修改，不接受整份方案重写','/delta')
             if req.get('kind')=='plan_delta':

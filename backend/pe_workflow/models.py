@@ -718,6 +718,26 @@ class ExtensionDecision(StrictModel):
     revision: int = Field(ge=1)
     approve: bool
 
+class FormulaCode(StrictModel):
+    """Implementation only. Confirmed contracts and identities are server-owned."""
+    implementation: Literal['expressions','python_subset','python_function'] = 'python_subset'
+    source: str = Field(default='',max_length=60000)
+    expressions: dict[str,str] = Field(default_factory=dict,max_length=40)
+    entrypoint: str | None = None
+    adapter: Adapter | None = None
+    transforms: list[TransformEvidence] = Field(default_factory=list,max_length=30)
+
+class FormulaPrecheck(StrictModel):
+    call_id: str
+    token: str
+    contract_hash: str
+    code: FormulaCode
+
+class FormulaSubmission(StrictModel):
+    contract_hash: str
+    code: FormulaCode
+    precheck_id: str
+
 class DesignWorkerResult(StrictModel):
     call_id: str
     token: str
@@ -809,7 +829,14 @@ class DesignContinue(DesignConfirm):
     max_calls: int = Field(default=3,ge=1,le=3)
 
 
+class StructureRepairConfirm(StrictModel):
+    revision: int = Field(ge=1)
+    preview_hash: str
+    confirm: Literal[True]
+
+
 class DependencyAudit(StrictModel):
+    warnings: list[dict[str,Any]] = Field(default_factory=list)
     check_fields: list[str] = Field(default_factory=list)
     carried_fields: list[str] = Field(default_factory=list)
     status: Literal['passed','failed','uncertain']

@@ -41,7 +41,11 @@
       Exactly one compute node per step with the same id and module reference; control nodes may wrap them.
       Wire declared dependencies. Expose needed runtime values as inputs, NEVER defaults or constants.
       Candidate arrays need explicit batch subworkflow; never select the first row silently.
-      FORMULA: return kind=module implementing only the user-supplied formula/source with exact step contracts.
+      COMPACT FORMULA OVERRIDE: if required_result_kind=module_code, read formula_authoring in section=formula. Return only implementation={contract_hash,code,precheck_id}. Never copy Module inputs/outputs, units, required flags, input_checks, identity or versions. The platform assembles those from the confirmed step.
+      Call design_precheck with exact contract_hash and code. Follow stop_required. On candidate_repair change only code and precheck within the displayed limit; same error twice stops. A passed precheck is not registration, publication or physical approval. Submit the exact latest passed code once using kind=module_code. Do not submit a full Module in this protocol.
+      Prechecks consume no extra model call, but remain within this call's approved budget, 3 precheck limit and same-error stopping rule. They use only user-supplied examples and never reveal expected answers. Missing examples means numerical verification not performed. Never invent reference answers or adjust frozen requirements to pass.
+      If fields are unused, compare actual formula requirements: missing implementation needs code repair; redundant contracts need the existing user-reviewed input-usage revision. Never remove a declared input or add dummy reads to evade checks.
+      FORMULA LEGACY ONLY (when required_result_kind=module): return kind=module implementing only the user-supplied formula/source with exact step contracts.
       Follow registration_target: when id is present use that exact id and version; only a null id means new unique id, version 1.
       Use contract_version 3.0; only expressions, python_subset or controlled python_function. parent_version is platform lineage, not a Module field.
       Explicit adapters only. No invented units, tests, physical assumptions or hidden transforms.

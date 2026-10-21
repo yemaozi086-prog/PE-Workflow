@@ -147,8 +147,13 @@ def audit_dependencies(module):
         if key in declared:check_fields.add(key)
     undeclared=(reads|check_fields)-declared.keys();unused=required-reads-check_fields
     optional=set(declared)-required
-    failed=bool(undeclared or unused or unsafe)
+    # Required describes call-time presence, not compulsory use by the code.
+    # Redundancy cannot establish missing physics or justify fake reads.
+    failed=bool(undeclared or unsafe)
+    warnings=[{'code':'UNUSED_REQUIRED_INPUT','severity':'warning','fields':sorted(unused),
+               'message':'部分必填输入未被当前代码或保护条件使用；保留原契约继续检查，可另行评审简化。该提示不能证明公式遗漏，也不要求添加无效读取。'}] if unused else []
     return DependencyAudit(status='uncertain' if unknown else 'failed' if failed else 'passed',
+        warnings=warnings,
         required_fields=sorted(required),optional_fields=sorted(optional),read_fields=sorted(reads),
         check_fields=sorted(check_fields),carried_fields=sorted(set(declared)-reads-check_fields),
         guarded_fields=sorted(guarded),unused_required_fields=sorted(unused),undeclared_fields=sorted(undeclared),

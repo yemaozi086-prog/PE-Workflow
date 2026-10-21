@@ -95,11 +95,23 @@ class Completion:
         result['global_concurrency']=GLOBAL_CONCURRENCY
         for item in result['items']:
             task=self.service.get(item['task_id'])
+            report=task.get('last_report') or {};route=(task.get('failure_routing') or {}).get('route')
+            label=None
+            if task['status'] in ('paused','blocked','needs_clarification'):
+                label=('可复检原候选（不调用 AI）' if report.get('code')=='INPUT_USAGE_REVIEW_REQUIRED'
+                       else '待补齐声明（未调用）' if task.get('completion_missing_info') and not task.get('calls')
+                       else '等待接口确认' if route=='needs_confirmation'
+                       else '平台问题待处理' if route=='platform_fault'
+                       else '额度耗尽' if task.get('calls',0)>=task.get('call_limit',item['max_calls'])
+                       else '代码问题待修正' if route=='candidate_repair' else '待核对依据')
             item.update(status=task['status'],calls=task.get('calls',0),
+                        status_label=label,
                         remaining_calls=max(0,task.get('call_limit',item['max_calls'])-task.get('calls',0)),
                         message=task.get('message',''),questions=task.get('questions',{}),
                         failure_routing=task.get('failure_routing'),validation=task.get('formula_validation'),
                         candidate=task.get('candidate'),registered=item.get('registered',False))
+            if report.get('code')=='INPUT_USAGE_REVIEW_REQUIRED' and task['status']=='paused':
+                item['message']='旧规则曾因输入冗余暂停；现可在下方集中复检原候选，不调用 AI、不改接口。原诊断保留在步骤详情。'
         result['active_count']=sum(i['status'] in IN_FLIGHT for i in result['items'])
         result['pending_count']=sum(i['status'] in ('completion_pending','dispatch_ready') for i in result['items'])
         result['total_calls']=sum(i['calls'] for i in result['items'])

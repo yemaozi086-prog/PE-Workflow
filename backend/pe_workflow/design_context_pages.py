@@ -41,6 +41,10 @@ def index_data(service,t):
                           'plan/step 中的来源是待确认或已确认声明，不能按类型单位猜测新连接。',
                           '不要读取无关模块；优先读取步骤已经选定的准确版本。'],
           'last_report':{k:v for k,v in (t.get('last_report') or {}).items() if k in ('code','path','message')}}
+    if t['phase']=='formula' and t.get('formula_authoring')=='formula_code_v1':
+        from .formula_authoring import context as authoring_context
+        data['required_result_kind']='module_code'
+        data['formula_authoring']=authoring_context(service,t)
     return data
 
 
@@ -68,7 +72,7 @@ def read(service,t,section,offset=0,step_id=''):
         context=service.context(t)
         data={'schema':context['schemas'],'rules':{k:context.get(k) for k in ('stage_instruction','rules','controlled_syntax','implementation_protocols','adapter_examples','planning_protocol')},
               'diagnostics':{k:context.get(k) for k in ('last_report','dependency_audit','previous_candidate','previous_patch','plan_repair','repair_mode','patch_base','repair_constraints','answers','previous_plan','replan_diagnostics','repair_budget','format_repair','repair_ticket')},
-              'formula':{k:context.get(k) for k in ('formula_request','registration_target','concrete_protocol_repair')},
+              'formula':{k:context.get(k) for k in ('formula_request','registration_target','concrete_protocol_repair','formula_authoring')},
               'extensions':{k:context.get(k) for k in ('extension_catalog','extension_proposal_schema','environment')}}[section]
     if section=='diagnostics' and t.get('format_repair'):
         for key in ('previous_candidate','previous_plan','patch_base'):data.pop(key,None)

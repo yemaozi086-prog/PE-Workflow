@@ -76,7 +76,9 @@ def test_all_carried_fields_remove_empty_input_bag_and_source(fixture):
     s.completion.tick();task=s.get(q['items'][0]['task_id'])
     m=tool().model_dump();m['id']='usage_empty_bag';m['inputs']=copy.deepcopy(step['inputs'])
     failed=callback(c,s,task,kind='module',module=m)
-    assert failed['status']=='paused' and failed['last_report']['code']=='INPUT_USAGE_REVIEW_REQUIRED'
+    assert failed['status']=='formula_candidate'
+    legacy=s.get(failed['id']);legacy.update(status='paused',previous_candidate={'kind':'module','module':legacy['candidate']},last_report={'code':'INPUT_USAGE_REVIEW_REQUIRED','path':'/module/inputs','message':'legacy redundancy stop'})
+    failed=s.save(legacy,'fixture_legacy_stop')
     url='/api/tool-completion-queues/'+q['id'];view=c.get(url+'/input-usage-preview').json()
     assert view['plan_check']['valid'],view['plan_check']
     assert [x['field'] for x in view['items'][0]['review']['changes']]==['unused.noise']
@@ -101,8 +103,9 @@ def test_overdeclared_new_candidate_routes_to_review_not_automatic_retry(fixture
     c,s,_=fixture;_,q,failed=setup(c,s);t=s.get(failed['id'])
     m=t['previous_candidate']['module'];m['inputs']['data']['fields']['carry']['required']=True
     t=callback(c,s,t,kind='module',module=m)
-    assert t['last_report']['code']=='INPUT_USAGE_REVIEW_REQUIRED',t
-    assert t['failure_routing']['route']=='needs_confirmation' and t['status']=='paused'
+    assert t['status']=='formula_candidate',t
+    assert t['formula_validation']['dependency_audit']['warnings']
+    assert t['candidate']['inputs']['data']['fields']['carry']['required']
 
 
 def test_samples_preserve_original_and_project_only_unused_inputs(fixture):

@@ -81,7 +81,7 @@ class Progress:
             try:seconds=max(0,round((datetime.fromisoformat(b['at'])-datetime.fromisoformat(a['at'])).total_seconds()))
             except (KeyError,ValueError):continue
             durations.append({'from':a['event'],'to':b['event'],'seconds':seconds})
-        return {**data,'candidate_processing':self.service.receipts.state(t),'status':t['status'],'active':active,'elapsed_seconds':elapsed,
+        return {**data,'formula_precheck':self.service.authoring.summary(t) if hasattr(self.service,'authoring') and t['phase']=='formula' else None,'candidate_processing':self.service.receipts.state(t),'status':t['status'],'active':active,'elapsed_seconds':elapsed,
                 'warning_after_seconds':threshold,'long_wait':active and elapsed>=threshold,
                 'warning':'长时间未收到可用结果；工具读取/会话心跳不等于方案完成。请检查进度或明确停止，不自动重发。' if active and elapsed>=threshold else None,
                 'stage_durations':durations[-12:],

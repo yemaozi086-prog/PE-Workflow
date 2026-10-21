@@ -95,6 +95,73 @@ def batch_output_issues(plan):
     return issues
 
 
+def scope_issues(plan):
+    """Report all illegal boundaries before dependency or field checks."""
+    plan=DesignPlan.model_validate(plan) if isinstance(plan,dict) else plan
+    members={sid:l for l in plan.loops for sid in l.step_ids}
+    top={s.id for s in plan.steps if s.id not in members}|{g.id for g in plan.grids}|{l.id for l in plan.loops}
+    issues=[]
+    def check(b,path,nodes,inputs,owner):
+        if b.source=='node' and b.node not in nodes or b.source=='input' and b.port not in inputs:
+            issues.append({'code':'CONTROL_SCOPE_REFERENCE','path':path,'message':'来源不在当前作用域；循环成员只能读取当前行 item、已声明共享输入及同一子图成员输出。',
+                           'owner':owner,'binding':b.model_dump(),'allowed_nodes':sorted(nodes),'allowed_inputs':sorted(inputs)})
+    for i,s in enumerate(plan.steps):
+        loop=members.get(s.id)
+        nodes=set(loop.step_ids) if loop else top
+        inputs={'item',*loop.captures} if loop else set(plan.external_inputs)
+        for name,b in s.input_sources.items():check(b,f'/steps/{i}/input_sources/{name}',nodes,inputs,loop.id if loop else 'top')
+    for i,g in enumerate(plan.grids):
+        for name,b in g.input_sources.items():check(b,f'/grids/{i}/input_sources/{name}',top,set(plan.external_inputs),'top')
+    for i,l in enumerate(plan.loops):
+        check(l.rows,f'/loops/{i}/rows',top,set(plan.external_inputs),'top')
+        for name,b in l.captures.items():check(b,f'/loops/{i}/captures/{name}',top,set(plan.external_inputs),'top')
+        for name,b in l.outputs.items():
+            if b.source!='node':
+                issues.append({'code':'CONTROL_SCOPE_REFERENCE','path':f'/loops/{i}/outputs/{name}','message':'子图出口必须来自本子图成员的输出'})
+            else:check(b,f'/loops/{i}/outputs/{name}',set(l.step_ids),set(),l.id)
+    return issues
+
+
+def boundary_corrections(plan):
+    """Review-only proposal: exact loop rows -> explicitly named item input.
+
+    No field/name/unit inference. Non-item aliases, different producers and
+    incompatible row contracts remain unresolved for explicit clarification.
+    """
+    from .engine import dictionary_plan
+    raw=plan.model_dump() if isinstance(plan,DesignPlan) else copy.deepcopy(plan)
+    p=DesignPlan.model_validate(raw);formal={n['id']:n for n in describe(p)['nodes'] if n['status']=='resolved'}
+    from .models import Binding,Port
+    edits=[]
+    for loop in p.loops:
+        declaration=formal.get(loop.id)
+        if not declaration:continue
+        row=row_port(Port.model_validate(declaration['inputs']['rows']))
+        for i,step in enumerate(p.steps):
+            if step.id not in loop.step_ids:continue
+            b=step.input_sources.get('item')
+            if not b or b.source!='node' or b.node in loop.step_ids or b.node!=loop.rows.node or b.port!=loop.rows.port or b.field or b.value is not None:continue
+            if 'item' not in step.inputs:continue
+            try:dictionary_plan(row,step.inputs['item'],b.field_map,'/proposal')
+            except WorkflowError:continue
+            target=raw['steps'][i];before=copy.deepcopy(target['input_sources']['item'])
+            after=Binding(source='input',port='item',field_map=b.field_map).model_dump()
+            target['input_sources']['item']=after
+            edits.append({'kind':'scope','path':f'/steps/{i}/input_sources/item','step':step.id,'title':step.title,'node':loop.id,
+                          'before':before,'after':after,'basis':'explicit_item_alias_exact_loop_rows_compatible_contract'})
+            # Remove only the obsolete outer dependency; preserve other declarations.
+            if b.node in target['dependencies'] and not any(x.get('source')=='node' and x.get('node')==b.node for x in target['input_sources'].values()):
+                before_deps=copy.deepcopy(target['dependencies']);target['dependencies']=[d for d in before_deps if d!=b.node]
+                edits.append({'kind':'dependency','path':f'/steps/{i}/dependencies','step':step.id,'node':loop.id,'before':before_deps,'after':copy.deepcopy(target['dependencies']),'basis':'remove_only_obsolete_outer_rows_dependency'})
+    return raw,edits
+
+
+def reviewed_corrections(plan):
+    raw,ports,contracts=port_corrections(plan)
+    raw,boundaries=boundary_corrections(raw)
+    return raw,ports+boundaries,contracts
+
+
 def connection_issues(plan):
     """Collect independent connection failures without repairing declarations.
 

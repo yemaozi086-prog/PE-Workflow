@@ -49,7 +49,7 @@ def main():
     from pe_workflow.worker_routes import resolve_route
     service_port=resolve_route(_config_root,key,call,token,_service_port)
     if not re.fullmatch('[0-9a-f]{32}',key) or not re.fullmatch('[0-9a-f]{32}',call):raise ValueError('Invalid task/call id')
-    design=operation in ('design-context','design-result','design-module','design-failure')
+    design=operation in ('design-context','design-result','design-module','design-failure','design-precheck')
     if design:operation=operation.removeprefix('design-')
     assembly=operation in ('assembly-context','assembly-result')
     if assembly:operation=operation.removeprefix('assembly-')
@@ -62,13 +62,14 @@ def main():
         if data.get('step_id'):call+='&step_id='+urllib.parse.quote(data['step_id'],safe='')
     if operation=='context':req=urllib.request.Request(base+'/context?call_id='+call,headers={'Authorization':'Bearer '+token})
     elif design and operation=='failure':req=urllib.request.Request(base+'/transport-failure',data=json.dumps(data,ensure_ascii=False).encode(),headers={'Content-Type':'application/json'},method='POST')
+    elif design and operation=='precheck':req=urllib.request.Request(base+'/formula-precheck',data=json.dumps(data,ensure_ascii=False).encode(),headers={'Content-Type':'application/json'},method='POST')
     elif operation=='result':req=urllib.request.Request(base+'/result',data=json.dumps(data,ensure_ascii=False).encode(),headers={'Content-Type':'application/json'},method='POST')
     else:raise ValueError('Only context/result are allowed')
     try:
-        with urllib.request.urlopen(req,timeout=30) as response:
+        with urllib.request.urlopen(req,timeout=90 if design and operation=='precheck' else 30) as response:
             value=json.load(response)
             print(json.dumps(result_receipt(value) if design and operation=='result' else value,ensure_ascii=False))
-    except urllib.error.HTTPError as exc:print(json.dumps({'http_status':exc.code,'response':json.loads(exc.read().decode('utf-8'))},ensure_ascii=False))
+    except urllib.error.HTTPError as exc:print(json.dumps({'http_status':exc.code,'response':json.loads(exc.read().decode('utf-8')),**({'stop_required':True,'instruction':'Precheck rejected; stop and inspect the current task, never resubmit blindly.'} if design and operation=='precheck' else {})},ensure_ascii=False))
 
 if __name__=='__main__':
     try:main()

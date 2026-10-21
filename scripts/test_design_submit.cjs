@@ -33,5 +33,11 @@ sandbox.module.exports.apply({tools:{register(t){registered[t.name]=t;}},subproc
  const misplaced=await registered.design_result.execute({...base,call_id:'other',module:{outputs:{source:'code'}}});
  assert.equal(misplaced.submitted,false);assert.equal(misplaced.diagnostics[0].path,'/module/source');
  await registered.design_result.execute({...base,call_id:'other',module:'broken'});assert.equal(sent,3);
+ assert.equal(registered.design_result.parameters.properties.implementation.type,'object');
+ const code={implementation:'python_subset',source:'def compute(inputs):\n    return {}'};
+ await registered.design_precheck.execute({task_id:'task',call_id:'call',token:'secret',contract_hash:'frozen',code});
+ assert.deepEqual(captured.code,code);assert.equal(captured.contract_hash,'frozen');assert.equal(captured._tool_runtime_hash,require('node:crypto').createHash('sha256').update(source).digest('hex'));
+ await registered.design_result.execute({task_id:'task',call_id:'call',token:'secret',kind:'module_code',implementation:{contract_hash:'frozen',code,precheck_id:'checked'}});
+ assert.equal(captured.kind,'module_code');assert.deepEqual(captured.implementation.code,code);assert.equal(captured.module,undefined);
  console.log('Design submission preflight passed: exact scope diagnostic, bounded local retry, missing-root-brace and misplaced-module-member packaging recovered, source unchanged.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

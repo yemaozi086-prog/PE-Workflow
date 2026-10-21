@@ -1,0 +1,15 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path'),ts=require('typescript');
+const code=ts.transpileModule(fs.readFileSync(path.join(__dirname,'../src/completionView.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const e={};vm.runInNewContext(code,{exports:e});
+const row=(action,remaining_calls=3)=>({action,remaining_calls,calls:1});
+const s=e.recoverySummary([...Array.from({length:9},()=>row('revalidate_candidate')),...Array.from({length:3},()=>row('declarations'))]);
+assert.equal(s.actionable,9);assert.equal(s.declarations,3);assert.equal(s.maximumCalls,0);assert.match(s.label,/不调用 AI/);
+const mixed=e.recoverySummary([row('revalidate_candidate'),row('candidate_repair',2),row('preparation_retry',1),row('stopped',4)]);
+assert.equal(mixed.actionable,3);assert.equal(mixed.maximumCalls,3);assert.match(mixed.label,/包含 AI/);
+assert.equal(e.recoverySummary([row('stopped')]).actionable,0);
+assert.equal(e.recoverySummary([]).actionable,0);
+assert.equal(e.toolAction({registered:true,status:'saved'}),'查看注册记录');
+assert.equal(e.toolAction({registered:false,status:'formula_candidate'}),'核对代码与验证结果');
+assert.equal(e.toolAction({registered:false,status:'paused',status_label:'原候选可复检'}),'查看原候选与提醒');
+assert.equal(e.toolAction({registered:false,status:'blocked'}),'补充这一步的信息');
+console.log('Completion actions distinguish free rechecks, budgeted repairs, declarations and stopped tasks');

@@ -58,6 +58,8 @@ def control_spec():
       'binding_example':{'source':'node','node':'chosen_grid_id','port':GRID_OUTPUT}},
       'batch':{'rows_input':GRID_OUTPUT,'rows_contract':'numeric column dictionary; every field shares batch_rows',
       'member_input':'item: one numeric row; plus explicitly named captures',
+      'member_input_example':{'source':'input','port':'item'},
+      'boundary_rule':'Only the batch rows binding references the outer grid. Inside its body, bind current row as source=input,port=item; never reference outer_grid/rows or list the grid as a member dependency. Shared inputs require captures; node dependencies name only producers visible in the same scope.',
       'member_output_field_types':list(BATCH_FIELD_TYPES),'text_output':{'member':'string scalar','batch':'array, dtype=string, shape=[batch_rows], axis_names=[batch_rows]','order':'one unchanged string per original row; empty string is retained; no filtering, sorting or numeric coercion'},'unsupported_output_policy':'boolean/collection and nested text lists are not currently accepted; never delete or coerce without a reviewed contract change',
       'outputs':'exact aliases in PlanLoop.outputs; bind the complete named member output dictionary, never set field; runtime prepends batch_rows to each member output field',
       'output_binding_example':{'source':'node','node':'member_step_id','port':'loss'},

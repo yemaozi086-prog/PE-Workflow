@@ -321,6 +321,8 @@ from .input_profiles import install as install_input_profiles
 install_input_profiles(app,lambda:store,module_map,problem)
 from .designs import install as install_designs
 install_designs(app,lambda:store,module_map,worker,problem)
+from .quick_chat import install as install_quick_chat
+install_quick_chat(app,lambda:store,problem)
 if DIST.exists():
     app.mount("/assets", StaticFiles(directory=DIST / "assets"), name="assets")
 

@@ -113,6 +113,27 @@ def guard_signature(expression,step,plan):
     except (ValueError,SyntaxError):return 'invalid:'+expression
 
 
+def declaration_issues(plan):
+    """Check executable contracts before asking for code, without inferring semantics."""
+    from .engine import check_port
+    issues=[]
+    def visit(port,path,needs_semantics):
+        if port.type=='flat_dict':
+            for name,field in port.fields.items():visit(field,path+'/fields/'+name,needs_semantics)
+            return
+        if needs_semantics and not (port.quantity or port.semantic_id):
+            issues.append({'code':'FIELD_SEMANTIC_REQUIRED','path':path,'message':'字段缺少含义声明；请核对已有说明并确认语义，不能自动猜测。'})
+        try:check_port(port,path)
+        except WorkflowError as error:
+            item=error.diagnostic.model_dump()
+            if item['code']=='UNKNOWN_UNIT':item.update(severity='warning',next_action='unit_extension',message=item['message']+'；生成工具前进入现有单位扩展确认流程，不猜测定义。')
+            issues.append(item)
+    for i,step in enumerate(plan.steps):
+        for side in ('inputs','outputs'):
+            for name,port in getattr(step,side).items():visit(port,f'/steps/{i}/{side}/{name}',not step.module_ref)
+    return issues
+
+
 def preflight(plan, previous=None):
     if plan.grids or plan.loops:
         from .plan_controls import preflight_controls
@@ -127,6 +148,11 @@ def preflight(plan, previous=None):
                 if old.input_checks and (step is None or {guard_signature(c,old,previous) for c in old.input_checks}-{guard_signature(c,step,plan) for c in step.input_checks}):
                     result['issues'].append({'code':'PLAN_GUARD_REGRESSION','message':'不能删除或修改冻结保护条件：'+old.id,'path':'/steps/'+old.id+'/input_checks'})
         result['valid']=not result['issues']
+        if not any(i['code']=='CONTROL_SCOPE_REFERENCE' for i in result['issues']):
+            lint=declaration_issues(plan)
+            result['issues'].extend(i for i in lint if i.get('severity')!='warning')
+            result['warnings']=[i for i in lint if i.get('severity')=='warning']
+            result['valid']=not result['issues']
         return result
     issues=[];repairs=[]
     def issue(code,message,path):
@@ -186,5 +212,6 @@ def preflight(plan, previous=None):
                     'required_conditions':lost,'previous_inputs':{n:list(p.fields) for n,p in old.inputs.items()},
                     'previous_sources':{n:b.model_dump() for n,b in old.input_sources.items()},
                     'required_changes':['保留原步骤 ID；按新端口及其显式 field_map 翻译保护条件，保持比较符和阈值。禁止删除保护条件来通过检查。'], 'not_applied':True})
-    return {'valid':not issues,'scope':'explicit_connections' if explicit else 'legacy_independent_inputs','issues':issues,'repairs':repairs,
+    lint=declaration_issues(plan);issues.extend(i for i in lint if i.get('severity')!='warning')
+    return {'valid':not issues,'scope':'explicit_connections' if explicit else 'legacy_independent_inputs','issues':issues,'repairs':repairs,'warnings':[i for i in lint if i.get('severity')=='warning'],
             'notice':'只检查声明接线和已声明的输入保护；不证明公式、物理适用性或全部数学定义域正确。'}

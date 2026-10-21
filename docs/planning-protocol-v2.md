@@ -38,3 +38,10 @@
 - 上述LLC使用测试专用明确公式模块，不进入用户工具库，也不冒充DSH生成。最终分组报告/推荐工具以及真实DSH在新协议下完整生成、补工具、保存与运行的端到端预演，仍需用户确认迁移并批准必要调用后实测。
 
 此次不承诺模型服务更快或固定几分钟完成；优化的是重复声明量与修正范围。真实速度收益应从新任务调用数、输出字符数和阶段耗时衡量。
+
+
+## 已知层级错放的平台修复
+
+模型把标准顶层成员（如 `steps`、`limitations`、`grids`、`loops`、`external_inputs`、`title`、`summary`）误放进 `port_defs`，或把 `explanation` 放进 `blueprint` 时，平台先做纯位置搬移再编译：只搬移类型匹配、目标缺失或内容完全相同的已知成员；目标已有不同内容时不猜、不覆盖，作为阻断问题返回。搬移记录写入 `structure_repair_audit`，公式、端口、单位、依赖和保护条件不变。
+
+旧任务可通过 `GET /api/workflow-designs/{id}/structure-repair-preview` 只读复检保存的原始候选回执，再用 `POST /api/workflow-designs/{id}/structure-repair-confirm` 派生已复检方案。该路径不调用模型、不追加调用额度，原任务、原始回执和诊断保留。

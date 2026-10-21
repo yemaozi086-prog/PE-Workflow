@@ -7,10 +7,12 @@ from pe_workflow.storage import Conflict
 
 
 def missing(c,s):
-    t=source(c,s,count=1);raw=s.get(t['id'])
+    # Retained legacy queue: modern plan lint prevents creating this invalid
+    # declaration, but historical queued tasks must remain recoverable.
+    t=source(c,s,count=1);q,_=queue(c,t);raw=s.get(q['items'][0]['task_id'])
     port=raw['plan']['steps'][0]['outputs']['result']['fields']['value']
     port.update(quantity='',description='示例输出功率')
-    t=s.save(raw,'fixture_missing');q,_=queue(c,t);s.completion.tick()
+    s.save(raw,'fixture_legacy_missing');s.completion.tick()
     return q,s.get(q['items'][0]['task_id'])
 
 

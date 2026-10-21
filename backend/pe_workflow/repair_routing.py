@@ -30,6 +30,8 @@ def route_failure(error, report):
     route, reason, action = 'uncertain', '现有证据不足以确定错误归属', '保存任务，集中补充诊断所缺证据'
     if not isinstance(error, (WorkflowError, ValueError)):
         route, reason, action = 'platform_fault', '平台执行出现非候选校验异常', '检查平台诊断；不让任务智能体修改校验器'
+    elif code in ('FORMULA_WORKER_FAULT','PRECHECK_TIMEOUT'):
+        route, reason, action = 'platform_fault', '预检执行环境未完成检查', '保留候选与诊断，核对平台后按原额度恢复；不修改公式或样例'
     elif code == 'COMPLETION_PREPARATION_FAILED':
         route, reason, action = 'platform_fault', '平台内部请求准备失败，尚未生成候选', '修复平台请求传递后恢复原步骤；不消耗候选修正额度，不要求用户改写声明'
     elif code == 'RESULT_ENVELOPE':
@@ -48,10 +50,12 @@ def route_failure(error, report):
         route, reason, action = 'needs_information', '物理声明缺失或存在冲突，不能自动猜测含义', '集中核对含义、单位定义及来源；改变已确认声明时先派生修订'
     elif code == 'DEPENDENCY_UNCERTAIN':
         route, reason, action = 'needs_information', '受控分析无法可靠确定字段读取', '补充允许读取范围，或明确允许改成显式字段访问'
+    elif code=='PLAN_PREFLIGHT' and any(i.get('code')=='CONTROL_SCOPE_REFERENCE' for i in (report.get('plan_preflight') or {}).get('issues',[])):
+        route,reason,action='needs_confirmation','循环与子图来源跨越作用域；不能只补依赖','集中核对来源修订预览；保留当前方案及额度，不自动更换物理来源'
     elif code in ('DEPENDENCY_CONFLICT', 'DEPENDENCY_MINIMUM_FAILED', 'DEPENDENCY_EXTRA_FAILED',
                   'PATCH_REQUIRED', 'PATCH_UNEXPECTED', 'PLAN_PROTOCOL_FORMAT', 'PLAN_DELTA_SCOPE', 'PLAN_PREFLIGHT', 'INPUT_CHECK_INVALID',
                   'MISSING_DICT_FIELD', 'DICTIONARY_PORT_REQUIRED', 'UNKNOWN_FIELD_MAP', 'FIELD_MAP_VERSION',
-                  'UNDECLARED_TRANSFORM', 'EXPRESSION_NAME', 'MODULE_SYNTAX', 'UNKNOWN_REFERENCE', 'UNKNOWN_FIELD', 'MISSING_BINDING', 'DUPLICATE_NODE',
+                  'CONTROLLED_RUNTIME_ERROR', 'PRECHECK_REQUIRED', 'UNDECLARED_TRANSFORM', 'EXPRESSION_NAME', 'MODULE_SYNTAX', 'UNKNOWN_REFERENCE', 'UNKNOWN_FIELD', 'MISSING_BINDING', 'DUPLICATE_NODE',
                   'CYCLE', 'OUTPUT_CONTRACT', 'EXPRESSION_OUTPUTS', 'RESERVED_INPUT', 'BRANCH_CONTRACT', 'BUILTIN_REFERENCE'):
         route, reason, action = 'candidate_repair', '声明、字段读取或接线的检查提供了候选修正证据', '仅修正候选，保留冻结公式、接口边界与保护条件'
     elif isinstance(error, ValueError):

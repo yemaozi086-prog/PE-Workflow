@@ -34,7 +34,8 @@ def test_buck_minimum_fields_and_complete_chain():
 def test_extra_required_field_detected_without_execution():
     m=buck();m.inputs['design'].fields['L'].required=True
     report=audit_dependencies(m)
-    assert report['status']=='failed' and report['unused_required_fields']==['design.L']
+    assert report['status']=='passed' and report['unused_required_fields']==['design.L']
+    assert report['warnings'][0]['code']=='UNUSED_REQUIRED_INPUT'
 
 
 def test_undeclared_field_read_detected():
