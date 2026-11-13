@@ -115,3 +115,27 @@ def test_validate_returns_canonical_document_for_editor(client):
     response = client.post("/api/validate", json=data).json()
     assert response["valid"]
     assert response["workflow"]["layout"] == {}
+
+
+def test_de_fixed_inputs_and_tolerances_are_used_and_replayable(client):
+    data = example(client)
+    request = {
+        **data, "bounds": {"fs": [80, 120]}, "fixed_inputs": {"vce": 2},
+        "objective": "mean_loss", "maxiter": 2, "popsize": 5,
+        "tol": 0, "atol": 0, "polish": True,
+    }
+    response = client.post("/api/optimize", json=request)
+    assert response.status_code == 200, response.text
+    run = response.json()
+    assert run["status"] == "succeeded", run["diagnostics"]
+    assert run["optimization"]["tol"] == run["optimization"]["atol"] == 0
+    assert run["optimization"]["polish"]
+    assert run["optimization"]["best_parameters"]["fs"] == pytest.approx(80)
+    saved = client.get(f"/api/runs/{run['id']}").json()
+    assert saved["snapshot"]["inputs"]["vce"] == 2
+    replay = client.post(f"/api/runs/{run['id']}/replay").json()
+    assert replay["outputs"] == run["outputs"]
+    assert replay["optimization"]["history"] == run["optimization"]["history"]
+    conflict = client.post("/api/optimize", json={**request, "fixed_inputs": {"fs": 100}})
+    assert conflict.status_code == 422
+    assert conflict.json()["diagnostics"][0]["code"] == "OPTIMIZATION_FIXED_INPUT"

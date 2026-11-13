@@ -364,12 +364,17 @@ class RevisionRequest(StrictModel):
 
 
 class OptimizeRequest(RunRequest):
+    timeout_seconds: float = Field(default=1200, ge=1, le=28800)
     bounds: dict[str, tuple[float, float]]
+    fixed_inputs: dict[str, float] = Field(default_factory=dict, max_length=100)
     objective: str
     direction: Literal["min", "max"] = "min"
-    seed: int = 42
+    seed: int = Field(default=42, ge=0, le=4294967295)
     maxiter: int = Field(default=8, ge=1, le=100)
     popsize: int = Field(default=5, ge=5, le=20)
+    tol: float = Field(default=0.01, ge=0, description="DE relative convergence tolerance")
+    atol: float = Field(default=0, ge=0, description="DE absolute convergence tolerance")
+    polish: bool = False
 
 
 class CandidateRequest(StrictModel):

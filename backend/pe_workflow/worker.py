@@ -38,19 +38,36 @@ def main(payload):
             return {"status": "succeeded" if all(r["passed"] for r in records) else "failed", "anchors": records, "trace": [], "outputs": {}}
         if payload.get("optimization"):
             from scipy.optimize import differential_evolution
+            from .optimization import address, candidate_inputs, read_value
             opt = payload["optimization"]
             names = list(opt["bounds"])
+            paths = [address(workflow.inputs, name, allow_index=True) for name in names]
+            target = address(workflow.output_ports, opt["objective"])
+            base = fill_inputs(payload["inputs"], workflow.inputs, "/inputs") if any(len(p)>1 for p in paths) else payload["inputs"]
             history = []
+            compiled = {}
             def objective(vector):
-                values = {**payload["inputs"], **dict(zip(names, [float(v) for v in vector]))}
-                result = execute(workflow, modules, values)
-                score = result[opt["objective"]]
-                history.append({"evaluation": len(history)+1, "parameters": {n: values[n] for n in names}, "objective": score})
+                values = candidate_inputs(base, paths, vector)
+                result = execute(workflow, modules, values, compiled=compiled)
+                score = read_value(result, target)
+                if not math.isfinite(score):
+                    raise ValueError(f"Optimization objective {opt['objective']} is not finite")
+                history.append({"evaluation": len(history)+1, "parameters": dict(zip(names, map(float, vector))), "objective": score})
                 return score if opt["direction"] == "min" else -score
-            result = differential_evolution(objective, list(opt["bounds"].values()), seed=opt["seed"], maxiter=opt["maxiter"], popsize=opt["popsize"], polish=False, workers=1)
-            final_inputs = {**payload["inputs"], **dict(zip(names, [float(v) for v in result.x]))}
-            outputs = execute(workflow, modules, final_inputs, trace)
-            return {"status": "succeeded", "outputs": outputs, "trace": trace, "optimization": {"algorithm": "DE", "converged": bool(result.success), "message": str(result.message), "evaluations": result.nfev, "best_parameters": {k: final_inputs[k] for k in names}, "history": history}}
+            tol, atol, polish = opt.get("tol", 0.01), opt.get("atol", 0), opt.get("polish", False)
+            result = differential_evolution(
+                objective, list(opt["bounds"].values()), seed=opt["seed"],
+                maxiter=opt["maxiter"], popsize=opt["popsize"],
+                tol=tol, atol=atol, polish=polish, workers=1,
+            )
+            final_inputs = candidate_inputs(base, paths, result.x)
+            outputs = execute(workflow, modules, final_inputs, trace, compiled=compiled)
+            return {"status": "succeeded", "outputs": outputs, "trace": trace, "optimization": {
+                "algorithm": "DE", "converged": bool(result.success), "message": str(result.message),
+                "iterations": result.nit, "evaluations": result.nfev,
+                "tol": tol, "atol": atol, "polish": polish,
+                "best_parameters": dict(zip(names, map(float, result.x))), "history": history,
+            }}
         outputs = execute(workflow, modules, payload["inputs"], trace)
         return {"status": "succeeded", "outputs": outputs, "trace": trace}
     except Exception as exc:

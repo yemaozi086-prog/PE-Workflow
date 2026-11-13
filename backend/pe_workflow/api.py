@@ -278,16 +278,43 @@ async def revise(module_id: str, req: RevisionRequest):
 
 @app.post("/api/optimize")
 async def optimize(req: OptimizeRequest):
+    from math import isfinite
+    from .optimization import address, candidate_inputs
+
     if not 1 <= len(req.bounds) <= 8:
         problem("OPTIMIZATION_BOUNDS", "首版 DE 支持 1–8 个变量")
+    search_paths = set()
     for key, (lo, hi) in req.bounds.items():
-        port = req.workflow.inputs.get(key)
-        if port is None or port.type != "number" or not lo < hi:
-            problem("OPTIMIZATION_BOUNDS", f"{key} 必须是工作流数字输入且下界小于上界")
-    objective = req.workflow.output_ports.get(req.objective)
-    if objective is None or objective.type != "number":
+        try:
+            search_paths.add(tuple(address(req.workflow.inputs, key, allow_index=True)))
+        except (KeyError, ValueError):
+            problem("OPTIMIZATION_BOUNDS", f"{key} 必须指向数字输入或定长浮点向量元素")
+        if not (isfinite(lo) and isfinite(hi) and lo < hi):
+            problem("OPTIMIZATION_BOUNDS", f"{key} 需要有限且递增的边界")
+    try:
+        address(req.workflow.output_ports, req.objective)
+    except (KeyError, ValueError):
         problem("OPTIMIZATION_OBJECTIVE", "目标必须是声明的数字输出")
-    opt = req.model_dump(include={"bounds", "objective", "direction", "seed", "maxiter", "popsize"})
+    fixed_paths = []
+    for key in req.fixed_inputs:
+        try:
+            path = address(req.workflow.inputs, key, allow_index=True)
+        except (KeyError, ValueError):
+            problem("OPTIMIZATION_FIXED_INPUT", f"{key} 必须指向数字输入或定长浮点向量元素")
+        if tuple(path) in search_paths:
+            problem("OPTIMIZATION_FIXED_INPUT", f"{key} 不能同时固定和搜索")
+        fixed_paths.append(path)
+    if fixed_paths:
+        try:
+            inputs = candidate_inputs(req.inputs or {}, fixed_paths, req.fixed_inputs.values())
+        except (KeyError, IndexError, TypeError):
+            problem("OPTIMIZATION_FIXED_INPUT", "请先填写固定变量所在的输入字典或完整向量")
+        req = req.model_copy(update={"inputs": inputs})
+    opt = req.model_dump(include={
+        "bounds", "fixed_inputs", "objective", "direction", "seed", "maxiter", "popsize", "tol", "atol", "polish",
+    })
+    # Run with the same variable order used by the canonical saved snapshot.
+    opt["bounds"] = dict(sorted(opt["bounds"].items()))
     return await perform(req, opt)
 
 
